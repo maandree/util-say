@@ -1,6 +1,6 @@
 //####################################################################################
 //##  The following code is pasted from TWT, but the class is made package private  ##
-//##  and the package has been changed to  se.kth.maandree.utilunisay               ##
+//##  and the package has been changed to  se.kth.maandree.utilsay                  ##
 //####################################################################################
 
 
@@ -21,7 +21,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package se.kth.maandree.utilunisay;
+package se.kth.maandree.utilsay;
 
 
 /**
