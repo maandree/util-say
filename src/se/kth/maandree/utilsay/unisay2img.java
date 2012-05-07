@@ -68,14 +68,14 @@ public class unisay2img
 	    System.out.println();
 	    System.out.println("USAGE:  unisay2img [-2] [-c] [-l] [--] TARGET < SOURCE");
 	    System.out.println();
-	    System.out.println("Source (STDOUT):  Unisay pony file to convert");
+	    System.out.println("Source (STDOUT):  unisay pony file to convert");
 	    System.out.println("Target:           File name for new image pony");
 	    System.out.println();
 	    System.out.println("-2  Output image should have double dimensioned pixels.");
 	    System.out.println("-c  Output image should be cropped to drawing.");
 	    System.out.println("-l  Encode baloon links.");
 	    System.out.println();
-	    System.out.println("Known supported input formats:");
+	    System.out.println("Supported output formats:");
 	    System.out.println("  ⋅  PNG");
 	    System.out.println();
 	    System.out.println();
