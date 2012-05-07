@@ -48,11 +48,11 @@ public class unisay2ttyunisay
      */
     public static void main(final String... args) throws IOException
     {
-	if (args.length != 0)
+	if ((args.length == 0) && args[0].equals("--help"))
 	{
 	    System.out.println("TTY suitifying unisay pony tool");
 	    System.out.println();
-	    System.out.println("USAGE:  unisay2ttyunisay < SOURCE > TARGET");
+	    System.out.println("USAGE:  unisay2ttyunisay [SOURCE... | < SOURCE > TARGET]");
 	    System.out.println();
 	    System.out.println("Source (STDIN):  Regular unisay pony");
 	    System.out.println("Target (STDOUT): New TTY unisay pony");
@@ -77,9 +77,34 @@ public class unisay2ttyunisay
 	    return;
 	}
 	
-	final InputStream in = System.in;
-	final PrintStream out = System.out;
-	
+	if (args.length == 0)
+            convert(stdin, stdout);
+        else
+            for (final String arg : args)
+		{
+		    String file = (new File(arg)).getAbsolutePath();
+		    String outfile = file.substring(0, file.lastIndexOf("/"));
+		    outfile = outfile.substring(0, outfile.lastIndexOf("/"));
+		    outfile += "/ttypony";
+		    outfile += file.substring(file.lastIndexOf("/"));
+		    
+		    InputStream fin = new BufferedInputStream(new FileInputStream(new File(arg)));
+		    PrintStream fout = new PrintStream(new BufferedOutputStream(new FileOutputStream(new File(outfile))));
+		    
+		    convert(fin, fout);
+		    
+		    fin.close();
+		    fout.close();
+		}
+    }
+    
+    
+    private static final InputStream stdin = System.in;
+    private static final PrintStream stdout = System.out;
+
+    
+    private static void convert(final InputStream in, final PrintStream out) throws IOException
+    {
 	out.println("\033c");
 	
 	boolean dollar = false;
@@ -94,12 +119,12 @@ public class unisay2ttyunisay
 		out.write(d);
 	    else if (d == '\033')
 	    {
-                d = System.in.read();
+                d = in.read();
                 if (d == '[')
 		{
-		    d = System.in.read();
+		    d = in.read();
 		    if (d == 'm')
-			System.out.print("\033]P7aaaaaa\033]Pfffffff\033[0m");
+			out.print("\033]P7aaaaaa\033]Pfffffff\033[0m");
 		    
 		    int lastlast = 0;
 		    int last = 0;
@@ -138,7 +163,7 @@ public class unisay2ttyunisay
 			}
 			else
 			    item = (item * 10) - (d & 15);
-			d = System.in.read();
+			d = in.read();
 		    }
 		}
                 else
