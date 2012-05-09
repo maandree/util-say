@@ -30,7 +30,7 @@ import java.io.*;
  *
  * @author  Mattias Andrée, <a href="mailto:maandree@kth.se">maandree@kth.se</a>
  */
-public class img2ponysay
+public class ponysay2img
 {
     /**
      * Non-constructor
