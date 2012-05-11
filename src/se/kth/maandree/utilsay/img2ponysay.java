@@ -55,13 +55,15 @@ public class img2ponysay
 	{
 	    System.out.println("Image to ponysay convertion tool");
 	    System.out.println();
-	    System.out.println("USAGE:  img2ponysay [-2] [--] SOURCE > TARGET");
+	    System.out.println("USAGE:  img2ponysay [-2] [-p | -c WEIGHT] [--] SOURCE > TARGET");
 	    System.out.println();
 	    System.out.println("Source:          Image file");
 	    System.out.println("Target (STDOUT): File name for new ponysay pony");
 	    System.out.println();
 	    System.out.println("-2  Input image have double dimensioned pixels.");
 	    System.out.println("-p  Use OSI P colouring for Linux VT");
+	    System.out.println("-c  Chromaticity weighting (1 is standard, but");
+	    System.out.println("    sRGB distance is used if not specified)");
 	    System.out.println();
 	    System.out.println("Known supported input formats:");
 	    System.out.println("  ⋅  PNG  (non-animated)");

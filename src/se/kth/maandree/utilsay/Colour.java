@@ -213,7 +213,7 @@ public class Colour
 	double d = -100.;
 	int best = 0;
 	
-        for (int i = 0; i <= 240; i++)
+        for (int i = 0; i < 240; i++)
         {
 	    final double[] tLab = labs[i];
             double ðL = L - tLab[0];

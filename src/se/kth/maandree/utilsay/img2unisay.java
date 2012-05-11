@@ -61,13 +61,15 @@ public class img2unisay
 	{
 	    System.out.println("Image to unisay convertion tool");
 	    System.out.println();
-	    System.out.println("USAGE:  img2unisay [-2] [--] SOURCE > TARGET");
+	    System.out.println("USAGE:  img2unisay [-2] [-p | -c WEIGHT] [--] SOURCE > TARGET");
 	    System.out.println();
 	    System.out.println("Source:          Image file");
 	    System.out.println("Target (STDOUT): File name for new unisay pony");
 	    System.out.println();
 	    System.out.println("-2  Input image have double dimensioned pixels.");
 	    System.out.println("-p  Use OSI P colouring for Linux VT");
+            System.out.println("-c  Chromaticity weighting (1 is standard, but");
+            System.out.println("    sRGB distance is used if not specified)");
 	    System.out.println();
 	    System.out.println("Known supported input formats:");
 	    System.out.println("  ⋅  PNG  (non-animated)");
@@ -94,19 +96,37 @@ public class img2unisay
 	}
 	
 	boolean useP = false;
+	boolean useC = false;
 	int ai = 0;
 	int ps = 1;
+	double cw = 1;
+	String file = null;
 	
-	for (;; ai++)
+	for (; ai < args.length; ai++)
 	    if      (args[ai].equals("-2"))  ps = 2;
 	    else if (args[ai].equals("-p"))  useP = true;
-	    else
+	    else if (args[ai].equals("-c"))
+	    {
+		useC = true;
+		cw = Double.valueOf(args[++ai]);
+	    }
+	    else if (args[ai].equals("--"))
+	    {
+		ai++;
 		break;
+	    }
+	    else
+		file = args[ai];
 	
-	if (args[ai].equals("--"))
-	    ai++;
+	if (useC && useP)
+	{
+	    System.err.print("Incompatible options: -p & -c, -p make 24-bit colouring, you may want to ");
+	    System.err.println("create a -c pony and then a tty pony from it, after you corrected the link.");
+	    System.exit(-1);
+	}
 	
-	String file = args[ai++];
+	if (file == null)
+	    file = args[ai++];
 	
 	final PrintStream out = System.out;
 	final BufferedImage img = ImageIO.read(new File(file));
@@ -142,7 +162,12 @@ public class img2unisay
 		
 		if (a != 0)
 		{
-		    pony[y][x] = useP ? ((r << 16) | (g << 8) | b) : (new Colour((byte)r, (byte)g, (byte)b)).index;
+		    if (useP)
+			pony[y][x] = ((r << 16) | (g << 8) | b);
+		    else if (useC)
+			pony[y][x] = (new Colour(r, g, b, cw)).index;
+		    else
+			pony[y][x] = (new Colour(r, g, b)).index;
 		    empty = false;
 		    if (maxx < x)  maxx = x;
 		    if (minx > x)  minx = x;
