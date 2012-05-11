@@ -1,5 +1,5 @@
 /**
- * ponysay2unisay — ponysay to unisay pony convertion tool
+ * ponysay2unisay — ponysay to unisay pony conversion tool
  *
  * Copyright © 2012  Mattias Andrée (maandree@kth.se)
  *

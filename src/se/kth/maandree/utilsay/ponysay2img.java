@@ -1,5 +1,5 @@
 /**
- * ponysay2img — Ponysay to imgage convertion tool
+ * ponysay2img — Ponysay to image conversion tool
  *
  * Copyright © 2012  Mattias Andrée (maandree@kth.se)
  *
@@ -53,7 +53,7 @@ public class ponysay2img
     {
 	if (args.length == 0)
 	{
-	    System.out.println("ponysay to image convertion tool");
+	    System.out.println("ponysay to image conversion tool");
 	    System.out.println();
             System.out.println("USAGE:  ponysay2img [-2] [-c] [-l] [--] TARGET < SOURCE");
             System.out.println();

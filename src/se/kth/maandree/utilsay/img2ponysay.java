@@ -1,5 +1,5 @@
 /**
- * img2ponysay — Image to ponysay convertion tool
+ * img2ponysay — Image to ponysay conversion tool
  *
  * Copyright © 2012  Mattias Andrée (maandree@kth.se)
  *
@@ -53,7 +53,7 @@ public class img2ponysay
     {
 	if (args.length == 0)
 	{
-	    System.out.println("Image to ponysay convertion tool");
+	    System.out.println("Image to ponysay conversion tool");
 	    System.out.println();
 	    System.out.println("USAGE:  img2ponysay [-2] [-p | -c WEIGHT] [--] SOURCE > TARGET");
 	    System.out.println();

@@ -1,5 +1,5 @@
 /**
- * img2unisay — Image to unisay convertion tool
+ * img2unisay — Image to unisay conversion tool
  *
  * Copyright © 2012  Mattias Andrée (maandree@kth.se)
  *
@@ -59,7 +59,7 @@ public class img2unisay
     {
 	if (args.length == 0)
 	{
-	    System.out.println("Image to unisay convertion tool");
+	    System.out.println("Image to unisay conversion tool");
 	    System.out.println();
 	    System.out.println("USAGE:  img2unisay [-2] [-p | -c WEIGHT] [--] SOURCE > TARGET");
 	    System.out.println();
