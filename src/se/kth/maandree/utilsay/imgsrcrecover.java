@@ -19,6 +19,7 @@
 package se.kth.maandree.utilsay;
 
 import javax.imageio.*;
+import java.lang.ref.*;
 import java.awt.*;
 import java.awt.image.*;
 import java.util.*;
@@ -57,15 +58,14 @@ public class imgsrcrecover
 	else if (args[0].equals("4") && (args.length == 3))  stage4(args[1], args[2]);
 	else if (args[0].equals("5") && (args.length == 5))  stage5(args[1], args[2], args[3], args[4]);
 	else if (args[0].equals("6") && (args.length == 5))  stage6(args[1], args[2], args[3], args[4]);
-	else if (args[0].equals("7") && (args.length == 6))  ;  //  stage7(args[1], args[2], args[3], args[4], args[5]);
-	else if (args[0].equals("8") && (args.length == 2))  ;  //  stage8(args[1]);
+	else if (args[0].equals("7") && (args.length == 6))  stage7(args[1], args[2], args[3], args[4], args[5]);
 	else
 	{
 	    boolean worked = false;
 	    
 	    if (args.length == 7)
 	    {
-		final String stages = args[0].replace("all", "12345678");
+		final String stages = args[0].replace("all", "1234567");
 		
 		if (stages.contains("1"))  main("1", args[1], args[2]);
 		if (stages.contains("2"))  main("2", args[2]);
@@ -74,7 +74,6 @@ public class imgsrcrecover
 		if (stages.contains("5"))  main("5", args[2], args[3], args[4], args[5]);
 		if (stages.contains("6"))  main("6", args[2], args[3], args[4], args[5]);
 		if (stages.contains("7"))  main("7", args[2], args[3], args[4], args[5], args[6]);
-		if (stages.contains("8"))  main("8", args[6]);
 		
 		if      (stages.contains("1"))  worked = true;
 		else if (stages.contains("2"))  worked = true;  
@@ -83,7 +82,6 @@ public class imgsrcrecover
 		else if (stages.contains("5"))  worked = true;
 		else if (stages.contains("6"))  worked = true;
 		else if (stages.contains("7"))  worked = true;
-		else if (stages.contains("8"))  worked = true;
 	    }
 	    
 	    if (worked == false)
@@ -98,7 +96,6 @@ public class imgsrcrecover
 	    System.out.println("        ⋅ imgsrcrecover 5 SRC SRCHASH RES RESHASH");
 	    System.out.println("        ⋅ imgsrcrecover 6 SRC SRCHASH RES RESHASH");
 	    System.out.println("        ⋅ imgsrcrecover 7 SRC SRCHASH RES RESHASH MATCH");
-	    System.out.println("        ⋅ imgsrcrecover 8 MATCH");
 	    System.out.println("        ⋅ imgsrcrecover all SRCSRC SRC SRCHASH RES RESHASH MATCH");
 	    System.out.println();
 	    System.out.println("1  Stage 1:  Collect all image files in SRCSRC and subs and put in SRC");
@@ -109,7 +106,7 @@ public class imgsrcrecover
 	    System.out.println("             the files SRCHASH and all from RES to the files RESHASH");
 	    System.out.println("6  Stage 6:  Remove all unmatchable files from SRC, SRCHASH, RES and RESHASH");
 	    System.out.println("7  Stage 7:  Match all files from RES(HASH) with SRC(HASH) and put in MATCH");
-	    System.out.println("8  Stage 8:  Delete all incorrect matches from MATCH");
+	    System.out.println("             and delete all incorrect matches from MATCH");
 	    System.out.println();
 	    System.out.println("all  Perform all stages at once");
 	    System.out.println();
@@ -137,6 +134,162 @@ public class imgsrcrecover
 	    return;
 	}
 	
+    }
+    
+
+    /**
+     * Stage 7:  Match all files from RES(HASH) with SRC(HASH) and put in MATCH and delete all incorrect matches from MATCH
+     */
+    @SuppressWarnings("unchecked")
+    public static void stage7(final String src, final String srchash, final String res, final String reshash, final String match) throws IOException
+    {
+	final File dirsrc = new File(src);
+	final File dirres = new File(res);
+	final File fsrchash = new File(srchash);
+	final File freshash = new File(reshash);
+	final File dirmatch = new File(match);
+	
+	String abssrc = dirsrc.getAbsolutePath();
+	if (abssrc.endsWith("/") == false)
+	    abssrc += '/';
+	String absres = dirres.getAbsolutePath();
+	if (absres.endsWith("/") == false)
+	    absres += '/';
+	String absmatch = dirmatch.getAbsolutePath();
+	if (absmatch.endsWith("/") == false)
+	    absmatch += '/';
+	
+	if (dirsrc.exists() == false)
+	{
+	    System.err.println("Stage 7: File does not exists.  Stop.");
+	    System.exit(-701);
+	}
+	if (dirsrc.isDirectory() == false)
+	{
+	    System.err.println("Stage 7: File is not a directory.  Stop.");
+	    System.exit(-702);
+	}
+	if (dirres.exists() == false)
+	{
+	    System.err.println("Stage 7: File does not exists.  Stop.");
+	    System.exit(-703);
+	}
+	if (dirres.isDirectory() == false)
+	{
+	    System.err.println("Stage 7: File is not a directory.  Stop.");
+	    System.exit(-704);
+	}
+	if (fsrchash.exists())
+	{
+	    System.err.println("Stage 7: File already exists.  Stop.");
+	    System.exit(-705);
+	}
+	if (freshash.exists())
+	{
+	    System.err.println("Stage 7: File already exists.  Stop.");
+	    System.exit(-706);
+	}
+	if (dirmatch.exists() == false)
+	{
+	    dirmatch.mkdir();
+	}
+	else if (dirmatch.isDirectory() == false)
+	{
+	    System.err.println("Stage 7: File is not a directory.  Stop.");
+	    System.exit(-707);
+	}
+	
+	final HashMap<Long, ArrayList<String>> srcmap = new HashMap<Long, ArrayList<String>>();
+	final HashMap<Long, ArrayList<String>> resmap = new HashMap<Long, ArrayList<String>>();
+	
+	for (final Object[] objs : new Object[][] {{fsrchash, srcmap}, {freshash, resmap}})
+	{
+	    final File hash = (File)(objs[0]);
+	    final HashMap<Long, ArrayList<String>> map = (HashMap<Long, ArrayList<String>>)(objs[1]);
+	    
+	    final Scanner sc = new Scanner(new BufferedInputStream(new FileInputStream(hash)));
+	    while (sc.hasNext())
+	    {
+		final String line = sc.nextLine();
+		if (line.isEmpty())
+		    break;
+		
+		final int space = line.indexOf(' ');
+		final Long key = Long.valueOf(line.substring(0, space));
+		final String value = line.substring(space + 1).replace("/", "\n");
+		ArrayList<String> values = map.get(key);
+		if (values == null)
+		    map.put(key, values = new ArrayList<String>());
+		values.add(value);
+	    }
+	}
+	
+	final Set<Long> keys = srcmap.keySet();
+	for (final Long key : keys)
+        {
+	    final ArrayList<String> srcs = srcmap.get(key);
+	    final ArrayList<String> ress = srcmap.get(key);
+	    final HashMap<String, SoftReference<long[]>> map = new HashMap<String, SoftReference<long[]>>();
+	    
+	    for (final String relsrc : srcs)
+	    {
+		final String asrc = abssrc + relsrc;
+		final long[] dsrc;
+		final int sw, sh;
+		
+		{
+		    final BufferedImage img = ImageIO.read(new File(asrc));
+		    sw = img.getWidth();
+		    sh = img.getHeight();
+		    dsrc = new long[((sw * sh) + 63) >> 6];
+		    
+		    long p = 0;
+		    for (int y = 0; y < sh; y++)
+			for (int x = 0; x < sw; x++, p++)
+			    if ((img.getRGB(x, y) & 0xFF000000) != 0)
+				dsrc[(int)(p >> 6)] ^= 1L << (p & 63);
+		}
+		
+		mid:
+		    for (final String relres : ress)
+		    {
+			final String ares = absres + relres;
+			final SoftReference<long[]> dressr = map.get(relres);
+			long[] dres = dressr == null ? null : dressr.get();
+			
+			final BufferedImage img = ImageIO.read(new File(ares));
+			final int w = img.getWidth(), h = img.getHeight();
+			if ((w != sw) || (h != sh))
+			    continue;
+			
+			if (dres == null)
+			{
+			    dres = new long[((w * h) + 63) >> 6];
+			    long p = 0;
+			    for (int y = 0; y < h; y++)
+				for (int x = 0; x < w; x++, p++)
+				    if ((img.getRGB(x, y) & 0xFF000000) != 0)
+					dres[(int)(p >> 6)] ^= 1L << (p & 63);
+			    
+			    map.put(relres, new SoftReference<long[]>(dres));
+			}
+			
+			for (int i = 0, n = dsrc.length; i < n; i++)
+			    if (dsrc[i] != dres[i])
+				continue mid;
+			
+			int ev;
+			if (exec("ln", "-P", ares, absmatch + relres) != 0)
+			    if ((ev = exec("cp", ares, absmatch + relres)) != 0)
+				System.err.println("\033[31mCan't(" + ev + ") copy " + ares + "  →  " + absmatch + relres + "\033[m");
+		    }
+		
+		(new File(abssrc + relsrc)).delete();
+	    }
+	    
+	    for (final String relres : ress)
+		(new File(absres + relres)).delete();
+	}
     }
     
     
@@ -178,14 +331,14 @@ public class imgsrcrecover
 	    System.err.println("Stage 6: File is not a directory.  Stop.");
 	    System.exit(-604);
 	}
-	if (fsrchash.exists() == false)
+	if (fsrchash.exists())
 	{
-	    System.err.println("Stage 6: Already exists not exists.  Stop.");
+	    System.err.println("Stage 6: File already exists.  Stop.");
 	    System.exit(-605);
 	}
-	if (freshash.exists() == false)
+	if (freshash.exists())
 	{
-	    System.err.println("Stage 6: Already exists not exists.  Stop.");
+	    System.err.println("Stage 6: File already exists.  Stop.");
 	    System.exit(-606);
 	}
 	
@@ -278,6 +431,7 @@ public class imgsrcrecover
 	}
     }
     
+    
     /**
      * Stage 5:  Create alpha channel hash collection for all files in SRC
      *           to the files SRCHASH and all from RES to the files RESHASH
@@ -316,14 +470,14 @@ public class imgsrcrecover
 	    System.err.println("Stage 5: File is not a directory.  Stop.");
 	    System.exit(-504);
 	}
-	if (fsrchash.exists() == false)
+	if (fsrchash.exists())
 	{
-	    System.err.println("Stage 5: Already exists not exists.  Stop.");
+	    System.err.println("Stage 5: File already exists.  Stop.");
 	    System.exit(-505);
 	}
-	if (freshash.exists() == false)
+	if (freshash.exists())
 	{
-	    System.err.println("Stage 5: Already exists not exists.  Stop.");
+	    System.err.println("Stage 5: Files already exists.  Stop.");
 	    System.exit(-506);
 	}
 	
@@ -364,6 +518,7 @@ public class imgsrcrecover
 	    fout.close();
 	}
     }
+    
     
     /**
      * Stage 4:  Unzoom all files in SRC and RES as much as possible
@@ -441,6 +596,7 @@ public class imgsrcrecover
 		ImageIO.write(cimg, file.substring(file.lastIndexOf('.') + 1).toUpperCase(), new File(dir + file));
 	    }
     }
+    
     
     /**
      * Stage 3:  Crop all files in SRC and RES
@@ -536,6 +692,7 @@ public class imgsrcrecover
 	    }
     }
     
+    
     /**
      * Stage 2:  Burst all .gif files in SRC and delete bursted files
      */
@@ -568,6 +725,7 @@ public class imgsrcrecover
 		    exec("rm", abs);
 	    }
     }
+    
     
     /**
      * Stage 1:  Collect all image files in SRCSRC and subs and put in SRC
