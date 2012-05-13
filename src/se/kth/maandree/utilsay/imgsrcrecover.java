@@ -181,14 +181,14 @@ public class imgsrcrecover
 	    System.err.println("Stage 7: File is not a directory.  Stop.");
 	    System.exit(-704);
 	}
-	if (fsrchash.exists())
+	if (fsrchash.exists() == false)
 	{
-	    System.err.println("Stage 7: File already exists.  Stop.");
+	    System.err.println("Stage 7: File does not exists.  Stop.");
 	    System.exit(-705);
 	}
-	if (freshash.exists())
+	if (freshash.exists() == false)
 	{
-	    System.err.println("Stage 7: File already exists.  Stop.");
+	    System.err.println("Stage 7: File does not exists.  Stop.");
 	    System.exit(-706);
 	}
 	if (dirmatch.exists() == false)
@@ -333,14 +333,14 @@ public class imgsrcrecover
 	    System.err.println("Stage 6: File is not a directory.  Stop.");
 	    System.exit(-604);
 	}
-	if (fsrchash.exists())
+	if (fsrchash.exists() == false)
 	{
-	    System.err.println("Stage 6: File already exists.  Stop.");
+	    System.err.println("Stage 6: File does not exists.  Stop.");
 	    System.exit(-605);
 	}
-	if (freshash.exists())
+	if (freshash.exists() == false)
 	{
-	    System.err.println("Stage 6: File already exists.  Stop.");
+	    System.err.println("Stage 6: File does not exists.  Stop.");
 	    System.exit(-606);
 	}
 	
