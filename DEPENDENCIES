@@ -3,12 +3,5 @@
 java-runtime>=6
 # not sure how low we can go
 
-
-# OPTIONAL: for imgsrcrecover 
-
-libungif
-# also provided by giflib
-# if you have .gif source files
-
 coreutils
 

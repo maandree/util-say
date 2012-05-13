@@ -639,7 +639,15 @@ public class imgsrcrecover
 	for (final String dir : new String[] {abssrc, absres})
 	    for (final String file : (new File(dir)).list())
 	    {
-		BufferedImage img = ImageIO.read(new File(dir + file));
+		BufferedImage img = null;
+		try
+		{
+		    ImageIO.read(new File(dir + file));
+		}
+		catch (final Exception err)
+		{
+		    //resume next
+		}
 		if (img == null) // not an image file
 		{
 		    final InputStream stdin = System.in;
@@ -727,6 +735,7 @@ public class imgsrcrecover
 	    System.exit(-202);
 	}
 	
+	/*  ***  gifasm sucks at bursting!  ***
 	int ev;
 	for (final String file : dir.list())
 	    if (file.toLowerCase().endsWith(".gif"))
@@ -737,6 +746,7 @@ public class imgsrcrecover
 		else
 		    exec("rm", abs);
 	    }
+	*/
     }
     
     
