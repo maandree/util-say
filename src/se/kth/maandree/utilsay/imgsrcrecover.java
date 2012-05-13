@@ -640,20 +640,16 @@ public class imgsrcrecover
 	    {
 		BufferedImage img = ImageIO.read(new File(dir + file));
 		if (img == null) // not an image file
-		    if (file.endsWith(".pony")) //ponysay
-		    {
-			final InputStream stdin = System.in;
-			System.setIn(new BufferedInputStream(new FileInputStream(new File(dir + file))));
-			ponysay2img.main("--", dir + file);
-			System.setIn(stdin);
-		    }
-		    else //unisay
-		    {
-			final InputStream stdin = System.in;
-			System.setIn(new BufferedInputStream(new FileInputStream(new File(dir + file))));
-			unisay2img.main("--", dir + file);
-			System.setIn(stdin);
-		    }
+		{
+		    final InputStream stdin = System.in;
+		    System.setIn(new BufferedInputStream(new FileInputStream(new File(dir + file))));
+		    
+		    if (file.endsWith(".pony"))  ponysay2img.main("--", dir + file);
+		    else                         unisay2img.main("--", dir + file);
+		    
+		    img = ImageIO.read(new File(dir + file));
+		    System.setIn(stdin);
+		}
 		final int w = img.getWidth(), h = img.getHeight();
 		int top = 0, bottom = 0, left = 0, right = 0;
 		
