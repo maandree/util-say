@@ -56,7 +56,7 @@ public class imgsrcrecover
 	else if (args[0].equals("3") && (args.length == 3))  stage3(args[1], args[2]);
 	else if (args[0].equals("4") && (args.length == 3))  stage4(args[1], args[2]);
 	else if (args[0].equals("5") && (args.length == 5))  stage5(args[1], args[2], args[3], args[4]);
-	else if (args[0].equals("6") && (args.length == 5))  ;  //  stage6(args[1], args[2], args[3], args[4]);
+	else if (args[0].equals("6") && (args.length == 5))  stage6(args[1], args[2], args[3], args[4]);
 	else if (args[0].equals("7") && (args.length == 6))  ;  //  stage7(args[1], args[2], args[3], args[4], args[5]);
 	else if (args[0].equals("8") && (args.length == 2))  ;  //  stage8(args[1]);
 	else
@@ -141,6 +141,144 @@ public class imgsrcrecover
     
     
     /**
+     * Stage 6:  Remove all unmatchable files from SRC, SRCHASH, RES and RESHASH
+     */
+    @SuppressWarnings("unchecked")
+    public static void stage6(final String src, final String srchash, final String res, final String reshash) throws IOException
+    {
+	final File dirsrc = new File(src);
+	final File dirres = new File(res);
+	final File fsrchash = new File(srchash);
+	final File freshash = new File(reshash);
+	
+	String abssrc = dirsrc.getAbsolutePath();
+	if (abssrc.endsWith("/") == false)
+	    abssrc += '/';
+	String absres = dirres.getAbsolutePath();
+	if (absres.endsWith("/") == false)
+	    absres += '/';
+	
+	if (dirsrc.exists() == false)
+	{
+	    System.err.println("Stage 6: File does not exists.  Stop.");
+	    System.exit(-601);
+	}
+	if (dirsrc.isDirectory() == false)
+	{
+	    System.err.println("Stage 6: File is not a directory.  Stop.");
+	    System.exit(-602);
+	}
+	if (dirres.exists() == false)
+	{
+	    System.err.println("Stage 6: File does not exists.  Stop.");
+	    System.exit(-603);
+	}
+	if (dirres.isDirectory() == false)
+	{
+	    System.err.println("Stage 6: File is not a directory.  Stop.");
+	    System.exit(-604);
+	}
+	if (fsrchash.exists() == false)
+	{
+	    System.err.println("Stage 6: Already exists not exists.  Stop.");
+	    System.exit(-605);
+	}
+	if (freshash.exists() == false)
+	{
+	    System.err.println("Stage 6: Already exists not exists.  Stop.");
+	    System.exit(-606);
+	}
+	
+	final ArrayDeque<long[]> srchashes = new ArrayDeque<long[]>();
+	final ArrayDeque<long[]> reshashes = new ArrayDeque<long[]>();
+	final ArrayDeque<String> srcfiles  = new ArrayDeque<String>();
+	final ArrayDeque<String> resfiles  = new ArrayDeque<String>();
+	
+	for (final Object[] objs : new Object[][] {{fsrchash, srchashes, srcfiles}, {freshash, reshashes, resfiles}})
+	{
+	    final File hash = (File)(objs[0]);
+	    final ArrayDeque<long[]> hashes = (ArrayDeque<long[]>)(objs[1]);
+	    final ArrayDeque<String> files  = (ArrayDeque<String>)(objs[2]);
+	    
+	    final Scanner sc = new Scanner(new BufferedInputStream(new FileInputStream(hash)));
+	    while (sc.hasNext())
+	    {
+		final String line = sc.nextLine();
+		if (line.isEmpty())
+		    break;
+		
+		final int space = line.indexOf(' ');
+		hashes.offerLast(new long[] { Long.parseLong(line.substring(0, space)) });
+		files.offerLast(line.substring(space + 1).replace("/", "\n"));
+	    }
+	}
+	
+	final ArrayDeque<String> srcok  = new ArrayDeque<String>();
+	final ArrayDeque<String> resok  = new ArrayDeque<String>();
+	
+	while ((srcfiles.isEmpty() || resfiles.isEmpty()) == false)
+	{
+	    final long srch = srchashes.peekLast()[0];
+	    final long resh = reshashes.peekLast()[0];
+	    
+	    if (srch > resh)
+	    {
+		srchashes.pollLast();
+		(new File(abssrc + srcfiles.pollLast())).delete();
+	    }
+	    else if (resh > resh)
+	    {
+		reshashes.pollLast();
+		(new File(absres + resfiles.pollLast())).delete();
+	    }
+	    else
+	    {
+		do
+		{
+		    srchashes.pollLast();
+		    srcok.offerLast(Long.toString(srch) + " " + srcfiles.pollLast().replace("\n", "/"));
+		}
+		  while (srchashes.peekLast()[0] == srch);
+		
+		do
+		{
+		    reshashes.pollLast();
+		    resok.offerLast(Long.toString(resh) + " " + resfiles.pollLast().replace("\n", "/"));
+		}
+	          while (reshashes.peekLast()[0] == resh);
+	    }
+	}
+	
+	while (srcfiles.isEmpty() == false)
+	{
+	    srchashes.pollLast();
+	    (new File(abssrc + srcfiles.pollLast())).delete();
+	}
+	
+	while (resfiles.isEmpty() == false)
+	{
+	    reshashes.pollLast();
+	    (new File(absres + resfiles.pollLast())).delete();
+	}
+	
+	
+	{
+	    final PrintStream fout = new PrintStream(new BufferedOutputStream(new FileOutputStream(fsrchash)));
+	    while (srcok.isEmpty() == false)
+		fout.println(srcok.pollLast());
+	    fout.flush();
+	    fout.close();
+	}
+	{
+	    final PrintStream fout = new PrintStream(new BufferedOutputStream(new FileOutputStream(freshash)));
+	    while (resok.isEmpty() == false)
+		fout.println(resok.pollLast());
+	    fout.flush();
+	    fout.close();
+	}
+    }
+    
+    /**
      * Stage 5:  Create alpha channel hash collection for all files in SRC
      *           to the files SRCHASH and all from RES to the files RESHASH
      */
@@ -189,7 +327,7 @@ public class imgsrcrecover
 	    System.exit(-506);
 	}
 	
-	for (final String[] dirhash : new String[][] {{abssrc, reshash}, {absres, reshash}})
+	for (final String[] dirhash : new String[][] {{abssrc, srchash}, {absres, reshash}})
 	{
 	    final String dir = dirhash[0];
 	    final String hash = dirhash[1];
@@ -218,7 +356,7 @@ public class imgsrcrecover
 	    }
 	    
 	    Arrays.sort(hashes);
-	
+	    
 	    final PrintStream fout = new PrintStream(new BufferedOutputStream(new FileOutputStream(new File(hash))));
 	    for (final String line : hashes)
 		fout.println(line);
