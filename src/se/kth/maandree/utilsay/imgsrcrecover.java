@@ -84,7 +84,7 @@ public class imgsrcrecover
 		else if (stages.contains("7"))  worked = true;
 	    }
 	    
-	    if (worked == false)
+	    if (worked)
 		return;
 	    
 	    System.out.println("Source image recover tool kit");
