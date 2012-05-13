@@ -230,67 +230,73 @@ public class imgsrcrecover
 	for (final Long key : keys)
         {
 	    final ArrayList<String> srcs = srcmap.get(key);
-	    final ArrayList<String> ress = srcmap.get(key);
+	    final ArrayList<String> ress = resmap.get(key);
 	    final HashMap<String, SoftReference<long[]>> map = new HashMap<String, SoftReference<long[]>>();
 	    
-	    for (final String relsrc : srcs)
+	    if (ress == null)
+		continue;
+	    
+	    for (final String relres : ress)
 	    {
-		final String asrc = abssrc + relsrc;
-		final long[] dsrc;
-		final int sw, sh;
+		final String ares = absres + relres;
+		final long[] dres;
+		final int rw, rh;
 		
 		{
-		    final BufferedImage img = ImageIO.read(new File(asrc));
-		    sw = img.getWidth();
-		    sh = img.getHeight();
-		    dsrc = new long[((sw * sh) + 63) >> 6];
+		    System.err.println("Reading res image " + ares + " at stage 7");
+		    final BufferedImage img = ImageIO.read(new File(ares));
+		    rw = img.getWidth();
+		    rh = img.getHeight();
+		    dres = new long[((rw * rh) + 63) >> 6];
 		    
 		    long p = 0;
-		    for (int y = 0; y < sh; y++)
-			for (int x = 0; x < sw; x++, p++)
+		    for (int y = 0; y < rh; y++)
+			for (int x = 0; x < rw; x++, p++)
 			    if ((img.getRGB(x, y) & 0xFF000000) != 0)
-				dsrc[(int)(p >> 6)] ^= 1L << (p & 63);
+				dres[(int)(p >> 6)] ^= 1L << (p & 63);
 		}
 		
+		exec("mkdir", "-p", absmatch + relres);
+		exec("mv", ares, absmatch + relres + ".");
+		
 		mid:
-		    for (final String relres : ress)
+		    for (final String relsrc : srcs)
 		    {
-			final String ares = absres + relres;
-			final SoftReference<long[]> dressr = map.get(relres);
-			long[] dres = dressr == null ? null : dressr.get();
+			final String asrc = abssrc + relsrc;
+			final SoftReference<long[]> dsrcsr = map.get(relsrc);
+			long[] dsrc = dsrcsr == null ? null : dsrcsr.get();
 			
-			final BufferedImage img = ImageIO.read(new File(ares));
+			System.err.println("Reading src image " + asrc + " at stage 7");
+			final BufferedImage img = ImageIO.read(new File(asrc));
 			final int w = img.getWidth(), h = img.getHeight();
-			if ((w != sw) || (h != sh))
+			if ((w != rw) || (h != rh))
 			    continue;
 			
-			if (dres == null)
+			if (dsrc == null)
 			{
-			    dres = new long[((w * h) + 63) >> 6];
+			    dsrc = new long[((w * h) + 63) >> 6];
 			    long p = 0;
 			    for (int y = 0; y < h; y++)
 				for (int x = 0; x < w; x++, p++)
 				    if ((img.getRGB(x, y) & 0xFF000000) != 0)
-					dres[(int)(p >> 6)] ^= 1L << (p & 63);
+					dsrc[(int)(p >> 6)] ^= 1L << (p & 63);
 			    
-			    map.put(relres, new SoftReference<long[]>(dres));
+			    map.put(relsrc, new SoftReference<long[]>(dsrc));
 			}
 			
-			for (int i = 0, n = dsrc.length; i < n; i++)
-			    if (dsrc[i] != dres[i])
+			for (int i = 0, n = dres.length; i < n; i++)
+			    if (dres[i] != dsrc[i])
 				continue mid;
 			
 			int ev;
-			if (exec("ln", "-P", ares, absmatch + relres) != 0)
-			    if ((ev = exec("cp", ares, absmatch + relres)) != 0)
-				System.err.println("\033[31mCan't(" + ev + ") copy " + ares + "  →  " + absmatch + relres + "\033[m");
+			if (exec("ln", "-P", asrc, absmatch + relres + "/" + relsrc) != 0)
+			    if ((ev = exec("cp", asrc, absmatch + relres + "/" + relsrc)) != 0)
+				System.err.println("\033[31mCan't(" + ev + ") copy " + asrc + "  →  " + absmatch + relres + "/" + relsrc + "\033[m");
 		    }
-		
-		(new File(abssrc + relsrc)).delete();
 	    }
 	    
-	    for (final String relres : ress)
-		(new File(absres + relres)).delete();
+	    for (final String relsrc : srcs)
+		(new File(abssrc + relsrc)).delete();
 	}
     }
     
@@ -378,11 +384,13 @@ public class imgsrcrecover
 	    
 	    if (srch > resh)
 	    {
+		System.err.println("Removing " + abssrc + srcfiles.peekLast() + " at stage 6, reason: srch > resh");
 		srchashes.pollLast();
 		(new File(abssrc + srcfiles.pollLast())).delete();
 	    }
 	    else if (resh > resh)
 	    {
+		System.err.println("Removing " + absres + resfiles.peekLast() + " at stage 6, reason: resh > srch");
 		reshashes.pollLast();
 		(new File(absres + resfiles.pollLast())).delete();
 	    }
@@ -393,25 +401,27 @@ public class imgsrcrecover
 		    srchashes.pollLast();
 		    srcok.offerLast(Long.toString(srch) + " " + srcfiles.pollLast().replace("\n", "/"));
 		}
-		  while (srchashes.peekLast()[0] == srch);
+		  while ((srchashes.isEmpty() == false) && (srchashes.peekLast()[0] == srch));
 		
 		do
 		{
 		    reshashes.pollLast();
 		    resok.offerLast(Long.toString(resh) + " " + resfiles.pollLast().replace("\n", "/"));
 		}
-	          while (reshashes.peekLast()[0] == resh);
+		  while ((reshashes.isEmpty() == false) && (reshashes.peekLast()[0] == resh));
 	    }
 	}
 	
 	while (srcfiles.isEmpty() == false)
 	{
+	    System.err.println("Removing " + abssrc + srcfiles.peekLast() + " at stage 6, reason: srcfiles.isEmpty() == false");
 	    srchashes.pollLast();
 	    (new File(abssrc + srcfiles.pollLast())).delete();
 	}
 	
 	while (resfiles.isEmpty() == false)
 	{
+	    System.err.println("Removing " + absres + resfiles.peekLast() + " at stage 6, reason: resfiles.isEmpty() == false");
 	    reshashes.pollLast();
 	    (new File(absres + resfiles.pollLast())).delete();
 	}
@@ -483,6 +493,37 @@ public class imgsrcrecover
 	    System.exit(-506);
 	}
 	
+	final Comparator<String> comp = new Comparator<String>()
+	        {
+		    /**
+		     * {@inheritDoc}
+		     */
+		    public int compare(String o1, String o2)
+		    {
+			if ((o1 == null) ^ (o2 == null))
+			    return (o1 == null) ? -1 : 1;
+				
+			if ((o1 == null) && (o2 == null))
+			    return 0;
+			
+			final long x1 = Long.parseLong(o1.substring(0, o1.indexOf(' ')));
+			final long x2 = Long.parseLong(o2.substring(0, o2.indexOf(' ')));
+			
+			if (x1 == x2)
+			    return 0;
+			return x1 < x2 ? -1 : 1;
+		    }
+		    
+		    /**
+		     * {@inheritDoc}
+		     */
+		    public boolean equals(Object obj)
+		    {
+			return obj == this;
+		    }
+		    
+		};
+	
 	for (final String[] dirhash : new String[][] {{abssrc, srchash}, {absres, reshash}})
 	{
 	    final String dir = dirhash[0];
@@ -493,6 +534,7 @@ public class imgsrcrecover
 	    int findex = 0;
 	    for (final String file : files)
 	    {
+		System.err.println("Reading " + dir + file + " at stage 5");
 		final BufferedImage img = ImageIO.read(new File(dir + file));
 		final int w = img.getWidth(), h = img.getHeight();
 		
@@ -511,7 +553,7 @@ public class imgsrcrecover
 		hashes[findex++] = Long.toString(ihash) + " " + file.replace("\n", "/");
 	    }
 	    
-	    Arrays.sort(hashes);
+	    Arrays.sort(hashes, comp);
 	    
 	    final PrintStream fout = new PrintStream(new BufferedOutputStream(new FileOutputStream(new File(hash))));
 	    for (final String line : hashes)
@@ -561,6 +603,7 @@ public class imgsrcrecover
 	for (final String dir : new String[] {abssrc, absres})
 	    for (final String file : (new File(dir)).list())
 	    {
+		System.err.println("Reading " + dir + file + " at stage 4");
 		final BufferedImage img = ImageIO.read(new File(dir + file));
 		final int w = img.getWidth(), h = img.getHeight();
 		
@@ -642,7 +685,8 @@ public class imgsrcrecover
 		BufferedImage img = null;
 		try
 		{
-		    ImageIO.read(new File(dir + file));
+		    System.err.println("Reading " + dir + file + " at stage 3");
+		    img = ImageIO.read(new File(dir + file));
 		}
 		catch (final Exception err)
 		{
@@ -650,6 +694,8 @@ public class imgsrcrecover
 		}
 		if (img == null) // not an image file
 		{
+		    System.err.println("Unable to read as pure image");
+		    
 		    final InputStream stdin = System.in;
 		    System.setIn(new BufferedInputStream(new FileInputStream(new File(dir + file))));
 		    
@@ -682,8 +728,13 @@ public class imgsrcrecover
 				break loopBottom;
 		    }
 		    
-		final int ch;
-		argbs = new int[ch = h - top - bottom];
+		int ch = h - top - bottom;
+		if (ch == 0)
+		{
+		    top--;
+		    ch++;
+		}
+		argbs = new int[ch];
 		    
 		loopLeft:
 		    for (; left < w; left++)
@@ -703,11 +754,16 @@ public class imgsrcrecover
 				break loopRight;
 		    }
 		    
-		final int cw = w - left - right;
+		int cw = w - left - right;
+		if (cw == 0)
+		{
+		    left--;
+		    cw++;
+		}
 		
 		final BufferedImage cimg = new BufferedImage(cw, ch, BufferedImage.TYPE_INT_ARGB);
 		argbs = new int[ch * cw];
-		img.getRGB(left, right, cw, ch, argbs, 0, cw);
+		img.getRGB(left, top, cw, ch, argbs, 0, cw);
 		cimg.setRGB(0, 0, cw, ch, argbs, 0, cw);
 		ImageIO.write(cimg, file.substring(file.lastIndexOf('.') + 1).toUpperCase(), new File(dir + file));
 	    }
