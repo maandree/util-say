@@ -52,7 +52,7 @@ public class imgsrcrecover
     public static void main(final String... args) throws IOException
     {
         if      (args[0].equals("1") && (args.length == 3))  stage1(args[1], args[2]);
-	else if (args[0].equals("2") && (args.length == 2))  ;  //  gifasm -d FILE. FILE
+	else if (args[0].equals("2") && (args.length == 2))  stage2(args[1]);
 	else if (args[0].equals("3") && (args.length == 3))  ;  //  ...
 	else if (args[0].equals("4") && (args.length == 3))  ;  //  ...
 	else if (args[0].equals("5") && (args.length == 5))  ;  //  ...
@@ -140,6 +140,38 @@ public class imgsrcrecover
     }
     
     
+    
+    /**
+     * Stage 2:  Burst all .gif files in SRC and delete bursted files
+     */
+    public static void stage2(final String src) throws IOException
+    {
+	final File dir = new File(src);
+	String absdir = dir.getAbsolutePath();
+	if (absdir.endsWith("/") == false)
+	    absdir += '/';
+	
+	if (dir.exists() == false)
+	{
+	    System.err.println("Stage 2: File does not exists.  Stop.");
+	    System.exit(-201);
+	}
+	if (dir.isDirectory() == false)
+	{
+	    System.err.println("Stage 2: File is not a directory.  Stop.");
+	    System.exit(-202);
+	}
+	
+	int ev;
+	for (final String file : dir.list())
+	    if (file.toLowerCase().endsWith(".gif"))
+	    {
+		final String abs = absdir + file;
+		if ((ev = exec("gifasm", "-d", abs + '.', abs)) != 0)
+		    System.err.println("\033[31mCan't(" + ev + ") burst " + abs + "\033[m");
+	    }
+    }
+    
     /**
      * Stage 1:  Collect all image files in SRCSRC and subs and put in SRC
      */
@@ -156,12 +188,12 @@ public class imgsrcrecover
 	if (root.exists() == false)
 	{
 	    System.err.println("Stage 1: File does not exists.  Stop.");
-	    System.exit(-100);
+	    System.exit(-101);
 	}
 	if (root.isDirectory() == false)
 	{
 	    System.err.println("Stage 1: File is not a directory.  Stop.");
-	    System.exit(-100);
+	    System.exit(-102);
 	}
 	
 	final File dest = new File(src);
@@ -172,7 +204,7 @@ public class imgsrcrecover
 	else if (dest.isDirectory() == false)
 	{
 	    System.err.println("Stage 1: File is not a directory.  Stop.");
-	    System.exit(-100);
+	    System.exit(-103);
 	}
 	
 	final ArrayDeque<String> dirs = new ArrayDeque<String>();
