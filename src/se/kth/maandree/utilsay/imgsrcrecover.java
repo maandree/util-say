@@ -54,7 +54,7 @@ public class imgsrcrecover
         if      (args[0].equals("1") && (args.length == 3))  stage1(args[1], args[2]);
 	else if (args[0].equals("2") && (args.length == 2))  stage2(args[1]);
 	else if (args[0].equals("3") && (args.length == 3))  stage3(args[1], args[2]);
-	else if (args[0].equals("4") && (args.length == 3))  ;  //  ...
+	else if (args[0].equals("4") && (args.length == 3))  stage4(args[1], args[2]);
 	else if (args[0].equals("5") && (args.length == 5))  ;  //  ...
 	else if (args[0].equals("6") && (args.length == 5))  ;  //  ...
 	else if (args[0].equals("7") && (args.length == 6))  ;  //  ...
@@ -139,6 +139,83 @@ public class imgsrcrecover
 	
     }
     
+    
+    /**
+     * Stage 4:  Unzoom all files in SRC and RES as much as possible
+     */
+    public static void stage4(final String src, final String res) throws IOException
+    {
+	final File dirsrc = new File(src);
+	final File dirres = new File(res);
+	
+	String abssrc = dirsrc.getAbsolutePath();
+	if (abssrc.endsWith("/") == false)
+	    abssrc += '/';
+	String absres = dirres.getAbsolutePath();
+	if (absres.endsWith("/") == false)
+	    absres += '/';
+	
+	if (dirsrc.exists() == false)
+	{
+	    System.err.println("Stage 4: File does not exists.  Stop.");
+	    System.exit(-401);
+	}
+	if (dirsrc.isDirectory() == false)
+	{
+	    System.err.println("Stage 4: File is not a directory.  Stop.");
+	    System.exit(-402);
+	}
+	if (dirres.exists() == false)
+	{
+	    System.err.println("Stage 4: File does not exists.  Stop.");
+	    System.exit(-403);
+	}
+	if (dirres.isDirectory() == false)
+	{
+	    System.err.println("Stage 4: File is not a directory.  Stop.");
+	    System.exit(-404);
+	}
+	
+	for (final String dir : new String[] {abssrc, absres})
+	    for (final String file : (new File(dir)).list())
+	    {
+		final BufferedImage img = ImageIO.read(new File(dir + file));
+		final int w = img.getWidth(), h = img.getHeight();
+		
+		int zoom = 1;
+		outer:
+		    for (int z = 2; (z <= w) && (z <= h); z++)
+		    {
+			if ((w % z != 0) || (h % z != 0))
+			    continue;
+			
+			int[] ps = new int[z * z];
+			
+			for (int y = 0; y < h; y += z)
+			    for (int x = 0; x < w; x += z)
+			    {
+				/* Not using 'final' here, it could be heavy duty. */
+				
+				int ref = img.getRGB(x, y);
+				img.getRGB(x, y, z, z, ps, 0, z);
+				for (final int p : ps)
+				    if (p != ref)
+					break outer;
+			    }
+			
+			zoom = z;
+		    }
+		
+		final int zw = w / zoom, zh = h / zoom;
+		final BufferedImage cimg = new BufferedImage(zw, zh, BufferedImage.TYPE_INT_ARGB);
+		
+		for (int y = 0, zy = 0; y < h; y += zoom, zy++)
+		    for (int x = 0, zx = 0; x < w; x += zoom, zx++)
+			cimg.setRGB(zx, zy, img.getRGB(x, y));
+		
+		ImageIO.write(cimg, file.substring(file.lastIndexOf('.') + 1).toUpperCase(), new File(dir + file));
+	    }
+    }
     
     /**
      * Stage 3:  Crop all files in SRC and RES
