@@ -55,10 +55,10 @@ public class imgsrcrecover
 	else if (args[0].equals("2") && (args.length == 2))  stage2(args[1]);
 	else if (args[0].equals("3") && (args.length == 3))  stage3(args[1], args[2]);
 	else if (args[0].equals("4") && (args.length == 3))  stage4(args[1], args[2]);
-	else if (args[0].equals("5") && (args.length == 5))  ;  //  ...
-	else if (args[0].equals("6") && (args.length == 5))  ;  //  ...
-	else if (args[0].equals("7") && (args.length == 6))  ;  //  ...
-	else if (args[0].equals("8") && (args.length == 2))  ;  //  ...
+	else if (args[0].equals("5") && (args.length == 5))  stage5(args[1], args[2], args[3], args[4]);
+	else if (args[0].equals("6") && (args.length == 5))  ;  //  stage6(args[1], args[2], args[3], args[4]);
+	else if (args[0].equals("7") && (args.length == 6))  ;  //  stage7(args[1], args[2], args[3], args[4], args[5]);
+	else if (args[0].equals("8") && (args.length == 2))  ;  //  stage8(args[1]);
 	else
 	{
 	    boolean worked = false;
@@ -139,6 +139,93 @@ public class imgsrcrecover
 	
     }
     
+    
+    /**
+     * Stage 5:  Create alpha channel hash collection for all files in SRC
+     *           to the files SRCHASH and all from RES to the files RESHASH
+     */
+    public static void stage5(final String src, final String srchash, final String res, final String reshash) throws IOException
+    {
+	final File dirsrc = new File(src);
+	final File dirres = new File(res);
+	final File fsrchash = new File(srchash);
+	final File freshash = new File(reshash);
+	
+	String abssrc = dirsrc.getAbsolutePath();
+	if (abssrc.endsWith("/") == false)
+	    abssrc += '/';
+	String absres = dirres.getAbsolutePath();
+	if (absres.endsWith("/") == false)
+	    absres += '/';
+	
+	if (dirsrc.exists() == false)
+	{
+	    System.err.println("Stage 5: File does not exists.  Stop.");
+	    System.exit(-501);
+	}
+	if (dirsrc.isDirectory() == false)
+	{
+	    System.err.println("Stage 5: File is not a directory.  Stop.");
+	    System.exit(-502);
+	}
+	if (dirres.exists() == false)
+	{
+	    System.err.println("Stage 5: File does not exists.  Stop.");
+	    System.exit(-503);
+	}
+	if (dirres.isDirectory() == false)
+	{
+	    System.err.println("Stage 5: File is not a directory.  Stop.");
+	    System.exit(-504);
+	}
+	if (fsrchash.exists() == false)
+	{
+	    System.err.println("Stage 5: Already exists not exists.  Stop.");
+	    System.exit(-505);
+	}
+	if (freshash.exists() == false)
+	{
+	    System.err.println("Stage 5: Already exists not exists.  Stop.");
+	    System.exit(-506);
+	}
+	
+	for (final String[] dirhash : new String[][] {{abssrc, reshash}, {absres, reshash}})
+	{
+	    final String dir = dirhash[0];
+	    final String hash = dirhash[1];
+	    final String[] files = (new File(dir)).list();
+	    final String[] hashes = new String[files.length];
+	    
+	    int findex = 0;
+	    for (final String file : files)
+	    {
+		final BufferedImage img = ImageIO.read(new File(dir + file));
+		final int w = img.getWidth(), h = img.getHeight();
+		
+		long ihash = 0;
+		long p = 1;
+		
+		for (int y = 0; y < h; y++)
+		    for (int x = 0; x < w; x++)
+		    {
+			ihash ^= (img.getRGB(x, y) & 0xFF000000) == 0 ? 0 : p;
+			p <<= 1;
+			if (p == 0)
+			    p = 1;
+		    }
+		
+		hashes[findex++] = Long.toString(ihash) + " " + file.replace("\n", "/");
+	    }
+	    
+	    Arrays.sort(hashes);
+	
+	    final PrintStream fout = new PrintStream(new BufferedOutputStream(new FileOutputStream(new File(hash))));
+	    for (final String line : hashes)
+		fout.println(line);
+	    fout.flush();
+	    fout.close();
+	}
+    }
     
     /**
      * Stage 4:  Unzoom all files in SRC and RES as much as possible
