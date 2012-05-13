@@ -51,7 +51,7 @@ public class imgsrcrecover
      */
     public static void main(final String... args) throws IOException
     {
-        if      (args[0].equals("1") && (args.length == 3))  ;  //  ...
+        if      (args[0].equals("1") && (args.length == 3))  stage1(args[1], args[2]);
 	else if (args[0].equals("2") && (args.length == 2))  ;  //  gifasm -d FILE. FILE
 	else if (args[0].equals("3") && (args.length == 3))  ;  //  ...
 	else if (args[0].equals("4") && (args.length == 3))  ;  //  ...
@@ -87,7 +87,7 @@ public class imgsrcrecover
 	    }
 	    
 	    if (worked == false)
-		break;
+		return;
 	    
 	    System.out.println("Source image recover tool kit");
 	    System.out.println();
@@ -139,4 +139,75 @@ public class imgsrcrecover
 	
     }
     
+    
+    /**
+     * Stage 1:  Collect all image files in SRCSRC and subs and put in SRC
+     */
+    public static void stage1(final String srcsrc, final String src) throws IOException
+    {
+	final File root = new File(srcsrc);
+	String absroot = root.getAbsolutePath();
+	if (absroot.endsWith("/") == false)
+	    absroot += '/';
+	String srcd = src;
+	if (srcd.endsWith("/") == false)
+	    srcd += '/';
+	
+	if (root.exists() == false)
+	{
+	    System.err.println("Stage 1: File does not exists.  Stop.");
+	    System.exit(-100);
+	}
+	if (root.isDirectory() == false)
+	{
+	    System.err.println("Stage 1: File is not a directory.  Stop.");
+	    System.exit(-100);
+	}
+	
+	final File dest = new File(src);
+	if (dest.exists() == false)
+	{
+	    dest.mkdir();
+	}
+	else if (dest.isDirectory() == false)
+	{
+	    System.err.println("Stage 1: File is not a directory.  Stop.");
+	    System.exit(-100);
+	}
+	
+	final ArrayDeque<String> dirs = new ArrayDeque<String>();
+	dirs.add(absroot);
+	
+	while (dirs.isEmpty() == false)
+	{
+	    int ev;
+	    final String dir = dirs.pollLast();
+	    final String pre = srcd + dir.substring(absroot.length()).replace("/", "\\");
+	    for (final String file : (new File(dir)).list())
+		if ((new File(dir + file)).isDirectory())
+		    dirs.offerLast(dir + file + '/');
+		else
+		    if ((ev = exec("ln", "-s", dir + file, pre + file)) != 0)
+			System.err.println("\033[31mCan't(" + ev + ") symlink " + dir + file + "  →  " + pre + file + "\033[m");
+	}
+    }
+    
+    
+    //* Easiest way to copy files without Java7, not too hard: exec("cp", src, dest) *//
+    //* And "only" way to link without Java7: exec("ln", ["-s"], from, to)*//
+    public static int exec(final String... command)
+    {
+	try
+	{
+	    final Process process = (new ProcessBuilder(command)).start();
+	    process.waitFor();
+	    return process.exitValue();
+	}
+	catch (final Throwable err)
+	{
+	    return ~0;
+	}
+    }
+
 }
+
