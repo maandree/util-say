@@ -52,13 +52,13 @@ public class imgsrcrecover
      */
     public static void main(final String... args) throws IOException
     {
-        if      (args[0].equals("1") && (args.length == 3))  stage1(args[1], args[2]);
-	else if (args[0].equals("2") && (args.length == 2))  stage2(args[1]);
-	else if (args[0].equals("3") && (args.length == 3))  stage3(args[1], args[2]);
-	else if (args[0].equals("4") && (args.length == 3))  stage4(args[1], args[2]);
-	else if (args[0].equals("5") && (args.length == 5))  stage5(args[1], args[2], args[3], args[4]);
-	else if (args[0].equals("6") && (args.length == 5))  stage6(args[1], args[2], args[3], args[4]);
-	else if (args[0].equals("7") && (args.length == 6))  stage7(args[1], args[2], args[3], args[4], args[5]);
+        if      ((args.length == 3) && args[0].equals("1"))  stage1(args[1], args[2]);
+	else if ((args.length == 2) && args[0].equals("2"))  stage2(args[1]);
+	else if ((args.length == 3) && args[0].equals("3"))  stage3(args[1], args[2]);
+	else if ((args.length == 3) && args[0].equals("4"))  stage4(args[1], args[2]);
+	else if ((args.length == 5) && args[0].equals("5"))  stage5(args[1], args[2], args[3], args[4]);
+	else if ((args.length == 5) && args[0].equals("6"))  stage6(args[1], args[2], args[3], args[4]);
+	else if ((args.length == 6) && args[0].equals("7"))  stage7(args[1], args[2], args[3], args[4], args[5]);
 	else
 	{
 	    boolean worked = false;
