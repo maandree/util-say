@@ -111,8 +111,10 @@ public class imgsrcrecover
 	    System.out.println("all  Perform all stages at once");
 	    System.out.println();
 	    System.out.println("Known supported input formats:");
-	    System.out.println("  ⋅  PNG  (non-animated)");
-	    System.out.println("  ⋅  GIF  (animated)");
+	    System.out.println("  ⋅  PNG      (non-animated)");
+	    System.out.println("  ⋅  GIF      (animated)");
+	    System.out.println("  ⋅  ponysay  (must have file name extension: .pony)");
+	    System.out.println("  ⋅  unisay");
 	    System.out.println();
 	    System.out.println();
 	    System.out.println("Copyright (C) 2012  Mattias Andrée <maandree@kth.se>");
@@ -625,19 +627,33 @@ public class imgsrcrecover
 	}
 	if (dirres.exists() == false)
 	{
-	    System.err.println("Stage 3: File does not exists.  Stop.");
-	    System.exit(-303);
+	    dirres.mkdir();
 	}
-	if (dirres.isDirectory() == false)
+	else if (dirres.isDirectory() == false)
 	{
 	    System.err.println("Stage 3: File is not a directory.  Stop.");
-	    System.exit(-304);
+	    System.exit(-303);
 	}
 	
 	for (final String dir : new String[] {abssrc, absres})
 	    for (final String file : (new File(dir)).list())
 	    {
-		final BufferedImage img = ImageIO.read(new File(dir + file));
+		BufferedImage img = ImageIO.read(new File(dir + file));
+		if (img == null) // not an image file
+		    if (file.endsWith(".pony")) //ponysay
+		    {
+			final InputStream stdin = System.in;
+			System.setIn(new BufferedInputStream(new FileInputStream(new File(dir + file))));
+			ponysay2img.main("--", dir + file);
+			System.setIn(stdin);
+		    }
+		    else //unisay
+		    {
+			final InputStream stdin = System.in;
+			System.setIn(new BufferedInputStream(new FileInputStream(new File(dir + file))));
+			unisay2img.main("--", dir + file);
+			System.setIn(stdin);
+		    }
 		final int w = img.getWidth(), h = img.getHeight();
 		int top = 0, bottom = 0, left = 0, right = 0;
 		
