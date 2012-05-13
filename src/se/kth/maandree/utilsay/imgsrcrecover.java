@@ -53,7 +53,7 @@ public class imgsrcrecover
     {
         if      (args[0].equals("1") && (args.length == 3))  stage1(args[1], args[2]);
 	else if (args[0].equals("2") && (args.length == 2))  stage2(args[1]);
-	else if (args[0].equals("3") && (args.length == 3))  ;  //  ...
+	else if (args[0].equals("3") && (args.length == 3))  stage3(args[1], args[2]);
 	else if (args[0].equals("4") && (args.length == 3))  ;  //  ...
 	else if (args[0].equals("5") && (args.length == 5))  ;  //  ...
 	else if (args[0].equals("6") && (args.length == 5))  ;  //  ...
@@ -140,6 +140,99 @@ public class imgsrcrecover
     }
     
     
+    /**
+     * Stage 3:  Crop all files in SRC and RES
+     */
+    public static void stage3(final String src, final String res) throws IOException
+    {
+	final File dirsrc = new File(src);
+	final File dirres = new File(res);
+	
+	String abssrc = dirsrc.getAbsolutePath();
+	if (abssrc.endsWith("/") == false)
+	    abssrc += '/';
+	String absres = dirres.getAbsolutePath();
+	if (absres.endsWith("/") == false)
+	    absres += '/';
+	
+	if (dirsrc.exists() == false)
+	{
+	    System.err.println("Stage 3: File does not exists.  Stop.");
+	    System.exit(-301);
+	}
+	if (dirsrc.isDirectory() == false)
+	{
+	    System.err.println("Stage 3: File is not a directory.  Stop.");
+	    System.exit(-302);
+	}
+	if (dirres.exists() == false)
+	{
+	    System.err.println("Stage 3: File does not exists.  Stop.");
+	    System.exit(-303);
+	}
+	if (dirres.isDirectory() == false)
+	{
+	    System.err.println("Stage 3: File is not a directory.  Stop.");
+	    System.exit(-304);
+	}
+	
+	for (final String dir : new String[] {abssrc, absres})
+	    for (final String file : (new File(dir)).list())
+	    {
+		final BufferedImage img = ImageIO.read(new File(dir + file));
+		final int w = img.getWidth(), h = img.getHeight();
+		int top = 0, bottom = 0, left = 0, right = 0;
+		
+		int[] argbs = new int[w];
+		
+		loopTop:
+		    for (; top < h; top++)
+		    {
+			img.getRGB(0, top, w, 1, argbs, 0, w);
+			for (final int argb : argbs)
+			    if ((argb & 0xFF000000) != 0)
+				break loopTop;
+		    }
+		    
+		loopBottom:
+		    for (; bottom < h - top; bottom++)
+		    {
+			img.getRGB(0, h - bottom - 1, w, 1, argbs, 0, w);
+			for (final int argb : argbs)
+			    if ((argb & 0xFF000000) != 0)
+				break loopBottom;
+		    }
+		    
+		final int ch;
+		argbs = new int[ch = h - top - bottom];
+		    
+		loopLeft:
+		    for (; left < w; left++)
+		    {
+			img.getRGB(left, top, 1, ch, argbs, 0, 1);
+			for (final int argb : argbs)
+			    if ((argb & 0xFF000000) != 0)
+				break loopLeft;
+		    }
+		    
+		loopRight:
+		    for (; right < w - left; right++)
+		    {
+			img.getRGB(w - right - 1, top, 1, ch, argbs, 0, 1);
+			for (final int argb : argbs)
+			    if ((argb & 0xFF000000) != 0)
+				break loopRight;
+		    }
+		    
+		final int cw = w - left - right;
+		
+		final BufferedImage cimg = new BufferedImage(cw, ch, BufferedImage.TYPE_INT_ARGB);
+		argbs = new int[ch * cw];
+		img.getRGB(left, right, cw, ch, argbs, 0, cw);
+		cimg.setRGB(0, 0, cw, ch, argbs, 0, cw);
+		ImageIO.write(cimg, file.substring(file.lastIndexOf('.') + 1).toUpperCase(), new File(dir + file));
+	    }
+    }
     
     /**
      * Stage 2:  Burst all .gif files in SRC and delete bursted files
@@ -169,6 +262,8 @@ public class imgsrcrecover
 		final String abs = absdir + file;
 		if ((ev = exec("gifasm", "-d", abs + '.', abs)) != 0)
 		    System.err.println("\033[31mCan't(" + ev + ") burst " + abs + "\033[m");
+		else
+		    exec("rm", abs);
 	    }
     }
     
@@ -219,14 +314,13 @@ public class imgsrcrecover
 		if ((new File(dir + file)).isDirectory())
 		    dirs.offerLast(dir + file + '/');
 		else
-		    if ((ev = exec("ln", "-s", dir + file, pre + file)) != 0)
-			System.err.println("\033[31mCan't(" + ev + ") symlink " + dir + file + "  →  " + pre + file + "\033[m");
+		    if ((ev = exec("cp", dir + file, pre + file)) != 0)
+			System.err.println("\033[31mCan't(" + ev + ") copy " + dir + file + "  →  " + pre + file + "\033[m");
 	}
     }
     
     
     //* Easiest way to copy files without Java7, not too hard: exec("cp", src, dest) *//
-    //* And "only" way to link without Java7: exec("ln", ["-s"], from, to)*//
     public static int exec(final String... command)
     {
 	try
