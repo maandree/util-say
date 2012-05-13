@@ -627,12 +627,13 @@ public class imgsrcrecover
 	}
 	if (dirres.exists() == false)
 	{
-	    dirres.mkdir();
+	    System.err.println("Stage 3: File does not exists.  Stop.");
+	    System.exit(-303);
 	}
-	else if (dirres.isDirectory() == false)
+	if (dirres.isDirectory() == false)
 	{
 	    System.err.println("Stage 3: File is not a directory.  Stop.");
-	    System.exit(-303);
+	    System.exit(-304);
 	}
 	
 	for (final String dir : new String[] {abssrc, absres})
