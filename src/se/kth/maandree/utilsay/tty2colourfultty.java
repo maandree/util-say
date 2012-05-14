@@ -159,7 +159,8 @@ public class tty2colourfultty
 	}
 	
 	int back = 0;
-	int fore = 7;
+        int fore = 7;
+	boolean bold = false;
 	
 	String esc = null;
 	final char[] pcs = new char[6];
@@ -189,11 +190,24 @@ public class tty2colourfultty
 		    double[] pal = pal(p, chromaArg != null, chroma);
 		    
 		    P = nearest(pal, bright ? forepal : backpal);
-		    if (bright)
-			P |= 8;
-		    
-		    e += Integer.toString(P);
+		    e += Integer.toString((bright ? 8 : 0) | P);
 		    e += p;
+		    
+		    System.out.print(e);
+		    
+		    if (bright)
+		    {
+			if (P != fore)
+			    System.out.print(e.substring(e.indexOf(']')) + "[3" + P + "m");
+			if (bold == false)
+			{
+			    System.out.print(e.substring(e.indexOf(']')) + "[1m");
+			    bold = true;
+			}
+		    }
+		    else
+			if (P != back)
+			    System.out.print(e.substring(e.indexOf(']')) + "[4" + P + "m");
 		}
 		else if (d == '[')
 		{
@@ -202,6 +216,7 @@ public class tty2colourfultty
 		    {
 			back = 0;
 			fore = 7;
+			    bold = false;
 			System.out.print(paletteArg);
 			System.out.print(e);
 		    }
@@ -212,6 +227,7 @@ public class tty2colourfultty
 			{
 			    back = 0;
 			    fore = 7;
+			    bold = false;
 			    System.out.print(paletteArg);
 			    System.out.print(e);
 			}
@@ -220,15 +236,30 @@ public class tty2colourfultty
 			for (;;)
 			{
 			    e += (char)(d = System.in.read());
-			    if (false == ((('0' <= d) && (d <= '9')) || (d == ';'))
+			    if (false == ((('0' <= d) && (d <= '9')) || (d == ';')))
 			    {
-				if (d == 'm');
+				if (d == 'm')
 				{
 				    e = e.substring(e.indexOf('[') + 1);
 				    e = e.substring(0, e.length() - 1);
-				    final String[] cp = e.split(";");
+				    final String[] cds = e.split(";");
 				    
-				    //////////////////////////////////////////////////////////////////////////////
+				    for (final String cd : cds)
+					if (cd.equals("1"))        bold = true;
+					else if (cd.equals("21"))  bold = false;
+					else if (cd.equals("39"))  fore = 7;
+					else if (cd.equals("49"))
+				        {
+					    back = 0;
+					    System.out.print(e.substring(e.indexOf('[')) + "]P0" + palette[0]);
+					}
+					else if (cd.startsWith("3"))
+					{
+					    System.out.print(e.substring(e.indexOf('[')) + "[3" + fore + (bold ? "m" : ";1m"));
+					    bold = true;
+					}
+					else if (cd.startsWith("4"))
+					    System.out.print(e.substring(e.indexOf('[')) + "[4" + back + "m");
 				}
 				else
 				    System.out.print(d);
@@ -256,7 +287,7 @@ public class tty2colourfultty
     }
     
     
-    private int nearest(final double[] pal, final double[][] pals)
+    private static int nearest(final double[] pal, final double[][] pals)
     {
 	double d = -100.;
         int best = 0;
@@ -284,7 +315,7 @@ public class tty2colourfultty
 	return best;
     }
     
-    private double[] pal(final String pal, final boolean chroma, final double weight)
+    private static double[] pal(final String pal, final boolean chroma, final double weight)
     {
 	char c;
 	int rh = (((c = pal.charAt(0)) & 64) >> 6) * 10 + (c & 15);
