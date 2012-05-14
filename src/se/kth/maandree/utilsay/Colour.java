@@ -1,6 +1,7 @@
 //####################################################################################
 //##  The following code is pasted from TWT, but the class is made package private  ##
 //##  and the package has been changed to  se.kth.maandree.utilsay                  ##
+//##  toLab(...) as also been publicised.                                           ##
 //####################################################################################
 
 
@@ -310,7 +311,7 @@ public class Colour
      * @param   chromaWeight  The weight of chromaticity [0–∞[, 1 is unweighted.
      * @return                {L*, a*, b}
      */
-    private static double[] toLab(final int red, final int green, final int blue, final double chromaWeight)
+    public static double[] toLab(final int red, final int green, final int blue, final double chromaWeight)
     {
         int ir = red  ;  if (ir < 0)  ir += 1 << 8;
         int ig = green;  if (ig < 0)  ig += 1 << 8;

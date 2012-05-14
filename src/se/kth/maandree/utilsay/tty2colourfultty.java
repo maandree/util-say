@@ -132,6 +132,12 @@ public class tty2colourfultty
 		palette[P & 15] = new String(p);
 	    }
 	}
+	else
+	{
+	    paletteArg = new String();
+	    for (int i = 0; i < 16; i++)
+		paletteArg += "\033]P" + "0123456789ABCDEF".charAt(i) + palette[i];
+	}
 	
 	if (chromaArg.equals("no"))  chromaArg = null;
 	else if (chromaArg == null)  chromaArg = "1";
@@ -139,6 +145,161 @@ public class tty2colourfultty
 	double chroma = 1.;
 	if (chromaArg != null)
 	    chroma = Double.parseDouble(chromaArg);
+	
+	final double[][] backpal = new double[8][];
+	final double[][] forepal = new double[8][];
+	final double[][] cpal = new double[16][];
+	for (int i = 0; i < 16; i++)
+	{
+	    cpal[i] = pal(palette[i], chromaArg != null, chroma);
+	    if (i < 8)
+		backpal[i] = cpal[i];
+	    else
+		forepal[i & 7] = cpal[i];
+	}
+	
+	int back = 0;
+	int fore = 7;
+	
+	String esc = null;
+	final char[] pcs = new char[6];
+	for (int d; (d = System.in.read()) != -1;)
+	    if (esc != null)
+	    {
+		String e = esc + (char)d;
+		esc = null;
+		
+		if (d == ']')
+		{
+		    d = System.in.read();
+		    if (d != 'P')
+		    {
+			System.out.print(e);
+			System.out.write(d);
+			continue;
+		    }
+		    d = System.in.read();
+		    e += "]P";
+		    
+		    int P = ((d & 64) >> 6) * 10 + (d & 15);
+		    boolean bright = (P & 8) == 8;
+		    for (int i = 0; i < 6; i++)
+			pcs[i] = System.in.read();
+		    final String p = new String(pcs);
+		    double[] pal = pal(p, chromaArg != null, chroma);
+		    
+		    P = nearest(pal, bright ? forepal : backpal);
+		    if (bright)
+			P |= 8;
+		    
+		    e += Integer.toString(P);
+		    e += p;
+		}
+		else if (d == '[')
+		{
+		    e += (char)(d = System.in.read());
+		    if (d == 'm')
+		    {
+			back = 0;
+			fore = 7;
+			System.out.print(paletteArg);
+			System.out.print(e);
+		    }
+		    else if (d == '0')
+		    {
+			e += (char)(d = System.in.read());
+			if (d == 'm')
+			{
+			    back = 0;
+			    fore = 7;
+			    System.out.print(paletteArg);
+			    System.out.print(e);
+			}
+		    }
+		    else
+			for (;;)
+			{
+			    e += (char)(d = System.in.read());
+			    if (false == ((('0' <= d) && (d <= '9')) || (d == ';'))
+			    {
+				if (d == 'm');
+				{
+				    e = e.substring(e.indexOf('[') + 1);
+				    e = e.substring(0, e.length() - 1);
+				    final String[] cp = e.split(";");
+				    
+				    //////////////////////////////////////////////////////////////////////////////
+				}
+				else
+				    System.out.print(d);
+				break;
+			    }
+			}
+		}
+		else
+		    System.out.print(e);
+	    }
+	    else if (allowEsc && (d == '\\'))
+		if (d == 'e')
+		    esc = "\\e";
+		else
+		{
+		    System.out.write('\\');
+		    System.out.write(d);
+		}
+	    else if (d == '\033')
+		esc = "\033";
+	    else
+		System.out.write(d);
+	
+	System.out.flush();
+    }
+    
+    
+    private int nearest(final double[] pal, final double[][] pals)
+    {
+	double d = -100.;
+        int best = 0;
+        
+	double L = pal[0];
+	double a = pal[1];
+	double b = pal[2];
+	
+        for (int i = 0, n = pals.length; i < n; i++)
+	{
+	    final double[] tLab = pals[i];
+	    double ðL = L - tLab[0];
+	    double ða = a - tLab[1];
+	    double ðb = b - tLab[2];
+            
+	    double ð = ðL*ðL + ða*ða + ðb*ðb;
+            
+	    if ((d > ð) || (d < -50.))
+	    {
+		d = ð;
+		best = i;
+	    }
+	}
+	
+	return best;
+    }
+    
+    private double[] pal(final String pal, final boolean chroma, final double weight)
+    {
+	char c;
+	int rh = (((c = pal.charAt(0)) & 64) >> 6) * 10 + (c & 15);
+	int rl = (((c = pal.charAt(1)) & 64) >> 6) * 10 + (c & 15);
+	int gh = (((c = pal.charAt(2)) & 64) >> 6) * 10 + (c & 15);
+	int gl = (((c = pal.charAt(3)) & 64) >> 6) * 10 + (c & 15);
+	int bh = (((c = pal.charAt(4)) & 64) >> 6) * 10 + (c & 15);
+	int bl = (((c = pal.charAt(5)) & 64) >> 6) * 10 + (c & 15);
+	int r = (rh << 4) | rl;
+	int g = (gh << 4) | gl;
+	int b = (bh << 4) | bl;
+	
+	if (chroma)
+	    return Colour.toLab(r, g, b, weight);
+	return new double[] { (double)r, (double)g, (double)b };
     }
 
 }
