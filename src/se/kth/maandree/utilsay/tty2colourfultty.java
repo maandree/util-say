@@ -103,12 +103,9 @@ public class tty2colourfultty
 	String chromaArg = null;
 	
 	for (int ai = 0, an = args.length; ai < an; ai++)
-	    if (args[ai].equals("-e"))
-		allowEsc = true;
-	    else if (args[ai].equals("-p"))
-		paletteArg = args[++ai];
-	    else if (args[ai].equals("-c"))
-		chromaArg = args[++ai];
+	    if      (args[ai].equals("-e"))  allowEsc = true;
+	    else if (args[ai].equals("-p"))  paletteArg = args[++ai];
+	    else if (args[ai].equals("-c"))  chromaArg = args[++ai];
 	
 	if (paletteArg != null)
 	{
@@ -138,9 +135,11 @@ public class tty2colourfultty
 	    for (int i = 0; i < 16; i++)
 		paletteArg += "\033]P" + "0123456789ABCDEF".charAt(i) + palette[i];
 	}
+	if (allowEsc)
+	    paletteArg = paletteArg.replace("\033", "\\e");
 	
-	if (chromaArg.equals("no"))  chromaArg = null;
-	else if (chromaArg == null)  chromaArg = "1";
+	if      (chromaArg == null)       chromaArg = "1";
+	else if (chromaArg.equals("no"))  chromaArg = null;
 	
 	double chroma = 1.;
 	if (chromaArg != null)
@@ -172,42 +171,42 @@ public class tty2colourfultty
 		
 		if (d == ']')
 		{
-		    d = System.in.read();
-		    if (d != 'P')
+		    if ((d = System.in.read()) != 'P')
 		    {
 			System.out.print(e);
 			System.out.write(d);
 			continue;
 		    }
+		    e += (char)d;
 		    d = System.in.read();
-		    e += "]P";
 		    
 		    int P = ((d & 64) >> 6) * 10 + (d & 15);
 		    boolean bright = (P & 8) == 8;
 		    for (int i = 0; i < 6; i++)
-			pcs[i] = System.in.read();
+			pcs[i] = (char)(System.in.read());
 		    final String p = new String(pcs);
 		    double[] pal = pal(p, chromaArg != null, chroma);
 		    
 		    P = nearest(pal, bright ? forepal : backpal);
-		    e += Integer.toString((bright ? 8 : 0) | P);
+		    e += Integer.toString((bright ? 8 : 0) | P, 16).toUpperCase();
 		    e += p;
 		    
 		    System.out.print(e);
+		    e = e.substring(0, e.indexOf(']'));
 		    
 		    if (bright)
 		    {
 			if (P != fore)
-			    System.out.print(e.substring(e.indexOf(']')) + "[3" + P + "m");
+			    System.out.print(e + "[3" + P + "m");
 			if (bold == false)
 			{
-			    System.out.print(e.substring(e.indexOf(']')) + "[1m");
+			    System.out.print(e + "[1m");
 			    bold = true;
 			}
 		    }
 		    else
 			if (P != back)
-			    System.out.print(e.substring(e.indexOf(']')) + "[4" + P + "m");
+			    System.out.print(e + "[4" + P + "m");
 		}
 		else if (d == '[')
 		{
@@ -216,21 +215,9 @@ public class tty2colourfultty
 		    {
 			back = 0;
 			fore = 7;
-			    bold = false;
+			bold = false;
 			System.out.print(paletteArg);
 			System.out.print(e);
-		    }
-		    else if (d == '0')
-		    {
-			e += (char)(d = System.in.read());
-			if (d == 'm')
-			{
-			    back = 0;
-			    fore = 7;
-			    bold = false;
-			    System.out.print(paletteArg);
-			    System.out.print(e);
-			}
 		    }
 		    else
 			for (;;)
@@ -240,6 +227,7 @@ public class tty2colourfultty
 			    {
 				if (d == 'm')
 				{
+				    final String pre = e.substring(0, e.indexOf('['));
 				    e = e.substring(e.indexOf('[') + 1);
 				    e = e.substring(0, e.length() - 1);
 				    final String[] cds = e.split(";");
@@ -251,18 +239,28 @@ public class tty2colourfultty
 					else if (cd.equals("49"))
 				        {
 					    back = 0;
-					    System.out.print(e.substring(e.indexOf('[')) + "]P0" + palette[0]);
+					    System.out.print(pre + "]P0" + palette[0]);
+					    System.out.print(pre + "[" + e + "m");
 					}
 					else if (cd.startsWith("3"))
 					{
-					    System.out.print(e.substring(e.indexOf('[')) + "[3" + fore + (bold ? "m" : ";1m"));
 					    bold = true;
+					    System.out.print(pre + "[3" + fore + (bold ? "m" : ";1m"));
+					    System.out.print(pre + "[" + e + "m");
 					}
 					else if (cd.startsWith("4"))
-					    System.out.print(e.substring(e.indexOf('[')) + "[4" + back + "m");
+					    System.out.print(pre + "[4" + back + "m");
+					else if (cd.equals("0"))
+					{
+					    back = 0;
+					    fore = 7;
+					    bold = false;
+					    System.out.print(paletteArg);
+					    System.out.print(pre + "[" + e + "m");
+					}
 				}
 				else
-				    System.out.print(d);
+				    System.out.print(e);
 				break;
 			    }
 			}
@@ -271,7 +269,7 @@ public class tty2colourfultty
 		    System.out.print(e);
 	    }
 	    else if (allowEsc && (d == '\\'))
-		if (d == 'e')
+		if ((d = System.in.read()) == 'e')
 		    esc = "\\e";
 		else
 		{
