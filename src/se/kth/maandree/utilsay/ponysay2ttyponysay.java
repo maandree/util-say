@@ -48,7 +48,7 @@ public class ponysay2ttyponysay
      */
     public static void main(final String... args) throws IOException
     {
-	if ((args.length == 1) && (args[0].equals("--help")))
+	if ((args.length > 0) && (args[0].equals("--help")))
 	{
 	    System.out.println("TTY suitifying ponysay pony tool");
 	    System.out.println();

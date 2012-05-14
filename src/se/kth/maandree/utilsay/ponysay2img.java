@@ -51,7 +51,7 @@ public class ponysay2img
      */
     public static void main(final String... args) throws IOException
     {
-	if (args.length == 0)
+	if ((args.length == 0) || args[0].equals("--help"))
 	{
 	    System.out.println("ponysay to image conversion tool");
 	    System.out.println();
