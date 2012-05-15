@@ -206,7 +206,6 @@ public class tty2colourfultty
 			final String pre = e.substring(0, e.indexOf('['));
 			System.out.print(paletteArg);
 			System.out.print(pre + "[0m");
-			//System.out.print(e);
 		    }
 		    else
 			for (;;)
@@ -229,7 +228,6 @@ public class tty2colourfultty
 					}
 					else if (cd.equals("0"))
 					{
-					    //System.out.print(pre + "]P0" + palette[0]);
 					    System.out.print(paletteArg);
 					    System.out.print(pre + "[0m");
 					}
