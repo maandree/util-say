@@ -117,7 +117,7 @@ public class tty2colourfultty
 		if (paletteArg.charAt(i++) != 'P')     continue;
 		
 		final char c = paletteArg.charAt(i++);
-		final int P = ((c & 64) >> 5) * 10 + (c & 15);
+		final int P = ((c & 64) >> 6) * 9 + (c & 15);
 		
 		p[0] = paletteArg.charAt(i++);
 		p[1] = paletteArg.charAt(i++);
@@ -179,7 +179,7 @@ public class tty2colourfultty
 		    e += (char)d;
 		    d = System.in.read();
 		    
-		    int P = ((d & 64) >> 5) * 10 + (d & 15);
+		    int P = ((d & 64) >> 6) * 9 + (d & 15);
 		    boolean bright = (P & 8) == 8;
 		    for (int i = 0; i < 6; i++)
 			pcs[i] = (char)(System.in.read());
@@ -289,12 +289,12 @@ public class tty2colourfultty
     private static double[] pal(final String pal, final boolean chroma, final double weight)
     {
 	char c;
-	int rh = (((c = pal.charAt(0)) & 64) >> 5) * 10 + (c & 15);
-	int rl = (((c = pal.charAt(1)) & 64) >> 5) * 10 + (c & 15);
-	int gh = (((c = pal.charAt(2)) & 64) >> 5) * 10 + (c & 15);
-	int gl = (((c = pal.charAt(3)) & 64) >> 5) * 10 + (c & 15);
-	int bh = (((c = pal.charAt(4)) & 64) >> 5) * 10 + (c & 15);
-	int bl = (((c = pal.charAt(5)) & 64) >> 5) * 10 + (c & 15);
+	int rh = (((c = pal.charAt(0)) & 64) >> 6) * 9 + (c & 15);
+	int rl = (((c = pal.charAt(1)) & 64) >> 6) * 9 + (c & 15);
+	int gh = (((c = pal.charAt(2)) & 64) >> 6) * 9 + (c & 15);
+	int gl = (((c = pal.charAt(3)) & 64) >> 6) * 9 + (c & 15);
+	int bh = (((c = pal.charAt(4)) & 64) >> 6) * 9 + (c & 15);
+	int bl = (((c = pal.charAt(5)) & 64) >> 6) * 9 + (c & 15);
 	int r = (rh << 4) | rl;
 	int g = (gh << 4) | gl;
 	int b = (bh << 4) | bl;
