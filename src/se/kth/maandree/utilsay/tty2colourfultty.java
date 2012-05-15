@@ -117,7 +117,7 @@ public class tty2colourfultty
 		if (paletteArg.charAt(i++) != 'P')     continue;
 		
 		final char c = paletteArg.charAt(i++);
-		final int P = ((c & 64) >> 6) * 10 + (c & 15);
+		final int P = ((c & 64) >> 5) * 10 + (c & 15);
 		
 		p[0] = paletteArg.charAt(i++);
 		p[1] = paletteArg.charAt(i++);
@@ -159,7 +159,6 @@ public class tty2colourfultty
 	
 	int back = 0;
         int fore = 7;
-	boolean bold = false;
 	
 	String esc = null;
 	final char[] pcs = new char[6];
@@ -195,29 +194,19 @@ public class tty2colourfultty
 		    e = e.substring(0, e.indexOf(']'));
 		    
 		    if (bright)
-		    {
-			if (P != fore)
-			    System.out.print(e + "[3" + P + "m");
-			if (bold == false)
-			{
-			    System.out.print(e + "[1m");
-			    bold = true;
-			}
-		    }
+			System.out.print(e + "[1;3" + P + "m");
 		    else
-			if (P != back)
-			    System.out.print(e + "[4" + P + "m");
+			System.out.print(e + "[4" + P + "m");
 		}
 		else if (d == '[')
 		{
 		    e += (char)(d = System.in.read());
 		    if (d == 'm')
 		    {
-			back = 0;
-			fore = 7;
-			bold = false;
+			final String pre = e.substring(0, e.indexOf('['));
 			System.out.print(paletteArg);
-			System.out.print(e);
+			System.out.print(pre + "[0m");
+			//System.out.print(e);
 		    }
 		    else
 			for (;;)
@@ -233,30 +222,16 @@ public class tty2colourfultty
 				    final String[] cds = e.split(";");
 				    
 				    for (final String cd : cds)
-					if (cd.equals("1"))        bold = true;
-					else if (cd.equals("21"))  bold = false;
-					else if (cd.equals("39"))  fore = 7;
-					else if (cd.equals("49"))
+					if (cd.equals("49") || cd.equals("40"))
 				        {
-					    back = 0;
 					    System.out.print(pre + "]P0" + palette[0]);
-					    System.out.print(pre + "[" + e + "m");
+					    System.out.print(pre + "[" + cd + "m");
 					}
-					else if (cd.startsWith("3"))
-					{
-					    bold = true;
-					    System.out.print(pre + "[3" + fore + (bold ? "m" : ";1m"));
-					    System.out.print(pre + "[" + e + "m");
-					}
-					else if (cd.startsWith("4"))
-					    System.out.print(pre + "[4" + back + "m");
 					else if (cd.equals("0"))
 					{
-					    back = 0;
-					    fore = 7;
-					    bold = false;
+					    //System.out.print(pre + "]P0" + palette[0]);
 					    System.out.print(paletteArg);
-					    System.out.print(pre + "[" + e + "m");
+					    System.out.print(pre + "[0m");
 					}
 				}
 				else
