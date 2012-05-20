@@ -258,6 +258,16 @@ public class img2unisay
 			    System.out.print("\033[38;5;" + (fore = upper) + "m");
 		    System.out.print('▀');
 		}
+		else if (lower == upper)
+		{
+		    if (back != lower)
+			if (useP)
+			    System.out.print(getOSIPCode(back = lower, true));
+			else
+			    System.out.print("\033[48;5;" + (back = lower) + "m");
+		    
+		    System.out.print(' ');
+		}
 		else if ((back == lower) || (fore == upper))
 		{
 		    if (fore != upper)
