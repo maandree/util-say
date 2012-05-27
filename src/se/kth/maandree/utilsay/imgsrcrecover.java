@@ -130,7 +130,7 @@ public class imgsrcrecover
 	    System.out.println("GNU General Public License for more details.");
 	    System.out.println();
 	    System.out.println("You should have received a copy of the GNU General Public License");
-	    System.out.println("along with this library.  If not, see <http://www.gnu.org/licenses/>.");
+	    System.out.println("along with this program.  If not, see <http://www.gnu.org/licenses/>.");
 	    System.out.println();
 	    System.out.println();
 	    return;
