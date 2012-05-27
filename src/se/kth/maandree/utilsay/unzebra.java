@@ -156,16 +156,18 @@ public class unzebra
 		    buf[ptr++] = 'N';
 		    d = 0;
 		    if ((buf[ptr++] = System.in.read()) == '{')
-			if ((buf[ptr++] = System.in.read()) == 'U')
-			    if ((buf[ptr++] = System.in.read()) == '+')
-				if ((buf[ptr++] = System.in.read()) == '2')
-				    if ((buf[ptr++] = System.in.read()) == '5')
-					if ((buf[ptr++] = System.in.read()) == '8')
-					    if (((buf[ptr++] = d = System.in.read()) == '0') || (d == '4'))
-						if ((buf[ptr++] = System.in.read()) != '}')
-						    d = 0;
+		      if ((buf[ptr++] = System.in.read()) == 'U')
+		        if ((buf[ptr++] = System.in.read()) == '+')
+		          if ((buf[ptr++] = System.in.read()) == '2')
+			    if ((buf[ptr++] = System.in.read()) == '5')
+			      if ((buf[ptr++] = System.in.read()) == '8')
+				if (((buf[ptr++] = d = System.in.read()) == '0') || (d == '4'))
+				  if ((buf[ptr++] = System.in.read()) != '}')
+				      d = 0;
 		    
-		    if ((d == 0) || (back != fore))
+		    System.err.println("d: " + d + "; back: " + back + "; fore: " + fore + "; ptr: " + ptr);
+		    
+		    if ((d == 0) || (back != fore) || (ptr != buf.length))
 			for (int i = 0; i < ptr; i++)
 			    System.out.write(buf[i]);
 		    else
