@@ -87,6 +87,7 @@ public class unzebra
 	
 	int back = 0;
         int fore = 7;
+	int[] buf = new int[10];
 	
 	String esc = null;
 	for (int d; (d = System.in.read()) != -1;)
@@ -148,6 +149,28 @@ public class unzebra
 	    else if (allowEsc && (d == '\\'))
 		if ((d = System.in.read()) == 'e')
 		    esc = "\\e";
+		else if (d == 'N') // \N{U+2580}  // \N{U+2584}
+		{
+		    int ptr = 0;
+		    buf[ptr++] = '\\';
+		    buf[ptr++] = 'N';
+		    d = 0;
+		    if ((buf[ptr++] = System.in.read()) == '{')
+			if ((buf[ptr++] = System.in.read()) == 'U')
+			    if ((buf[ptr++] = System.in.read()) == '+')
+				if ((buf[ptr++] = System.in.read()) == '2')
+				    if ((buf[ptr++] = System.in.read()) == '5')
+					if ((buf[ptr++] = System.in.read()) == '8')
+					    if (((buf[ptr++] = d = System.in.read()) == '0') || (d == '4'))
+						if ((buf[ptr++] = System.in.read()) != '}')
+						    d = 0;
+		    
+		    if ((d == 0) || (back != fore))
+			for (int i = 0; i < ptr; i++)
+			    System.out.write(buf[i]);
+		    else
+			System.out.write(' ');
+		}
 		else
 		{
 		    System.out.write('\\');
