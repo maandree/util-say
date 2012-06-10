@@ -1,3 +1,16 @@
+#!/bin/sh
+
+## completion
+. run.sh --completion--
+
+## create directory for Java binaries
 mkdir bin 2>/dev/null
 
-javac -Xlint:all,-serial -cp . -s src -d bin src/se/kth/maandree/*/*.java
+## warnings
+warns="-Xlint:all,-serial"
+
+## standard parameters
+params="-s src -d bin"
+
+## compile util-say
+javac $warn -cp . $params $(find src | grep '.java$')  2>&1
