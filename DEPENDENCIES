@@ -5,3 +5,8 @@ java-runtime>=6
 
 coreutils
 
+
+# OPTIONAL
+
+imagemagick
+# for bursting gif images

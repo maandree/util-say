@@ -791,18 +791,16 @@ public class imgsrcrecover
 	    System.exit(-202);
 	}
 	
-	/*  ***  gifasm sucks at bursting!  ***
 	int ev;
 	for (final String file : dir.list())
 	    if (file.toLowerCase().endsWith(".gif"))
 	    {
 		final String abs = absdir + file;
-		if ((ev = exec("gifasm", "-d", abs + '.', abs)) != 0)
+		if ((ev = exec("convert", "-coalesce", abs, abs + ".%d.gif")) != 0)
 		    System.err.println("\033[31mCan't(" + ev + ") burst " + abs + "\033[m");
 		else
 		    exec("rm", abs);
 	    }
-	*/
     }
     
     
