@@ -105,7 +105,7 @@ public class unisay2ttyunisay
     
     private static void convert(final InputStream in, final PrintStream out) throws IOException
     {
-	out.println("\033c");
+	out.print("\033c");
 	
 	boolean dollar = false;
 	
