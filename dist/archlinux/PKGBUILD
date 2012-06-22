@@ -16,6 +16,7 @@ url="https://github.com/maandree/util-say"
 license=('GPL3')
 depends=('java-runtime>=6')
 makedepends=('git' 'java-environment>=6' 'bash')
+optdepends=('imagemagick: allows imgsrcrecovery to read frames in GIF files')
 provides=('util-say')
 conflicts=('util-say')
 
