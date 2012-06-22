@@ -9,7 +9,7 @@
 # Maintainer: Mattias Andrée <maandree@operamail.com>
 pkgname=util-say-git
 pkgver=20120622
-pkgrel=1
+pkgrel=2
 pkgdesc="Tools for creating ponies for cowsay and cowsay-like programs"
 arch=('any')
 url="https://github.com/maandree/util-say"
@@ -40,6 +40,7 @@ build() {
   git clone "$srcdir/$_gitname" "$srcdir/$_gitname-build"
   cd "$srcdir/$_gitname-build"
 
+  ./build.sh --build-make
   make DESTDIR="$pkgdir/"
 }
 

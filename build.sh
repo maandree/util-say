@@ -1,19 +1,28 @@
 #!/bin/sh
 
-paramBuildScripts=0
+
+paramBuild=0
 for arg in $@; do
     if [[ "$arg" = "--build-scripts" ]]; then
-	paramBuildScripts=1
+	paramBuild=1
+    elif [[ "$arg" = "--build-make" ]]; then
+	paramBuild=2
     fi
 done
 
 
 
-if [[ $paramBuildScripts = 1 ]]; then
+if [[ $paramBuild = 1 ]]; then
     ## build scripts
     for prog in $(java -jar util-say.jar --list); do
 	echo "java -jar /usr/bin/util-say.jar $prog \$@" > ./$prog
 	chmod 755 $prog
+    done
+elif [[ $paramBuild = 2 ]]; then
+    ## build make file
+    cp src-Makefile Makefile
+    for prog in $(java -jar util-say.jar --list); do
+	echo -e '\tunlink "${DESTDIR}/usr/bin/'$prog'"' >> ./Makefile
     done
 else
     ## completion
