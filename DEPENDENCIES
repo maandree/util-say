@@ -9,3 +9,6 @@ coreutils
 
 imagemagick
 # for bursting gif images
+
+perl
+# required for cowsay2unisay
