@@ -8,15 +8,15 @@
 
 # Maintainer: Mattias Andrée <maandree@operamail.com>
 pkgname=util-say-git
-pkgver=20120622
-pkgrel=2
+pkgver=20120623
+pkgrel=1
 pkgdesc="Tools for creating ponies for cowsay and cowsay-like programs"
 arch=('any')
 url="https://github.com/maandree/util-say"
 license=('GPL3')
 depends=('java-runtime>=6')
 makedepends=('git' 'java-environment>=6' 'bash')
-optdepends=('imagemagick: allows imgsrcrecovery to read frames in GIF files')
+optdepends=('imagemagick: allows imgsrcrecovery to read frames in GIF files' 'perl: required for cowsay2unisay')
 provides=('util-say')
 conflicts=('util-say')
 
