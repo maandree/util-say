@@ -95,7 +95,14 @@ public class cowsay2unisay
 	cow.append("print \"$the_cow\";\n");
 	
 	
-	System.out.write(execCow(cow.toString()));
+	final String uni = new String(execCow(cow.toString()), "UTF-8");
+	String line = uni.substring(0, uni.indexOf('\n'));
+	int pos = line.indexOf("$\\$") + 3;
+	if (pos > 3)
+	    System.out.println("$baloon" + pos + "$"); 
+	else
+	    System.out.println("$baloon$"); 
+	System.out.print(uni);
 	System.out.flush();
     }
     
