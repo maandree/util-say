@@ -1,8 +1,12 @@
-install:
+all: utilsay
+
+utilsay:
 	javac -cp . -s src -d . src/se/kth/maandree/utilsay/*.java
 	jar -cfm util-say.jar META-INF/MANIFEST.MF se/kth/maandree/utilsay/*.class
 	rm -r se
 	./build.sh --build-scripts
+
+install: all
 	install -d "${DESTDIR}/usr/bin"
 	install -m 755 util-say{,.jar} "${DESTDIR}/usr/bin"
 	install -d "${DESTDIR}/usr/share/bash-completion/completions"
