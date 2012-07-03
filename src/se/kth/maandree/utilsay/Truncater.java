@@ -197,8 +197,7 @@ public class Truncater
     {
 	try
 	{
-	    /* This can be done much better with Java 7 and stty. */
-	    Process process = (new ProcessBuilder("/bin/sh", "-c", "tput cols 2> " + (new File("/dev/stderr")).getCanonicalPath())).start();
+	    Process process = (new ProcessBuilder("/bin/sh", "-c", "stty size < " + (new File("/dev/stderr")).getCanonicalPath() + " | cut -d ' ' -f 2")).start();
 	    String rcs = new String();
 	    InputStream stream = process.getInputStream();
 	    int c;
