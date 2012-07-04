@@ -114,6 +114,7 @@ public class Wordwrap
     public static void wrap(final byte[] buf, final int len, final int width)
     {
 	final byte[] b = new byte[buf.length];
+	final int[] map = new int[buf.length];
 	int bi = 0, d, cols = 0, w = width;
 	int indent = -1, indentc = 0;
 	for (int i = 0; i <= len;)
@@ -141,33 +142,44 @@ public class Wordwrap
 		if (indent == -1)
 	        {
 		    indent = i - 1;
-		    indentc = cols - 1;
+		    for (int j = 0; j < indent; j++)
+			if (buf[j] == ' ')
+			    indentc++;
 		}
 		b[bi++] = (byte)d;
 		if (((d & 0x80) == 0) || ((d & 0xC0) == 0xC0))
-		    cols++;
+		    map[++cols] = bi;
 	    }
 	    else
 	    {
-		//if ((w > 8) && (cols > w + 4)
-		//{
-		//}
+		int m, mm = 0;
+		while ((w > 8) && (cols > w + 3))
+		{
+		    System.out.write(b, 0, m = map[mm += w - 1]);
+		    System.out.write('-');
+		    System.out.write('\n');
+		    cols -= w - 1;
+		    System.arraycopy(b, m += w - 1, b, 0, bi -= m);
+		    w = width;
+		    if (indent != -1)
+		    {
+			System.out.write(buf, 0, indent);
+			w -= indentc;
+		    }
+		}
 		if (cols > w)
 		{
 		    System.out.write('\n');
 		    w = width;
-		    if (indent == -1)
-			indent = indentc = 0;
-		    else
+		    if (indent != -1)
 		    {
 			System.out.write(buf, 0, indent);
-			w -= indent;
+			w -= indentc;
 		    }
 		}
 		System.out.write(b, 0, bi);
-		bi = 0;
 		w -= cols;
-		cols = 0;
+		cols = bi = 0;
 		if (d == -1)
 		    i++;
 		else
@@ -180,12 +192,10 @@ public class Wordwrap
 		    {
 			System.out.write('\n');
 			w = width;
-			if (indent == -1)
-			    indent = indentc = 0;
-			else
+			if (indent != -1)
 			{
 			    System.out.write(buf, 0, indent);
-			    w -= indent;
+			    w -= indentc;
 			}
 		    }
 	    }
