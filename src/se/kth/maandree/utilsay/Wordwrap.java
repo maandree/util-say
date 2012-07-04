@@ -147,7 +147,7 @@ public class Wordwrap
 			    indentc++;
 		}
 		b[bi++] = (byte)d;
-		if (((d & 0x80) == 0) || ((d & 0xC0) == 0xC0))
+		if ((d & 0xC0) != 0x80)
 		    map[++cols] = bi;
 	    }
 	    else
