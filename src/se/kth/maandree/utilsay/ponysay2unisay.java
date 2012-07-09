@@ -127,7 +127,7 @@ public class ponysay2unisay
 	    break;
 	}
 	
-	out.println("$baloon$");
+	out.println("$balloon$");
 	
 	final int[] link = {'$', 't', 'h', 'o', 'u', 'g', 'h', 't', 's'};
 	

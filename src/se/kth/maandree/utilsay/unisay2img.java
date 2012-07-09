@@ -73,7 +73,7 @@ public class unisay2img
 	    System.out.println();
 	    System.out.println("-2  Output image should have double dimensioned pixels.");
 	    System.out.println("-c  Output image should be cropped to drawing.");
-	    System.out.println("-l  Encode baloon links.");
+	    System.out.println("-l  Encode balloon links.");
 	    System.out.println();
 	    System.out.println("Supported output formats:");
 	    System.out.println("  ⋅  PNG");

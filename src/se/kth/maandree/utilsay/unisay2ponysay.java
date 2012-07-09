@@ -127,7 +127,7 @@ public class unisay2ponysay
 		if (d == '$')
 		{
 		    if      (buf.equals("\\") || buf.equals("/"))  out.print("$thoughts");
-		    else if (buf.startsWith("baloon"))             skipln = true;
+		    else if (buf.startsWith("balloon"))            skipln = true;
 		    else if (buf.contains("="))                    vars.put(buf.substring(0, buf.indexOf("=")), buf.substring(buf.indexOf("=") + 1));
 		    else                                           out.print(vars.get(buf));
 		    buf = null;

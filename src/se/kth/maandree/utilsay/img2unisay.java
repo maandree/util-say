@@ -217,7 +217,7 @@ public class img2unisay
 	
 	if (useP)
 	    System.out.println("\033c");
-	System.out.println("$baloon" + (bw + 3) +  "$\033[0m");
+	System.out.println("$balloon" + (bw + 3) +  "$\033[0m");
 	System.out.println(offl + "$\\$");
 	System.out.println(offl + " $\\$");
 	System.out.println(offl + "  $\\$");

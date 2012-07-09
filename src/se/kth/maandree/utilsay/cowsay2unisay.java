@@ -99,9 +99,9 @@ public class cowsay2unisay
 	String line = uni.substring(0, uni.indexOf('\n'));
 	int pos = line.indexOf("$\\$") + 3;
 	if (pos > 3)
-	    System.out.println("$baloon" + pos + "$"); 
+	    System.out.println("$balloon" + pos + "$"); 
 	else
-	    System.out.println("$baloon$"); 
+	    System.out.println("$balloon$"); 
 	System.out.print(uni);
 	System.out.flush();
     }
