@@ -14,7 +14,7 @@ done
 
 if [[ $paramBuild = 1 ]]; then
     ## build scripts
-    for prog in $(java -jar util-say.jar --list); do
+    for prog in $(java -jar util-say.jar ++list); do
 	echo 'java -jar /usr/bin/util-say.jar '"$prog"' "$@"' > ./$prog
 	chmod 755 $prog
     done

@@ -1,0 +1,1 @@
+unisay2img -l '/dev/stdout' | ponyed4png "$@" | img2unisay '/dev/stdin'

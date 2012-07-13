@@ -1,0 +1,3 @@
+stty -icanon -echo
+java -jar /usr/bin/util-say.jar ponyed4png "$@"
+stty icanon echo

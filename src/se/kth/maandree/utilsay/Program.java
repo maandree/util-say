@@ -51,8 +51,10 @@ public class Program
 	{
             System.out.println("Copyright (C) 2012  Mattias Andrée <maandree@kth.se>");
             System.out.println();
-            System.out.println("You can use --list to get a list of all programs");
-            System.out.println("USAGE:  util-say [--list | --help | PROGRAM ARGUMENTS...]");
+            System.out.println("You can use --list to get a list of all programs, or ++list");
+            System.out.println("for only those that do not use a custom execute script.");
+            System.out.println();
+            System.out.println("USAGE:  util-say [--list | ++list | --help | PROGRAM ARGUMENTS...]");
 	    System.out.println();
             System.out.println();
             System.out.println("This program is free software: you can redistribute it and/or modify");
@@ -75,7 +77,7 @@ public class Program
 	final String[] _args = new String[args.length - 1];
 	System.arraycopy(args, 1, _args, 0, _args.length);
 	
-	if (args[0].equals("--list"))
+	if (args[0].equals("--list") || args[0].equals("++list"))
 	{
 	    System.out.println("img2ponysay");
 	    System.out.println("img2unisay");
@@ -91,6 +93,12 @@ public class Program
 	    System.out.println("cowsay2unisay");
 	    System.out.println("Truncater");
 	    System.out.println("Wordwrap");
+	    if (args[0].equals("--list"))
+	    {
+		System.out.println("ponyed4png");
+		System.out.println("ponyed4ponysay");
+		System.out.println("ponyed4unisay");
+	    }
 	}
 	else if (args[0].equals("img2ponysay"))         img2ponysay.main(_args);
 	else if (args[0].equals("img2unisay"))          img2unisay.main(_args);
@@ -106,6 +114,9 @@ public class Program
 	else if (args[0].equals("unisay2ttyunisay"))    unisay2ttyunisay.main(_args);
 	else if (args[0].equals("cowsay2unisay"))       cowsay2unisay.main(_args);
 	else if (args[0].equals("tty2colourfultty"))    tty2colourfultty.main(_args);
+	else if (args[0].equals("ponyed4png"))          ponyed4png.main(_args);
+	//else if (args[0].equals("ponyed4ponysay"))      ponyed4ponysay.main(_args);
+	//else if (args[0].equals("ponyed4unisay"))       ponyed4unisay.main(_args);
 	else
 	    System.err.println("util-say: error: no such utility");
     }
