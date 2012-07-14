@@ -1,0 +1,46 @@
+##  compiled files  ##
+######################
+
+/bin/
+/doc/javadoc/
+*.class
+/*.jar
+
+/Truncater
+/Wordwrap
+/cowsay2unisay
+/img2ponysay
+/img2unisay
+/imgsrcrecover
+/ponysay2img
+/ponysay2ttyponysay
+/ponysay2unisay
+/tty2colourfultty
+/unisay2img
+/unisay2ponysay
+/unisay2ttyunisay
+/unzebra
+
+
+##  backup files  ##
+####################
+
+*~
+\#*\#
+.\#*
+*.swp
+
+
+##  distribution files  ##
+##########################
+
+/dist/*/src/
+/dist/*/util-say-*.tar.*
+
+
+##  non-included files  ##
+##########################
+
+/dev/ecj.jar
+/ecj.jar
+
