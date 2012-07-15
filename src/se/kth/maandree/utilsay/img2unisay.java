@@ -68,8 +68,7 @@ public class img2unisay
 	    System.out.println();
 	    System.out.println("-2  Input image have double dimensioned pixels.");
 	    System.out.println("-p  Use OSI P colouring for Linux VT");
-            System.out.println("-c  Chromaticity weighting (1 is standard, but");
-            System.out.println("    sRGB distance is used if not specified)");
+            System.out.println("-c  Chromaticity weighting (1 is standard, no for sRGB distance)");
 	    System.out.println();
 	    System.out.println("Known supported input formats:");
 	    System.out.println("  ⋅  PNG  (non-animated)");
@@ -96,7 +95,7 @@ public class img2unisay
 	}
 	
 	boolean useP = false;
-	boolean useC = false;
+	boolean useC = true;
 	int ai = 0;
 	int ps = 1;
 	double cw = 1;
@@ -106,10 +105,10 @@ public class img2unisay
 	    if      (args[ai].equals("-2"))  ps = 2;
 	    else if (args[ai].equals("-p"))  useP = true;
 	    else if (args[ai].equals("-c"))
-	    {
-		useC = true;
-		cw = Double.valueOf(args[++ai]);
-	    }
+		if (args[++ai].equalsIgnoreCase("no") || args[ai].equalsIgnoreCase("n"))
+		    useC = false;
+		else
+		    cw = Double.valueOf(args[ai]);
 	    else if (args[ai].equals("--"))
 	    {
 		ai++;

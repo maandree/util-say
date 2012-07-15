@@ -62,8 +62,7 @@ public class img2ponysay
 	    System.out.println();
 	    System.out.println("-2  Input image have double dimensioned pixels.");
 	    System.out.println("-p  Use OSI P colouring for Linux VT");
-	    System.out.println("-c  Chromaticity weighting (1 is standard, but");
-	    System.out.println("    sRGB distance is used if not specified)");
+            System.out.println("-c  Chromaticity weighting (1 is standard, no for sRGB distance)");
 	    System.out.println();
 	    System.out.println("Known supported input formats:");
 	    System.out.println("  ⋅  PNG  (non-animated)");
