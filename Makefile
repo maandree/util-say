@@ -6,7 +6,7 @@ utilsay:
 	rm -r se
 	./build.sh --build-scripts
 
-install: all
+install:
 	install -d "${DESTDIR}/usr/bin"
 	install -m 755 util-say{,.jar} "${DESTDIR}/usr/bin"
 	install -d "${DESTDIR}/usr/share/bash-completion/completions"
