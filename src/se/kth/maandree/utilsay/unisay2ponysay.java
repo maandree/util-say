@@ -97,6 +97,26 @@ public class unisay2ponysay
 		if (d == 'c')
 		{
 		    skipln = true;
+		    continue; 
+		}
+		if (d == '[')
+		{
+		    if ((d = in.read()) == -1)
+		    {
+			out.print("[");
+			break;
+		    }
+		    if (d == 'H')
+		    {
+			in.read(); // \e
+			in.read(); // [
+			in.read(); // 2
+			in.read(); // J
+			skipln = true;
+			continue;
+		    }
+		    out.print("\\e[");
+		    out.write(d);
 		    continue;
 		}
 		out.print("\\e");
