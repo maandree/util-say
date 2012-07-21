@@ -165,8 +165,6 @@ public class unzebra
 				  if ((buf[ptr++] = System.in.read()) != '}')
 				      d = 0;
 		    
-		    System.err.println("d: " + d + "; back: " + back + "; fore: " + fore + "; ptr: " + ptr);
-		    
 		    if ((d == 0) || (back != fore) || (ptr != buf.length))
 			for (int i = 0; i < ptr; i++)
 			    System.out.write(buf[i]);
