@@ -52,7 +52,7 @@ public class tty2colourfultty
 	{
 	    System.out.println("3-palette TTY pony to 16-palette TTY pony conversion tool");
 	    System.out.println();
-	    System.out.println("USAGE:  tty2colourfultty [-e] [-p PALETTE] [-c CHROMA] < SOURCE > TARGET]");
+	    System.out.println("USAGE:  tty2colourfultty [-e] [-p PALETTE] [-c CHROMA] < SOURCE > TARGET");
 	    System.out.println();
 	    System.out.println("Source (STDIN):  3-palette TTY pony");
 	    System.out.println("Target (STDOUT): 16-palettel TTY pony");
