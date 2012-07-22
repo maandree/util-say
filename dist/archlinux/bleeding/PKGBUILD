@@ -8,7 +8,7 @@
 
 # Maintainer: Mattias Andrée <maandree@operamail.com>
 pkgname=util-say-git
-pkgver=20120703
+pkgver=20120722
 pkgrel=1
 pkgdesc="Tools for creating ponies for cowsay and cowsay-like programs"
 arch=('any')
