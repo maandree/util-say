@@ -6,12 +6,14 @@ utilsay:
 	rm -r se
 	./build.sh --build-scripts
 
-install: all
+
+install:
 	install -d "${DESTDIR}/usr/bin"
 	install -m 755 util-say{,.jar} "${DESTDIR}/usr/bin"
 	install -d "${DESTDIR}/usr/share/bash-completion/completions"
 	install -m 644 share/bash-completion/completions/util-say "${DESTDIR}/usr/share/bash-completion/completions/util-say"
 	install -m 755 $$(java -jar util-say.jar --list) "${DESTDIR}/usr/bin"
+
 
 uninstall:
 	unlink "${DESTDIR}/usr/bin/util-say"
