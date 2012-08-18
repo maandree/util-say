@@ -95,7 +95,7 @@ public class ponysay2img
 	System.setIn(stdin);
 	System.setOut(Pout);
 	
-	ponysay2unisay.main(args);
+	ponysay2unisay.main();
 	Pout.close();
 	
 	System.setIn(pin);
