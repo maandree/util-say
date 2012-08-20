@@ -85,7 +85,7 @@ public class ponysay2ttyponysay
 		    String file = (new File(arg)).getAbsolutePath();
 		    String outfile = file.substring(0, file.lastIndexOf("/"));
 		    outfile = outfile.substring(0, outfile.lastIndexOf("/"));
-		    outfile += "/ttypony";
+		    outfile += "/ttyponies";
 		    outfile += file.substring(file.lastIndexOf("/"));
 		    
 		    InputStream fin = new BufferedInputStream(new FileInputStream(new File(arg)));
