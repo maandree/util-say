@@ -1,6 +1,6 @@
 # Maintainer: Mattias Andrée <maandree@operamail.com>
 pkgname=util-say
-pkgver=1.1
+pkgver=2.0
 pkgrel=1
 pkgdesc="Tools for creating ponies for cowsay and cowsay-like programs"
 arch=('any')
@@ -12,7 +12,7 @@ optdepends=('imagemagick: allows imgsrcrecovery to read frames in GIF files' 'pe
 provides=('util-say')
 conflicts=('util-say')
 source=(src.tar.xz)
-md5sums=(5e42c24b5adf35b0eca59472217f2e53)
+md5sums=(3fc16540c0e1371ddcd5928fd35e75bf)
 
 build() {
   cd "$srcdir"
