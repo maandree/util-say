@@ -78,13 +78,8 @@ public class Program
 	if (args[0].equals("--list"))
 	{
 	    System.out.println("img2ponysay");
-	    System.out.println("img2unisay");
 	    System.out.println("ponysay2img");
-	    System.out.println("unisay2img");
-	    System.out.println("ponysay2unisay");
-	    System.out.println("unisay2ponysay");
 	    System.out.println("ponysay2ttyponysay");
-	    System.out.println("unisay2ttyunisay");
 	    System.out.println("tty2colourfultty");
 	    System.out.println("imgsrcrecover");
 	    System.out.println("unzebra");
@@ -93,17 +88,12 @@ public class Program
 	    System.out.println("Wordwrap");
 	}
 	else if (args[0].equals("img2ponysay"))         img2ponysay.main(_args);
-	else if (args[0].equals("img2unisay"))          img2unisay.main(_args);
 	else if (args[0].equals("ponysay2img"))         ponysay2img.main(_args);
-	else if (args[0].equals("unisay2img"))          unisay2img.main(_args);
-	else if (args[0].equals("ponysay2unisay"))      ponysay2unisay.main(_args);
-	else if (args[0].equals("unisay2ponysay"))      unisay2ponysay.main(_args);
 	else if (args[0].equals("Truncater"))           Truncater.main(_args);
 	else if (args[0].equals("Wordwrap"))            Wordwrap.main(_args);
 	else if (args[0].equals("unzebra"))             unzebra.main(_args);
 	else if (args[0].equals("imgsrcrecover"))       imgsrcrecover.main(_args);
 	else if (args[0].equals("ponysay2ttyponysay"))  ponysay2ttyponysay.main(_args);
-	else if (args[0].equals("unisay2ttyunisay"))    unisay2ttyunisay.main(_args);
 	else if (args[0].equals("cowsay2unisay"))       cowsay2unisay.main(_args);
 	else if (args[0].equals("tty2colourfultty"))    tty2colourfultty.main(_args);
 	else
