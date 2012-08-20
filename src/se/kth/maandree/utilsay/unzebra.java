@@ -57,7 +57,7 @@ public class unzebra
 	    System.out.println("Source (STDIN):  Zebra pony");
 	    System.out.println("Target (STDOUT): Non-zebra pony");
 	    System.out.println();
-	    System.out.println("-e  Allow escaped input and output. Use if you are fixing ponysay ponies.");
+	    System.out.println("-e  Allow escaped input and output. Use if you are fixing ponysay<=2.0 ponies.");
 	    System.out.println();
 	    System.out.println();
 	    System.out.println("Copyright (C) 2012  Mattias Andrée <maandree@kth.se>");

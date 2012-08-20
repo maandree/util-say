@@ -1,5 +1,5 @@
 /**
- * img2unisay — Image to unisay conversion tool
+ * img2ponysay — Image to ponysay conversion tool
  *
  * Copyright © 2012  Mattias Andrée (maandree@kth.se)
  *
@@ -26,18 +26,18 @@ import java.io.*;
 
 
 /**
- * The main class of the img2unisay program
+ * The main class of the img2ponysay program
  *
  * @author  Mattias Andrée, <a href="mailto:maandree@kth.se">maandree@kth.se</a>
  */
-public class img2unisay
+public class img2ponysay
 {
     /**
      * Non-constructor
      */
-    private img2unisay()
+    private img2ponysay()
     {
-	assert false : "This class [img2unisay] is not meant to be instansiated.";
+	assert false : "This class [img2ponysay] is not meant to be instansiated.";
     }
     
     
@@ -59,9 +59,9 @@ public class img2unisay
     {
 	if ((args.length == 0) || args[0].equals("--help"))
 	{
-	    System.out.println("Image to unisay conversion tool");
+	    System.out.println("Image to ponysay conversion tool");
 	    System.out.println();
-	    System.out.println("USAGE:  img2unisay [-2] [-p | -c WEIGHT] [--] SOURCE > TARGET");
+	    System.out.println("USAGE:  img2ponysay [-2] [-p | -c WEIGHT] [--] SOURCE > TARGET");
 	    System.out.println();
 	    System.out.println("Source:          Image file");
 	    System.out.println("Target (STDOUT): File name for new unisay pony");

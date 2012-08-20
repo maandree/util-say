@@ -57,7 +57,7 @@ public class tty2colourfultty
 	    System.out.println("Source (STDIN):  3-palette TTY pony");
 	    System.out.println("Target (STDOUT): 16-palettel TTY pony");
 	    System.out.println();
-	    System.out.println("-e  Allow escaped input and output. Use if you are converting ponysay ponies.");
+	    System.out.println("-e  Allow escaped input and output. Use if you are converting ponysay<=2.0 ponies.");
 	    System.out.println("-p  Palette, echo in your TTY palette setup string.");
 	    System.out.println("-c  Colour match chromaticity weight. 1 is default, enter 'no' for sRGB distances.");
 	    System.out.println();

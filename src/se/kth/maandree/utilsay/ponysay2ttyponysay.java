@@ -1,5 +1,5 @@
 /**
- * unisay2ttyunisay — TTY suitifying unisay pony tool
+ * ponysay2ttyponysay — TTY suitifying ponysay pony tool
  *
  * Copyright © 2012  Mattias Andrée (maandree@kth.se)
  *
@@ -23,18 +23,18 @@ import java.io.*;
 
 
 /**
- * The main class of the unisay2ttyunisay program
+ * The main class of the ponysay2ttyponysay program
  *
  * @author  Mattias Andrée, <a href="mailto:maandree@kth.se">maandree@kth.se</a>
  */
-public class unisay2ttyunisay
+public class ponysay2ttyponysay
 {
     /**
      * Non-constructor
      */
-    private unisay2ttyunisay()
+    private ponysay2ttyponysay()
     {
-	assert false : "This class [unisay2ttyunisay] is not meant to be instansiated.";
+	assert false : "This class [ponysay2ttyponysay] is not meant to be instansiated.";
     }
     
     
@@ -50,9 +50,9 @@ public class unisay2ttyunisay
     {
 	if ((args.length > 0) && args[0].equals("--help"))
 	{
-	    System.out.println("TTY suitifying unisay pony tool");
+	    System.out.println("TTY suitifying ponysay pony tool");
 	    System.out.println();
-	    System.out.println("USAGE:  unisay2ttyunisay [SOURCE... | < SOURCE > TARGET]");
+	    System.out.println("USAGE:  ponysay2ttyponysay [SOURCE... | < SOURCE > TARGET]");
 	    System.out.println();
 	    System.out.println("Source (STDIN):  Regular unisay pony");
 	    System.out.println("Target (STDOUT): New TTY unisay pony");
@@ -105,8 +105,6 @@ public class unisay2ttyunisay
     
     private static void convert(final InputStream in, final PrintStream out) throws IOException
     {
-	out.print("\033[H\033[2J");
-	
 	boolean dollar = false;
 	
 	for (int d; (d = in.read()) != -1;)

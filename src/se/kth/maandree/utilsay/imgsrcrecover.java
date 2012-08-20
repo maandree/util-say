@@ -113,7 +113,7 @@ public class imgsrcrecover
 	    System.out.println("Known supported input formats:");
 	    System.out.println("  ⋅  PNG      (non-animated)");
 	    System.out.println("  ⋅  GIF      (animated)");
-	    System.out.println("  ⋅  ponysay  (must have file name extension: .pony)");
+	    System.out.println("  ⋅  ponysay");
 	    System.out.println("  ⋅  unisay");
 	    System.out.println();
 	    System.out.println();
@@ -699,8 +699,7 @@ public class imgsrcrecover
 		    final InputStream stdin = System.in;
 		    System.setIn(new BufferedInputStream(new FileInputStream(new File(dir + file))));
 		    
-		    if (file.endsWith(".pony"))  ponysay2img.main("--", dir + file);
-		    else                         unisay2img.main("--", dir + file);
+		    ponysay2img.main("--", dir + file);
 		    
 		    img = ImageIO.read(new File(dir + file));
 		    System.setIn(stdin);

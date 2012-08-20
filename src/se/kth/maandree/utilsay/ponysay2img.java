@@ -1,5 +1,5 @@
 /**
- * unisay2img — unisay to image conversion tool
+ * ponysay2img — ponysay to image conversion tool
  *
  * Copyright © 2012  Mattias Andrée (maandree@kth.se)
  *
@@ -26,11 +26,11 @@ import java.io.*;
 
 
 /**
- * The main class of the unisay2img program
+ * The main class of the ponysay2img program
  *
  * @author  Mattias Andrée, <a href="mailto:maandree@kth.se">maandree@kth.se</a>
  */
-public class unisay2img
+public class ponysay2img
 {
     public static final Color LINK_B = new Color(0, 0, 255, 128);
     public static final Color LINK_F = new Color(255, 255, 0, 128);
@@ -40,9 +40,9 @@ public class unisay2img
     /**
      * Non-constructor
      */
-    private unisay2img()
+    private ponysay2img()
     {
-	assert false : "This class [unisay2img] is not meant to be instansiated.";
+	assert false : "This class [ponysay2img] is not meant to be instansiated.";
     }
     
     
@@ -64,9 +64,9 @@ public class unisay2img
     {
 	if ((args.length == 0) || args[0].equals("--help"))
 	{
-	    System.out.println("unisay to image conversion tool");
+	    System.out.println("ponysay to image conversion tool");
 	    System.out.println();
-	    System.out.println("USAGE:  unisay2img [-2] [-c] [-l] [--] TARGET < SOURCE");
+	    System.out.println("USAGE:  ponysay2img [-2] [-c] [-l] [--] TARGET < SOURCE");
 	    System.out.println();
 	    System.out.println("Source (STDOUT):  unisay pony file to convert");
 	    System.out.println("Target:           File name for new image pony");
