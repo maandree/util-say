@@ -105,7 +105,7 @@ public class unisay2ttyunisay
     
     private static void convert(final InputStream in, final PrintStream out) throws IOException
     {
-	//out.print("\033[H\033[2J");
+	out.print("\033[H\033[2J");
 	
 	boolean dollar = false;
 	
