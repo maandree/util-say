@@ -1,7 +1,7 @@
 # Maintainer: Mattias Andrée <maandree@operamail.com>
 pkgname=util-say
 pkgver=2.0
-pkgrel=1
+pkgrel=2
 pkgdesc="Tools for creating ponies for cowsay and cowsay-like programs"
 arch=('any')
 url="https://github.com/maandree/util-say"
@@ -11,16 +11,16 @@ makedepends=('java-environment>=6' 'bash')
 optdepends=('imagemagick: allows imgsrcrecovery to read frames in GIF files' 'perl: required for cowsay2unisay')
 provides=('util-say')
 conflicts=('util-say')
-source=(src.tar.xz)
-md5sums=(3fc16540c0e1371ddcd5928fd35e75bf)
+source=(https://github.com/maandree/util-say/tarball/2.0)
+md5sums=(25d40cb24640f31fd729fd895ae75ab8)
 
 build() {
-  cd "$srcdir"
+  cd maandree-util-say-a1a906b
   ./build.sh --build-make
   make -B DESTDIR="$pkgdir/"
 }
 
 package() {
-  cd "$srcdir"
+  cd maandree-util-say-a1a906b
   make DESTDIR="$pkgdir/" install
 }
