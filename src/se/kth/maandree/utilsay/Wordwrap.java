@@ -153,13 +153,13 @@ public class Wordwrap
 	    else
 	    {
 		int m, mm = 0;
-		while ((w > 8) && (cols > w + 3))
+		while (/*(w > 8) &&*/ (cols > w + 3))
 		{
 		    System.out.write(b, 0, m = map[mm += w - 1]);
-		    System.out.write('-');
+		    System.out.write('̣­');
 		    System.out.write('\n');
 		    cols -= w - 1;
-		    System.arraycopy(b, m += w - 1, b, 0, bi -= m);
+		    System.arraycopy(b, m, b, 0, bi -= m);
 		    w = width;
 		    if (indent != -1)
 		    {
