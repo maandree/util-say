@@ -153,7 +153,7 @@ public class Wordwrap
 	    else
 	    {
 		int m, mm = 0;
-		while (/*(w > 8) &&*/ (cols > w + 3))
+		while (((w > 8) && (cols > w + 3)) || (cols > width))
 		{
 		    System.out.write(b, 0, m = map[mm += w - 1]);
 		    System.out.write('̣­');
