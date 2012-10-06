@@ -156,7 +156,7 @@ public class Wordwrap
 		while (((w > 8) && (cols > w + 3)) || (cols > width))
 		{
 		    System.out.write(b, 0, m = map[mm += w - 1]);
-		    System.out.print('̣­');
+		    System.out.print('­');
 		    System.out.print('\n');
 		    cols -= w - 1;
 		    System.arraycopy(b, m, b, 0, bi -= m);
