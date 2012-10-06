@@ -156,8 +156,8 @@ public class Wordwrap
 		while (((w > 8) && (cols > w + 3)) || (cols > width))
 		{
 		    System.out.write(b, 0, m = map[mm += w - 1]);
-		    System.out.write('̣­');
-		    System.out.write('\n');
+		    System.out.print('̣­');
+		    System.out.print('\n');
 		    cols -= w - 1;
 		    System.arraycopy(b, m, b, 0, bi -= m);
 		    w = width;
@@ -169,7 +169,7 @@ public class Wordwrap
 		}
 		if (cols > w)
 		{
-		    System.out.write('\n');
+		    System.out.print('\n');
 		    w = width;
 		    if (indent != -1)
 		    {
@@ -185,12 +185,12 @@ public class Wordwrap
 		else
 		    if (w > 0)
 		    {
-			System.out.write(' ');
+			System.out.print(' ');
 			w--;
 		    }
 		    else
 		    {
-			System.out.write('\n');
+			System.out.print('\n');
 			w = width;
 			if (indent != -1)
 			{
