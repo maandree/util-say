@@ -105,9 +105,26 @@ public class ponysay2ttyponysay
     
     private static void convert(final InputStream in, final PrintStream out) throws IOException
     {
-	boolean dollar = false;
+	int[] metabuf = {-1, -1, -1, -1, -1};
+	boolean dollar = false, metadata = true;
 	
 	for (int d; (d = in.read()) != -1;)
+	{
+	    metabuf[0] = metabuf[1]; metabuf[1] = metabuf[2]; metabuf[2] = metabuf[3]; metabuf[3] = metabuf[4]; metabuf[4] = d;
+	    if (metadata)
+	    {
+		out.write(d);
+		if ((metabuf[0] == '\n') && (metabuf[1] == '$') && (metabuf[2] == '$') && (metabuf[3] == '$') && (metabuf[4] == '\n'))
+		    metadata = dollar = false;
+		continue;
+	    }
+	    else if ((metabuf[0] == -1) && (metabuf[1] == '$') && (metabuf[2] == '$') && (metabuf[3] == '$') && (metabuf[4] == '\n'))
+	    {
+		metadata = true;
+		out.write(d);
+		continue;
+	    }
+	    
 	    if (d == '$')
 	    {
 		dollar ^= true;
@@ -172,6 +189,7 @@ public class ponysay2ttyponysay
 	    }
 	    else
 		out.write(d);
+	}
     }
     
     

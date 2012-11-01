@@ -129,8 +129,19 @@ public class ponysay2img
 	upper.add(new ArrayList<Color>());
 	lower.add(new ArrayList<Color>());
 	
+	int[] metabuf = {-1, -1, -1, -1, -1};
+	boolean metadata = true;
+	
 	for (int d; (d = System.in.read()) != -1;)
         {
+	    metabuf[0] = metabuf[1]; metabuf[1] = metabuf[2]; metabuf[2] = metabuf[3]; metabuf[3] = metabuf[4]; metabuf[4] = d;
+	    if (metadata)
+	    {
+		if ((metabuf[0] == '\n') && (metabuf[1] == '$') && (metabuf[2] == '$') && (metabuf[3] == '$') && (metabuf[4] == '\n'))
+		    metadata = false;
+		continue;
+	    }
+	    
 	    if (d == '$')
 	    {
 		d = System.in.read();
@@ -159,6 +170,19 @@ public class ponysay2img
 		    }
 		else
 		{
+		    if (d == '$')
+			if (System.in.read() == '$')
+			{
+			    if (System.in.read() == '\n') && (metabuf[3] == -1)
+			    {
+				metabuf[4] = '\n';
+				metadata = true;
+				continue;
+			    }
+			    System.err.println("Not a pretty pony.  Stop. (0)");
+			    System.exit(-1);
+			}
+		    
 		    System.err.println("Not a pretty pony.  Stop. (0)");
 		    System.exit(-1);
 		}

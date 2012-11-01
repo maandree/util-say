@@ -89,8 +89,27 @@ public class unzebra
         int fore = 7;
 	int[] buf = new int[10];
 	
+	int[] metabuf = {-1, -1, -1, -1, -1};
+	boolean metadata = true;
+	
 	String esc = null;
 	for (int d; (d = System.in.read()) != -1;)
+	{
+	    metabuf[0] = metabuf[1]; metabuf[1] = metabuf[2]; metabuf[2] = metabuf[3]; metabuf[3] = metabuf[4]; metabuf[4] = d;
+	    if (metadata)
+	    {
+		System.out.write(d);
+		if ((metabuf[0] == '\n') && (metabuf[1] == '$') && (metabuf[2] == '$') && (metabuf[3] == '$') && (metabuf[4] == '\n'))
+		    metadata = false;
+		continue;
+	    }
+	    else if ((metabuf[0] == -1) && (metabuf[1] == '$') && (metabuf[2] == '$') && (metabuf[3] == '$') && (metabuf[4] == '\n'))
+	    {
+		metadata = true;
+		System.out.write(d);
+		continue;
+	    }
+	    
 	    if (esc != null)
 	    {
 		System.out.print(esc);
@@ -201,6 +220,7 @@ public class unzebra
 	    }
 	    else
 		System.out.write(d);
+	}
 	
 	System.out.flush();
     }
