@@ -75,7 +75,7 @@ public class Pony
     public Pony.Cell[][] matrix;
     
     /**
-     * The cells in the pony
+     * The metacells in the pony
      */
     public Pony.Meta[][][] metamatrix;
     
