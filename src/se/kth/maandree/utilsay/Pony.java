@@ -89,7 +89,7 @@ public class Pony
 	/**
 	 * Pixel pair
 	 */
-	public static final long PIXELS = -1;
+	public static final long PIXELS = -1L;
 	
 	/**
 	 * NNE–SSW link
