@@ -111,12 +111,15 @@ public class Pony
 	 * @param  lowerColour  The colour to apply to the lower pixed if a pixel, background colour if character, otherwise ignored, {@code null} is preferable for fully transparent
 	 * @param  format       Formatting to apply, nine booleans
 	 */
-	public Cell(int character, Color upperColour, Color lowerColour, boolean[] format)
+	public Cell(int character, Color upperColour, Color lowerColour, boolean[] format, Color foregroundColour2, Color backgroundColour2, boolean[] format2)
 	{
 	    this.character = character;
 	    this.upperColour = upperColour;
 	    this.lowerColour = lowerColour;
 	    this.format = format;
+	    this.foregroundColour2 = foregroundColour2;
+	    this.backgroundColour2 = backgroundColour2;
+	    this.format2 = format2;
 	}
 	
 	
@@ -140,6 +143,21 @@ public class Pony
 	 * Formatting to apply, nine booleans
 	 */
 	public boolean[] format;
+	
+	/**
+	 * Foreground colour applied to the second character if it exists, {@code null} is preferable for fully transparent
+	 */
+	public Color foregroundColour2;
+	
+	/**
+	 * Background colour applied to the second character if it exists, {@code null} is preferable for fully transparent
+	 */
+	public Color backgroundColour2;
+	
+	/**
+	 * Formatting to apply to the second character if it exists, nine booleans
+	 */
+	public boolean[] format2;
 	
     }
     
