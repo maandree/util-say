@@ -46,7 +46,7 @@ public class Ponysay
 	this.chroma = (flags.contains("chroma") == false) ? -1 : parseDouble(flags.get("chroma"));
 	this.left = (flags.contains("left") == false) ? 2 : parseInteger(flags.get("left"));
 	this.right = (flags.contains("right") == false) ? 0 : parseInteger(flags.get("right"));
-	this.top = (flags.contains("top") == false) ? 0 : parseInteger(flags.get("top"));
+	this.top = (flags.contains("top") == false) ? 3 : parseInteger(flags.get("top"));
 	this.bottom = (flags.contains("bottom") == false) ? 1 : parseInteger(flags.get("bottom"));
 	this.palette = (flags.contains("palette") == false) ? null : parsePalette(flags.get("palette").toUpperCase().replace("\033", "").replace("]", "").replace("P", ""));
     }
