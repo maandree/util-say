@@ -29,7 +29,7 @@ import java.awt.Color;
 public class Pony
 {
     /**
-     * Contructor
+     * Constructor
      * 
      * @param  heigth   The height of the pony, in lines (paired pixels)
      * @param  width    The width of the pony, in columns (pixels)
