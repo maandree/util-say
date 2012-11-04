@@ -62,7 +62,8 @@ public class Ponysay
 	this.file = (this.file = flags.contains("file") ? flags.get("file") : null).equals("-") ? null : this.file;
 	this.even = (flags.contains("even") == false) || flags.get("even").toLowerCase().startswith("y");
 	this.tty = flags.contains("tty") && flags.get("tty").toLowerCase().startswith("y");
-	this.zebra = flags.contains("zebra") ? flags.get("zebra").toLowerCase().startswith("y") : (this.tty == false);
+	this.spacesave = flags.contains("spacesave") && flags.get("spacesave").toLowerCase().startswith("y");
+	this.zebra = flags.contains("zebra") && flags.get("zebra").toLowerCase().startswith("y");
 	this.version = flags.contains("version") ? parseVersion(flags.get("version")) : VERSION_HORIZONTAL_JUSTIFICATION;
 	this.utf8 = this.version > VERSION_COWSAY ? true : (flags.contains("utf8") && flags.get("utf8").toLowerCase().startswith("y"));
 	this.fullcolour = flags.contains("fullcolour") && flags.get("fullcolour").toLowerCase().startswith("y");
@@ -90,6 +91,11 @@ public class Ponysay
      * Output option: linux vt
      */
     protected boolean tty;
+    
+    /**
+     * Output option: make foreground for whitespace the same as the background
+     */
+    protected boolean spacesave;
     
     /**
      * Output option: zebra effect
@@ -660,6 +666,7 @@ public class Ponysay
 	    if (this.utf8 == false)
 		data = date.replace("▀", "\\N{U+2580}").replace("▄", "\\N{U+2584}");
 	}
+	
 	
 	OutputStream out = System.out;
 	if (this.file != null)
