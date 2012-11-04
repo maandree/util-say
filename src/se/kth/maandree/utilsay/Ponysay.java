@@ -59,12 +59,12 @@ public class Ponysay
      */
     public Ponysay(HashMap<String, String> flags)
     {
+	this.file = (this.file = flags.contains("file") ? flags.get("file") : null).equals("-") ? null : this.file;
 	this.even = (flags.contains("even") == false) || flags.get("even").toLowerCase().startswith("y");
 	this.tty = flags.contains("tty") && flags.get("tty").toLowerCase().startswith("y");
 	this.zebra = flags.contains("zebra") ? flags.get("zebra").toLowerCase().startswith("y") : (this.tty == false);
 	this.version = flags.contains("version") ? parseVersion(flags.get("version")) : VERSION_HORIZONTAL_JUSTIFICATION;
 	this.utf8 = this.version > VERSION_COWSAY ? true : (flags.contains("utf8") && flags.get("utf8").toLowerCase().startswith("y"));
-	this.file = flags.contains("file") ? flags.get("file") : null;
 	this.fullcolour = flags.contains("fullcolour") && flags.get("fullcolour").toLowerCase().startswith("y");
 	this.chroma = (flags.contains("chroma") == false) ? -1 : parseDouble(flags.get("chroma"));
 	this.left = (flags.contains("left") == false) ? 2 : parseInteger(flags.get("left"));
@@ -75,6 +75,11 @@ public class Ponysay
     }
     
     
+    
+    /**
+     * Input/output option: pony file
+     */
+    protected String file;
     
     /**
      * Output option: pad right side
@@ -102,19 +107,14 @@ public class Ponysay
     protected double chroma;
     
     /**
-     * Output option: ponysay version
+     * Input/output option: ponysay version
      */
     protected int version;
     
     /**
-     * Output option: use utf8 encoding
+     * Output option: use utf8 encoding on pixels
      */
     protected boolean utf8;
-    
-    /**
-     * Input/output option: pony file
-     */
-    protected String file;
     
     /**
      * Output option: do not limit to xterm 256 standard colours
@@ -141,6 +141,41 @@ public class Ponysay
      */
     protected int bottom;
     
+    
+    
+    /**
+     * Import the pony from file
+     * 
+     * @return  The pony
+     */
+    public Pony importPony()
+    {
+	if (this.version == VERSION_COWSAY)
+	    return this.importCow();
+	
+	return null; // TODO implement
+    }
+    
+    /**
+     * Import the pony from file using the cowsay format
+     * 
+     * @return  The pony
+     */
+    protected Pony importCow()
+    {
+	return null; // TODO implement
+    }
+    
+    
+    /**
+     * Export a pony to the file
+     * 
+     * @param  pony  The pony
+     */
+    public void exportPony(Pony pony)
+    {
+	// TODO implement
+    }
     
     
     /**

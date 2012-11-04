@@ -39,6 +39,17 @@ public class Cowsay extends Ponysay
     
     
     /**
+     * Import the pony from file
+     * 
+     * @return  The pony
+     */
+    protected Pony importCow()
+    {
+	return null; // TODO implement
+    }
+    
+    
+    /**
      * Modify the flags to fit this module
      * 
      * @param   flag  The flags
