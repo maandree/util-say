@@ -89,17 +89,17 @@ public class Pony
 	/**
 	 * Pixel pair
 	 */
-	public static final long PIXELS = -1L;
+	public static final int PIXELS = -1;
 	
 	/**
 	 * NNE–SSW link
 	 */
-	public static final long NNE_SSW = -2L;
+	public static final int NNE_SSW = -2;
 	
 	/**
 	 * NNW–SSE link
 	 */
-	public static final long NNW_SSE = -3L;
+	public static final int NNW_SSE = -3;
 	
 	
 	
@@ -111,23 +111,20 @@ public class Pony
 	 * @param  lowerColour  The colour to apply to the lower pixed if a pixel, background colour if character, otherwise ignored, {@code null} is preferable for fully transparent
 	 * @param  format       Formatting to apply, nine booleans
 	 */
-	public Cell(int character, Color upperColour, Color lowerColour, boolean[] format, Color foregroundColour2, Color backgroundColour2, boolean[] format2)
+	public Cell(int character, Color upperColour, Color lowerColour, boolean[] format)
 	{
 	    this.character = character;
 	    this.upperColour = upperColour;
 	    this.lowerColour = lowerColour;
-	    this.format = format;
-	    this.foregroundColour2 = foregroundColour2;
-	    this.backgroundColour2 = backgroundColour2;
-	    this.format2 = format2;
+	    System.arraycopy(format, 0, this.format = new boolean[9], 0, 9);
 	}
 	
 	
 	
 	/**
-	 * The character duo in UTF-32, if negative it will have a special meaning, for example pixels or boolean link
+	 * The character in UTF-32, if negative it will have a special meaning, for example pixels or boolean link
 	 */
-	public long character;
+	public int character;
 	
 	/**
 	 * The colour to apply to the upper pixed if a pixel, foreground colour if character, otherwise ignored, {@code null} is preferable for fully transparent
@@ -144,21 +141,6 @@ public class Pony
 	 */
 	public boolean[] format;
 	
-	/**
-	 * Foreground colour applied to the second character if it exists, {@code null} is preferable for fully transparent
-	 */
-	public Color foregroundColour2;
-	
-	/**
-	 * Background colour applied to the second character if it exists, {@code null} is preferable for fully transparent
-	 */
-	public Color backgroundColour2;
-	
-	/**
-	 * Formatting to apply to the second character if it exists, nine booleans
-	 */
-	public boolean[] format2;
-	
     }
     
     
@@ -171,6 +153,52 @@ public class Pony
 	// Marker intergace
     }
     
+    
+    
+    /**
+     * Combining character
+     */
+    public class Combining implements Meta
+    {
+	/**
+	 * Constructor
+	 * 
+	 * @param  character         The character in UTF-32
+	 * @param  foregroundColour  Foreground colour to apply to the character
+	 * @param  backgroundColour  Background colour to apply to the character
+	 * @param  format            Formatting to apply, nine booleans
+	 */
+	public Combining(int character, Color foregroundColour, Color backgroundColour, boolean[] format)
+	{
+	    this.character = character;
+	    this.foregroundColour = foregroundColour;
+	    this.backgroundColour = backgroundColour;
+	    System.arraycopy(format, 0, this.format = new boolean[9], 0, 9);
+	}
+	
+	
+	
+	/**
+	 * The character in UTF-32
+	 */
+	public int character;
+	
+	/**
+	 * Foreground colour to apply to the character
+	 */
+	public Color foregroundColour;
+	
+	/**
+	 * Background colour to apply to the character
+	 */
+	public Color backgroundColour;
+	
+	/**
+	 * Formatting to apply, nine booleans
+	 */
+	public boolean[] format;
+	
+    }
     
     
     /**
@@ -191,7 +219,7 @@ public class Pony
 	    this.name = name;
 	    this.foregroundColour = foregroundColour;
 	    this.backgroundColour = backgroundColour;
-	    this.format = format;
+	    System.arraycopy(format, 0, this.format = new boolean[9], 0, 9);
 	}
 	
 	
@@ -217,7 +245,6 @@ public class Pony
 	public boolean[] format;
 	
     }
-    
     
     
     /**

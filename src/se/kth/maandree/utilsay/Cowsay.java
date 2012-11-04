@@ -109,6 +109,23 @@ public class Cowsay extends Ponysay
 	InputStream stdin = System.in;
 	try
 	{
+	    final byte[] streamdata = data.toString().getBytes('UTF-8');
+	    System.setIn(new InputStream()
+		{
+		    int ptr = 0;
+		    @Override
+		    public int read()
+		    {
+			if (this.ptr == streamdata.length)
+			    return -1;
+			return streamdata[this.ptr++] & 255;
+		    }
+		    @Override
+		    public int available()
+		    {
+			return streamdata.length - this.ptr;
+		    }
+		});
 	    this.flags.put("file", null);
 	    Ponysay ponysay = new Ponysay(this.flags);
 	    if (ponysay.version == this.version)

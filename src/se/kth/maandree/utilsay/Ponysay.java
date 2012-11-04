@@ -153,6 +153,141 @@ public class Ponysay
 	if (this.version == VERSION_COWSAY)
 	    return this.importCow();
 	
+	Color[] colours = new Color[256];
+	boolean[] format = new boolean[9];
+	Color background = null, foreground = null;
+	
+	for (int i = 0; i < 256; i++)
+	{   Colour colour = new Colour(i);
+	    colours[i] = new Color(colour.red, colour.green, colour.blue);
+	}
+	if (this.palette == null)
+	    System.arraycopy(this.palette, 0, colours, 0, 16);
+	
+	InputStream in = System.in;
+	if (this.file != null)
+	    in = BufferedInputStream(new FileInputStream(this.file));
+	
+	// TODO support metadata
+	
+	boolean dollar = false;
+	boolean escape = false;
+	
+	int[] dollarbuf = new int[256];
+	int dollarptr = 0;
+	int dollareql = -1;
+	
+	int width = 0;
+	int curwidth = 0;
+	
+	ArrayList<Object> items = new ArrayList<Object>();
+	
+	for (int d = 0, stored = -1, c;;)
+	{
+	    if ((d = stored) != -1)
+		stored = -1;
+	    else if ((d == in.read()) == -1)
+		break;
+	    
+	    if (((c = d) & 0x80) == 0x80)
+	    {   int n = 0;
+		while ((c & 0x80) == 0x80)
+		{   c <<= 1;
+		    n++;
+		}
+		c = (c & 255) >> n;
+		while (((d = in.read()) & 0xC0) == 0x80)
+		    c = (c << 6) | (d & 0x3F);
+		stored = d;
+	    }
+	    
+	    if (dollar)
+		if ((d == '\033') && !escape)
+		    escape = true;
+		else if ((d == '$') && !escape)
+		{   dollar = false;
+		    if (dollareql == -1)
+		    {
+			int[] _name = new int[dollarptr];
+			System.arraycopy(dollarbuf, 0, _name, 0, _name.length);
+			String name = utf32to16(_name);
+			if (name.equals("\\"))
+		        {   curwidth++;
+			    items.add(new Pony.Cell(Pony.Cell.NNE_SSW, null, null, format));
+			}
+			else if (name.equals("/"))
+		        {   curwidth++;
+			    items.add(new Pony.Cell(Pony.Cell.NNW_SSE, null, null, format));
+			}
+			else if (name.startsWith("balloon") == false)
+			    items.add(new Recall(name, foreground, background, format));
+			else
+			{   String[] parts = (name.substring("balloon".length()) + ",,,,,").split(",");
+			    Integer h = parts[1].isEmpty() ? null : new Integer(parts[1]);
+			    int justify = Pony.Balloon.NONE;
+			    if      (parts[0].contains("l"))  justify = Pony.Balloon.LEFT;
+			    else if (parts[0].contains("r"))  justify = Pony.Balloon.RIGHT;
+			    else if (parts[0].contains("c"))  justify = Pony.Balloon.CENTRE;
+			    else
+				items.add(new Pony.Balloon(null, null, parts[0].isEmpty() ? null : new Integer(parts[0]), h, null, null, Pony.Balloon.NONE));
+			    if (justify != Pony.Balloon.NONE)
+			    {
+				parts = parts[0].replace('l', ',').replace('r', ',').replace('c', ',').split(",");
+				int part0 = Integer.parseInt(parts[0]), part1 = Integer.parseInt(parts[1]);
+				items.add(new Pony.Balloon(new Integer(part0), null, new Integer(part1 - part0 + 1), h, null, null, justify));
+			}   }
+		    }
+		    else
+		    {   int[] name = new int[dollareql];
+			System.arraycopy(dollarbuf, 0, name, 0, name.length);
+			int[] value = new int[dollarptr - dollareql - 1];
+			System.arraycopy(dollarbuf, dollareql + 1, value, 0, value.length);
+			items.add(new Pony.Recall(utf32to16(name), utf32to16(value)));
+		    }
+		    dollarptr = 0;
+		    dollareql = -1;
+		}
+		else
+		{   escape = false;
+		    if (dollarptr == dollarbuf.length)
+			System.arraycopy(dollarbuf, 0, dollarbuf = new int[dollarptr << 1], 0, dollarbuf);
+		    if ((dollareql == -1) && (d == '='))
+			dollareql = dollarptr;
+		    dollarbuf[dollarptr++] = d;
+		}
+	    else if (escape)
+		; // TODO implement
+	    else if (d == '\033')
+		escape = true;
+	    else if (d == '$')
+		dollar = true;
+	    else if (d == '\n')
+	    {   if (width < curwidth)
+		    width = curwidth;
+		curwidth = 0;
+		items.add(null);
+	    }
+	    else
+	    {	boolean combining = false;
+		if ((0x0300 <= c) && (c <= 0x036F))  combining = true;
+		if ((0x20D0 <= c) && (c <= 0x20FF))  combining = true;
+		if ((0x1DC0 <= c) && (c <= 0x1DFF))  combining = true;
+		if ((0xFE20 <= c) && (c <= 0xFE2F))  combining = true;
+		if (combining)
+		    items.add(new Pony.Combining(c, foreground, background, format));
+		else
+		{   curwidth++;
+		    if (c == '▀')
+			items.add(new Pony.Cell(Pony.Cell.PIXELS, foreground == null ? colours[7] : foreground, background, format));
+		    else if (c == '▄')
+			items.add(new Pony.Cell(Pony.Cell.PIXELS, background, foreground == null ? colours[7] : foreground, format));
+		    else if (c == ' ')
+			items.add(new Pony.Cell(Pony.Cell.PIXELS, background, background, format));
+		    else
+			items.add(new Pony.Cell(c, foreground, background, format));
+	    }   }
+	}
+	
 	return null; // TODO implement
     }
     
@@ -260,6 +395,43 @@ public class Ponysay
 	    palette[index] = new Color(red, green, blue);
 	}
 	return palette;
+    }
+    
+    
+    /**
+     * Converts an integer array to a string with only 16-bit charaters
+     * 
+     * @param   ints  The int array
+     * @return        The string
+     */
+    public static String utf32to16(final int... ints)
+    {
+	int len = ints.length;
+	for (final int i : ints)
+	    if (i > 0xFFFF)
+		len++;
+	    else if (i > 0x10FFFF)
+		throw new RuntimeException("Be serious, there is no character above plane 16.");
+	
+	final char[] chars = new char[len];
+	int ptr = 0;
+	
+	for (final int i : ints)
+	    if (i <= 0xFFFF)
+		chars[ptr++] = (char)i;
+	    else
+	    {
+		// 0x10000 + (H - 0xD800) * 0x400 + (L - 0xDC00)
+		
+		int c = i - 0x10000;
+		int L = (c & 0x3FF) + 0xDC00;
+		int H = (c >>> 10) + 0xD800;
+		
+		chars[ptr++] = (char)H;
+		chars[ptr++] = (char)L;
+	    }
+	
+	return new String(chars);
     }
     
 }
