@@ -74,7 +74,7 @@ public class Ponysay
     protected Color[] palette;
     
     /**
-     * Input/optput option: chroma weight, negative for sRGB distance
+     * Output option: chroma weight, negative for sRGB distance
      */
     protected double chroma;
     
