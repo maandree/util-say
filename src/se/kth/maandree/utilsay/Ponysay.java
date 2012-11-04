@@ -168,8 +168,6 @@ public class Ponysay
 	if (this.file != null)
 	    in = BufferedInputStream(new FileInputStream(this.file));
 	
-	// TODO support metadata
-	
 	boolean dollar = false;
 	boolean escape = false;
 	boolean csi = false;
@@ -184,10 +182,90 @@ public class Ponysay
 	int height = 1;
 	
 	ArrayList<Object> items = new ArrayList<Object>();
+	String comment = null;
+	String[][] tags = null;
+	int tagptr = 0;
+	
+	int[] unmetabuf = new int[4];
+	int unmetaptr = 0;
+	unmetabuf[unmetaptr++] = in.read();
+	unmetabuf[unmetaptr++] = in.read();
+	unmetabuf[unmetaptr++] = in.read();
+	unmetabuf[unmetaptr++] = in.read();
+	if ((unmetabuf[0] == '$') && (unmetabuf[1] == '$') && (unmetabuf[2] == '$') && (unmetabuf[3] == '\n'))
+	{   unmetaptr = 0;
+	    byte[] data = new byte[256];
+	    int d = 0;
+	    while ((d = in.read()) != -1)
+	    {
+		if (ptr == data.lenght)
+		    System.arraycopy(data, 0, data = new byte[ptr << 1], 0, ptr);
+		data[ptr++] = d;
+		if ((ptr >= 5) && (data[ptr - 1] == '\n') && (data[ptr - 2] == '$') && (data[ptr - 3] == '$') && (data[ptr - 4] == '$') && (data[ptr - 5] == '\n'))
+		{   ptr -= 5;
+		    break;
+		}
+		if ((ptr == 4) && (data[ptr - 1] == '\n') && (data[ptr - 2] == '$') && (data[ptr - 3] == '$') && (data[ptr - 4] == '$'))
+		{   ptr -= 4;
+		    break;
+		}
+	    }
+	    if (d == -1)
+		throw new RuntimeException("Metadata was never closed");
+	    String[] code = (new String(data, 0, ptr, "UTF-8")).split("\n");
+	    StringBuilder commentbuf = new StringBuilder();
+	    for (String line : code)
+	    {
+		int colon = line.indexOf(':');
+		boolean istag = colon > 0;
+		String name = null, value = null;
+		block: {
+		    if (istag)
+		    {
+			istag = false;
+			name = line.substring(0, colon);
+			value = line.substring(colon + 1);
+			char c;
+			for (int i = 0, n = name.length(); i < n; i++)
+			    if ((c = name.charAt(i)) != ' ')
+				if (('A' > c) || (c > 'Z'))
+				    break block;
+			istag = true;
+		    }}
+		if (istag)
+		{
+		    if (tags == null)
+			tags = new String[32][];
+		    else if (tagptr == tags.length)
+			Systm.arraycopy(tags, 0, tags = new String[tagptr << 1], 0, tagptr);
+		    tags[tagptr++] = new String[] {name.trim(), value.trim()};
+		}
+		else
+		{
+		    commentbuf.append(line);
+		    commentbuf.append('\n');
+		}
+	    }
+	    ptr = 0;
+	    comment = commentbuf.toString();
+	    while ((ptr < comment.length()) && (comment.charAt(ptr) == '\n'))
+		ptr++;
+	    if (ptr > 0)
+	    {   comment = comment.substring(ptr);
+		ptr = 0;
+	    }
+	    if ((tags != null) && (tagptr < tags.length))
+		Systm.arraycopy(tags, 0, tags = new String[tagptr], 0, tagptr);
+	}
 	
 	for (int d = 0, stored = -1, c;;)
 	{
-	    if ((d = stored) != -1)
+	    if (unmetaptr > 0)
+	    {   d = unmetabuf[3 - --unmetaptr];
+		if (d == -1)
+		    break;
+	    }
+	    else if ((d = stored) != -1)
 		stored = -1;
 	    else if ((d == in.read()) == -1)
 		break;
@@ -399,7 +477,7 @@ public class Ponysay
 	    }   }
 	}
 	
-	Pony pony = new Pony(height, width, null, null);
+	Pony pony = new Pony(height, width, comment, tags);
 	int y = 0, x = 0;
 	Pony.Meta[] metabuf = new Pony.Meta[256];
 	int metaptr = 0;
@@ -574,7 +652,7 @@ public class Ponysay
 		chars[ptr++] = (char)i;
 	    else
 	    {
-		// 0x10000 + (H - 0xD800) * 0x400 + (L - 0xDC00)
+		/* 10000₁₆ + (H − D800₁₆) ⋅ 400₁₆ + (L − DC00₁₆) */
 		
 		int c = i - 0x10000;
 		int L = (c & 0x3FF) + 0xDC00;
