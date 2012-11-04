@@ -34,7 +34,15 @@ public class Cowsay extends Ponysay
     public Cowsay(HashMap<String, String> flags)
     {
 	super(Cowsay.modifyFlags(flags));
+	this.flags = flags;
     }
+    
+    
+    
+    /**
+     * Flags passed to the module
+     */
+    private HashMap<String, String> flags;
     
     
     
@@ -43,9 +51,120 @@ public class Cowsay extends Ponysay
      * 
      * @return  The pony
      */
-    protected Pony importCow()
+    public Pony importCow()
     {
-	return null; // TODO implement
+	InputStream in = System.in;
+	if (this.file != null)
+	    in = BufferedInputStream(new FileInputStream(this.file));
+	Scanner sc = new Scanner(in, "UTF-8");
+	
+	
+	StringBuilder cow = new StringBuilder();
+	StringBuilder data = new StringBuilder();
+	boolean meta = false;
+	
+	cow.append("#!/usr/bin/perl\n");
+	cow.append("$thoughts = \"\\$\\\\\\$\";\n");
+	cow.append("$tongue = \"\\$tongue\\$\";\n");
+	cow.append("$eyes = \"\\$eye\\$eye\";\n");
+	while (sc.hasNextLine())
+	{
+	    String line = sc.nextLine();
+	    if (line.replace("\t", "").replace(" ", "").startsWith("#"))
+	    {
+		if (meta == false)
+		{
+		    meta = true;
+		    data.append("$$$\n");
+		}
+		line = line.substring(0, line.indexOf("#")) + line.substring(line.indexOf("#") + 1);
+		data.append("$" + line + "\n")
+	    }
+	    else
+	    {
+		cow.append(line.replace("chop($eyes);", "\"\\$eye\\$\";\n$eyes = \"\\$eye\\$\";"));
+		cow.append("\n");
+	    }
+	}
+	if (meta)
+	    data.append("$$$\n");
+	cow.append("print \"$the_cow\";\n");
+	
+	
+	if (in != System.in)
+	    in.close();
+	
+	
+	String pony = new String(execCow(cow.toString()), "UTF-8");
+	String line = pony.substring(0, pony.indexOf('\n'));
+	int pos = line.indexOf("$\\$") + 3;
+	
+	if (pos > 3)
+	    data.append("$balloon" + pos + "$"); 
+	else
+	    data.append("$balloon$"); 
+	data.append(pony);
+	
+	
+	InputStream stdin = System.in;
+	try
+	{
+	    this.flags.put("file", null);
+	    Ponysay ponysay = new Ponysay(this.flags);
+	    if (ponysay.version == this.version)
+		throw new Error("Default ponysay version should not be the cowsay version");
+	    return ponysay.importPony();
+	}
+	finally
+	{
+	    System.setIn(stdin);
+	}
+    }
+    
+    
+    /**
+     * Executes a perl script
+     *
+     * @param   cow  The cow cowsay→ponysay converting script in perl
+     * @return       The cow in ponysay
+     * 
+     * @throws  IOException  On perl executing failure
+     */
+    public static byte[] execCow(final String cow) throws IOException
+    {
+	Process process = (new ProcessBuilder("perl")).start();
+	OutputStream cowout = process.getOutputStream();
+	InputStream stream = process.getInputStream();
+	    
+	cowout.write(cow.getBytes("UTF-8"));
+	cowout.flush();
+	try
+	{
+	    cowout.close();
+	}
+	catch (final Throwable err)
+	{
+	    //Ignore
+	}
+	    
+	byte[] buf = new byte[2048];
+	int ptr = 0;
+	for (int d; (d = stream.read()) != -1;)
+	{
+	    buf[ptr++] = (byte)d;
+	    if (ptr == buf.length)
+		System.arraycopy(buf, 0, buf = new byte[ptr << 1], 0, ptr);
+	}
+	try
+	{
+	    stream.close();
+	}
+	catch (final Throwable err)
+	{
+	    //Ignore
+	}
+	System.arraycopy(buf, 0, buf = new byte[ptr], 0, ptr);
+	return buf;
     }
     
     
