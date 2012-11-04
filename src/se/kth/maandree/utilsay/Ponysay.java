@@ -19,6 +19,7 @@
 package se.kth.maandree.utilsay;
 
 import java.io.*;
+import java.util.LinkedList;
 import java.util.HashMap;
 import java.awt.Color;
 
@@ -191,7 +192,7 @@ public class Ponysay
 	int curwidth = 0;
 	int height = 1;
 	
-	ArrayList<Object> items = new ArrayList<Object>();
+	LinkedList<Object> items = new LinkedList<Object>();
 	String comment = null;
 	String[][] tags = null;
 	int tagptr = 0;
@@ -653,12 +654,12 @@ public class Ponysay
 	
 	
 	// TODO implement
-	// protected boolean even;
-	// protected boolean tty;
 	// protected boolean spacesave;
 	// protected boolean zebra;
+	// protected boolean tty;
 	// protected double chroma;
 	// protected boolean fullcolour;
+	// protected boolean even;
 	// protected int left;
 	// protected int right;
 	// protected int top;
