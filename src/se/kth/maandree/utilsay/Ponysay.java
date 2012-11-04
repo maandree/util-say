@@ -651,19 +651,55 @@ public class Ponysay
 	
 	
 	StringBuilder databuf = new StringBuilder();
+	int curleft = 0, curright = 0, curtop = 0, curbottom = 0;
+	Pony.Cell[][] matrix = pony.matrix;
+	Pony.Meta[][][] metamatrix = pony.metamatrix;
 	
 	
 	// TODO implement
-	// protected boolean spacesave;
-	// protected boolean zebra;
-	// protected boolean tty;
-	// protected double chroma;
-	// protected boolean fullcolour;
-	// protected boolean even;
-	// protected int left;
-	// protected int right;
-	// protected int top;
-	// protected int bottom;
+	if (this.left >= 0)
+	{
+	}
+	if (this.right >= 0)
+	{
+	}
+	if (this.top >= 0)
+	{
+	}
+	if (this.bottom >= 0)
+	{
+	}
+	
+	// TODO implement
+	if (this.even == false)
+	{
+	}
+	
+	
+	// TODO implement
+	// boolean this.spacesave;
+	// boolean this.zebra;
+	// boolean this.tty;
+	// double this.chroma;
+	// boolean this.fullcolour;
+	for (int y = 0, h = matrix.length; y < h; y++)
+	{
+	    Pony.Cell[] row = matrix[y];
+	    Pony.Meta[][] metarow = metamatrix[y];
+	    for (int x = 0, w = row.length; x <= w; x++)
+	    {   Pony.Meta[] metacell = metarow[row.length];
+		if (metacell != null)
+		    for (int z = 0, d = metacell.length; z < d; z++)
+		    {   Pony.Meta meta = metacell[z];
+			;
+		    }
+		if (x != w)
+	        {   Pony.Cell cell = row[x];
+		    ;
+		}
+	    }
+	    databuf.append('\n');
+	}
 	
 	
 	String data = databuf.toString();
