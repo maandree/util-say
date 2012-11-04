@@ -31,6 +31,28 @@ import java.awt.Color;
 public class Ponysay
 {
     /**
+     * Until, and including, version 2.0 of ponysay the cowsay format was used
+     */
+    private static final int VERSION_COWSAY = 0;
+    
+    /**
+     * Until, and including, version 2.8 of ponysay the unisay format was used
+     */
+    private static final int VERSION_UNISAY = 1;
+    
+    /**
+     * Until, but excluding, version 3.0 of ponysay's pony format was extended to support metadata
+     */
+    private static final int VERSION_METADATA = 2;
+    
+    /**
+     * In version 3.0 of ponysay's pony format was extended to support horizontal justifiction of balloons
+     */
+    private static final int VERSION_HORIZONTAL_JUSTIFICATION = 3;
+    
+    
+    
+    /**
      * Constructor
      * 
      * @param  flags  Flags passed to the module
@@ -40,7 +62,8 @@ public class Ponysay
 	this.even = (flags.contains("even") == false) || flags.get("even").toLowerCase().startswith("y");
 	this.tty = flags.contains("tty") && flags.get("tty").toLowerCase().startswith("y");
 	this.zebra = flags.contains("zebra") ? flags.get("zebra").toLowerCase().startswith("y") : (this.tty == false);
-	this.version = flags.contains("version") ? flags.get("version") : "3.0";
+	this.version = flags.contains("version") ? parseVersion(flags.get("version")) : VERSION_HORIZONTAL_JUSTIFICATION;
+	this.utf8 = this.version > VERSION_COWSAY ? true : (flags.contains("utf8") && flags.get("utf8").toLowerCase().startswith("y"));
 	this.file = flags.contains("file") ? flags.get("file") : null;
 	this.fullcolour = flags.contains("fullcolour") && flags.get("fullcolour").toLowerCase().startswith("y");
 	this.chroma = (flags.contains("chroma") == false) ? -1 : parseDouble(flags.get("chroma"));
@@ -69,7 +92,7 @@ public class Ponysay
     protected boolean zebra;
     
     /**
-     * Output option: colour palette
+     * Input/output option: colour palette
      */
     protected Color[] palette;
     
@@ -81,10 +104,15 @@ public class Ponysay
     /**
      * Output option: ponysay version
      */
-    protected String version;
+    protected int version;
     
     /**
-     * Input/optput option: pony file
+     * Output option: use utf8 encoding
+     */
+    protected boolean utf8;
+    
+    /**
+     * Input/output option: pony file
      */
     protected String file;
     
@@ -114,6 +142,28 @@ public class Ponysay
     protected int bottom;
     
     
+    
+    /**
+     * Determine pony file format version for ponysay version string
+     * 
+     * @param   value  The ponysay version
+     * @return         The pony file format version
+     */
+    private static int parseVersion(String value)
+    {
+	String[] strdots = value.split(".");
+	int[] dots = new int[strdots.length < 10 ? 10 : strdots.length];
+	for (int i = 0, n = strdots.length; i < n; i++)
+	    dots[i] = Integer.parseInt(strdots[i]);
+	
+	if (dots[0] < 2)       return VERSION_COWSAY;
+	if (dots[0] == 2)
+	{   if (dots[1] == 0)  return VERSION_COWSAY;
+	    if (dots[1] <= 8)  return VERSION_UNISAY;
+	                       return VERSION_METADATA;
+	}
+	/* version 3.0 */      return VERSION_HORIZONTAL_JUSTIFICATION;
+    }
     
     /**
      * Parse double value
