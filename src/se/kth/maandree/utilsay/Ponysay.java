@@ -161,7 +161,7 @@ public class Ponysay
 	{   Colour colour = new Colour(i);
 	    colours[i] = new Color(colour.red, colour.green, colour.blue);
 	}
-	if (this.palette == null)
+	if (this.palette != null)
 	    System.arraycopy(this.palette, 0, colours, 0, 16);
 	
 	InputStream in = System.in;
@@ -254,6 +254,8 @@ public class Ponysay
 	    {   comment = comment.substring(ptr);
 		ptr = 0;
 	    }
+	    if (comment.isEmpty())
+		comment = null;
 	    if ((tags != null) && (tagptr < tags.length))
 		Systm.arraycopy(tags, 0, tags = new String[tagptr], 0, tagptr);
 	}
@@ -522,6 +524,7 @@ public class Ponysay
 	return pony;
     }
     
+    
     /**
      * Import the pony from file using the cowsay format
      * 
@@ -529,6 +532,32 @@ public class Ponysay
      */
     protected Pony importCow()
     {
+	this.version++;
+	InputStream stdin = System.in;
+	try
+	{
+	    InputStream _in = System.in;
+	    if (this.file != null)
+		_in = BufferedInputStream(new FileInputStream(this.file));
+	    final InputStream in = _in;
+	    
+	    System.setIn(new InputStream()
+		{
+		    @Override
+		    public int read()
+		    {
+			return in.read();
+		    }
+		});
+	    
+	    this.file = null;
+	    return this.importPony();
+	}
+	finally
+	{
+	    System.setIn(stdin);
+	}
+	
 	return null; // TODO implement
     }
     
