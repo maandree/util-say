@@ -479,6 +479,11 @@ public class Ponysay
 	    }   }
 	}
 	
+	
+	if (in != System.in)
+	    in.close();
+	
+	
 	Pony pony = new Pony(height, width, comment, tags);
 	int y = 0, x = 0;
 	Pony.Meta[] metabuf = new Pony.Meta[256];
@@ -622,7 +627,47 @@ public class Ponysay
      */
     public void exportPony(Pony pony)
     {
-	// TODO implement
+	String data = null; // TODO implement
+	
+	
+	if (this.version == VERSION_COWSAY)
+	{
+	    String metadata = null;
+	    if (data.startsWith("$$$\n"))
+	    {
+		String metadata = data.substring(4);
+		if (metadata.startsWith("$$$\n"))
+		    metadata = null;
+		else
+		    metadata = metadata.substring(0, metadata.indexOf("\n$$$\n"));
+		data = data.substring(data.indexOf("\n$$$\n") + 5);
+		metadata = '#' + metadata.replace("\n", "\n#");
+	    }
+	    String eop = "\nEOP";
+	    while (data.contains(eop + '\n'))
+		eop += 'P';
+	    data = data.replace("$/$", "/").replace("$\\$", "${thoughts}");
+	    while (data.contains("$balloon"))
+	    {
+		int start = data.indexOf("$balloon");
+		int end = data.indexOf("$", start + 8);
+		data = data.substring(0, start) + data.substring(end + 1);
+	    }
+	    data = "$the_cow = <<" + eop + ";\n" + data;
+	    data += eop + '\n';
+	    if (metadata != null)
+		data = metadata + data;
+	    if (this.utf8 == false)
+		data = date.replace("▀", "\\N{U+2580}").replace("▄", "\\N{U+2584}");
+	}
+	
+	OutputStream out = System.out;
+	if (this.file != null)
+	    out = new FileOutputStream(this.file); /* buffering is not needed, everything is written at once */
+	out.write(data.getBytes("UTF-8");
+	out.flush();
+	if (out != System.out)
+	    out.close();
     }
     
     
