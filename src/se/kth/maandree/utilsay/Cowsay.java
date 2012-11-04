@@ -77,13 +77,16 @@ public class Cowsay extends Ponysay
 		    meta = true;
 		    data.append("$$$\n");
 		}
-		line = line.substring(0, line.indexOf("#")) + line.substring(line.indexOf("#") + 1);
-		data.append("$" + line + "\n")
+		line = line.substring(line.indexOf("#") + 1);
+		if (line.equals("$$$"))
+		    line = "$$$(!)";
+		data.append(line + "\n")
+		data.append('\n')
 	    }
 	    else
 	    {
 		cow.append(line.replace("chop($eyes);", "\"\\$eye\\$\";\n$eyes = \"\\$eye\\$\";"));
-		cow.append("\n");
+		cow.append('\n');
 	    }
 	}
 	if (meta)

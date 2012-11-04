@@ -536,17 +536,72 @@ public class Ponysay
 	InputStream stdin = System.in;
 	try
 	{
-	    InputStream _in = System.in;
+	    InputStream in = System.in;
 	    if (this.file != null)
-		_in = BufferedInputStream(new FileInputStream(this.file));
-	    final InputStream in = _in;
+		in = BufferedInputStream(new FileInputStream(this.file));
+	    Scanner sc = new Scanner(in, "UTF-8");
 	    
+	    StringBuilder cow = new StringBuilder();
+	    StringBuilder data = new StringBuilder();
+	    boolean meta = false;
+	    
+	    while (sc.hasNextLine())
+	    {
+		String line = sc.nextLine();
+		if (line.replace("\t", "").replace(" ", "").startsWith("#"))
+		{
+		    if (meta == false)
+		    {   meta = true;
+			data.append("$$$\n");
+		    }
+		    line = line.substring(line.indexOf("#") + 1);
+		    if (line.equals("$$$"))
+			line = "$$$(!)";
+		    data.append(line)
+		    data.append('\n')
+		}
+		else
+		{
+		    line = line.replace("$thoughts", "${thoughts}").replace("${thoughts}", "$\\$");
+		    line = line.replace("\\N{U+002580}", "▀");
+		    line = line.replace("\\N{U+002584}", "▄");
+		    line = line.replace("\\N{U+2580}", "▀");
+		    line = line.replace("\\N{U+2584}", "▄");
+		    cow.append(line);
+		    cow.append('\n');
+		}
+	    }
+	    if (meta)
+		data.append("$$$\n");
+	    
+	    String pony = cow.toString();
+	    pony = pony.substring(pony.indexOf("$the_cow") + 8);
+	    pony = pony.substring(pony.indexOf("<<") + 2);
+	    String eop = pony.substring(0, pony.indexOf(";"));
+	    if (eop.startsWith("<")) /* here document */
+		pony = eop.substring(1);
+	    else
+	    {   pony = pony.substring(pony.indexOf('\n') + 1);
+		pony = pony.substring(0, pony.indexOf('\n' + eop + '\n'));
+	    }
+	    data.append("$balloon" + (pony.indexOf("$\\$") + 2) + "$\n");
+	    data.append(pony);
+	    
+	    final byte[] streamdata = data.toString().getBytes('UTF-8');
 	    System.setIn(new InputStream()
 		{
+		    int ptr = 0;
 		    @Override
 		    public int read()
 		    {
-			return in.read();
+			if (this.ptr == streamdata.length)
+			    return -1;
+			return streamdata[this.ptr++] & 255;
+		    }
+		    @Override
+		    public int available()
+		    {
+			return streamdata.length - this.ptr;
 		    }
 		});
 	    
@@ -557,8 +612,6 @@ public class Ponysay
 	{
 	    System.setIn(stdin);
 	}
-	
-	return null; // TODO implement
     }
     
     
