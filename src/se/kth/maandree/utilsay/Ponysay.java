@@ -23,6 +23,10 @@ import java.util.HashMap;
 import java.awt.Color;
 
 
+// This class should be tried to be keeped as optimised as possible for the
+// lastest version of ponysay (only) without endangering its maintainability.
+
+
 /**
  * Ponysay support module
  * 
@@ -633,7 +637,35 @@ public class Ponysay
      */
     public void exportPony(Pony pony)
     {
-	String data = null; // TODO implement
+	Color[] colours = new Color[256];
+	boolean[] format = new boolean[9];
+	Color background = null, foreground = null;
+	
+	for (int i = 0; i < 256; i++)
+	{   Colour colour = new Colour(i);
+	    colours[i] = new Color(colour.red, colour.green, colour.blue);
+	}
+	if (this.palette != null)
+	    System.arraycopy(this.palette, 0, colours, 0, 16);
+	
+	
+	StringBuilder databuf = new StringBuilder();
+	
+	
+	// TODO implement
+	// protected boolean even;
+	// protected boolean tty;
+	// protected boolean spacesave;
+	// protected boolean zebra;
+	// protected double chroma;
+	// protected boolean fullcolour;
+	// protected int left;
+	// protected int right;
+	// protected int top;
+	// protected int bottom;
+	
+	
+	String data = databuf.toString();
 	
 	
 	if (this.version == VERSION_COWSAY)
@@ -664,7 +696,52 @@ public class Ponysay
 	    if (metadata != null)
 		data = metadata + data;
 	    if (this.utf8 == false)
-		data = date.replace("▀", "\\N{U+2580}").replace("▄", "\\N{U+2584}");
+		data = data.replace("▀", "\\N{U+2580}").replace("▄", "\\N{U+2584}");
+	}
+	else
+	{   if (this.version < VERSION_METADATA)
+	    {
+		if (data.startsWith("$$$\n"))
+		    data = data.substring(data.indexOf("\n$$$\n") + 5);
+	    }
+	    if (this.version < VERSION_HORIZONTAL_JUSTIFICATION)
+	    {
+		databuf = new StringBuilder();
+		int pos = data.indexOf("\n$$$\n");
+		pos += pos < 0 ? 1 : 5;
+		databuf.append(data.substring(0, pos));
+		StringBuilder dollarbuf = null;
+		boolean esc = false;
+		for (int n = data.length; i < n;)
+		{
+		    char c = data.charAt(i++);
+		    if (dollarbuf != null)
+		    {
+			dollarbuf.append(c);
+			if (esc || (c == '\033'))
+			    esc ^= true;
+			else if (c == '$')
+			{
+			    String dollar = dollarbuf.toString();
+			    dollarbuf = null;
+			    if (dollar.startsWith("$balloon") == false)
+				data.append(dollar);
+			    else
+			    {   data.append("$balloon");
+				dollar = dollar.substring(8);
+				if      (dollar.contains("l"))  dollar = dollar,substring(dollar.indexOf('l') + 1);
+				else if (dollar.contains("r"))  dollar = dollar,substring(dollar.indexOf('r') + 1);
+				else if (dollar.contains("c"))  dollar = dollar,substring(dollar.indexOf('c') + 1);
+				data.append(dollar);
+			}   }
+		    }
+		    else if (c == '$')
+			dollarbuf = new StringBuilder("$");
+		    else
+			databuf.append(c);
+		}
+		data = databuf.toString();
+	    }
 	}
 	
 	
