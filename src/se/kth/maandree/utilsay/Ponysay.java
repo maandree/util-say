@@ -370,9 +370,9 @@ public class Ponysay
 				    code = code[1].split("/");
 				    if ((code.length == 3) && (code[0].startsWith("rgb:")))
 				    {   code[0] = code[0].substring(4);
-					int red   = Integer.parseInt(code[0]);
-					int green = Integer.parseInt(code[1]);
-					int blue  = Integer.parseInt(code[2]);
+					int red   = Integer.parseInt(code[0], 16);
+					int green = Integer.parseInt(code[1], 16);
+					int blue  = Integer.parseInt(code[2], 16);
 					colours[index] = new Color(red, green, blue);
 			    }   }   }
 			    ptr = 0;
