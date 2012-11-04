@@ -181,6 +181,7 @@ public class Ponysay
 	
 	int width = 0;
 	int curwidth = 0;
+	int height = 1;
 	
 	ArrayList<Object> items = new ArrayList<Object>();
 	
@@ -264,13 +265,13 @@ public class Ponysay
 			if (ptr == 8)
 			{   ptr = 0;
 			    osi = escape = false;
-			    int index = (ptr[0] < 'A') ? (ptr[0] & 15) : ((ptr[0] ^ '@') + 9);
-			    int red = (ptr[1] < 'A') ? (ptr[1] & 15) : ((ptr[1] ^ '@') + 9);
-			    red = (red << 4) | ((ptr[2] < 'A') ? (ptr[2] & 15) : ((ptr[2] ^ '@') + 9));
-			    int green = (ptr[3] < 'A') ? (ptr[3] & 15) : ((ptr[3] ^ '@') + 9);
+			    int index =             (ptr[0] < 'A') ? (ptr[0] & 15) : ((ptr[0] ^ '@') + 9);
+			    int red =               (ptr[1] < 'A') ? (ptr[1] & 15) : ((ptr[1] ^ '@') + 9);
+			    red = (red << 4) |     ((ptr[2] < 'A') ? (ptr[2] & 15) : ((ptr[2] ^ '@') + 9));
+			    int green =             (ptr[3] < 'A') ? (ptr[3] & 15) : ((ptr[3] ^ '@') + 9);
 			    green = (green << 4) | ((ptr[4] < 'A') ? (ptr[4] & 15) : ((ptr[4] ^ '@') + 9));
-			    int blue = (ptr[5] < 'A') ? (ptr[5] & 15) : ((ptr[5] ^ '@') + 9);
-			    blue = (blue << 4) | ((ptr[6] < 'A') ? (ptr[6] & 15) : ((ptr[6] ^ '@') + 9));
+			    int blue =              (ptr[5] < 'A') ? (ptr[5] & 15) : ((ptr[5] ^ '@') + 9);
+			    blue = (blue << 4) |   ((ptr[6] < 'A') ? (ptr[6] & 15) : ((ptr[6] ^ '@') + 9));
 			    colours[index] = new Color(red, green, blue);
 			}
 		    }
@@ -302,10 +303,8 @@ public class Ponysay
 			    ptr--;
 			}
 		    }
-		    else if (d == 'P')
-			ptr = 1;
-		    else if (d == '4')
-			ptr = ~0;
+		    else if (d == 'P')  ptr = 1;
+		    else if (d == '4')  ptr = ~0;
 		    else
 		    {   osi = escape = false;
 			items.add(new Pony.Cell('\033', foreground, background, format));
@@ -329,10 +328,8 @@ public class Ponysay
 			    {   int value = Integer.parseInt(seg);
 				if (xterm256 == 2)
 				{   xterm256 = 0;
-				    if (back)
-					background = colours[value];
-				    else
-					foreground = colours[value];
+				    if (back)  background = colours[value];
+				    else       foreground = colours[value];
 				}
 				else if (value == 0)
 				{   for (int i = 0; i < 9; i++)
@@ -345,18 +342,12 @@ public class Ponysay
 				    format[value - 1] = true;
 				else if ((20 < value) && (value < 30))
 				    format[value - 21] = false;
-				else if (value == 39)
-				    foreground = null;
-				else if (value == 49)
-				    background = null;
-				else if (value < 38)
-				    foreground = colours[value - 30];
-				else if (value < 48)
-				    background = colours[value - 30];
-				else if (value == 38)
-				    xterm256 = 1;
-				else if (value == 48)
-				    xterm256 = 1;
+				else if (value == 39)   foreground = null;
+				else if (value == 49)   background = null;
+				else if (value < 38)    foreground = colours[value - 30];
+				else if (value < 48)    background = colours[value - 30];
+				else if (value == 38)   xterm256 = 1;
+				else if (value == 48)   xterm256 = 1;
 				if (xterm256 == 1)
 				    back = value == 48;
 			    }
@@ -384,6 +375,7 @@ public class Ponysay
 	    {   if (width < curwidth)
 		    width = curwidth;
 		curwidth = 0;
+		height = 0;
 		items.add(null);
 	    }
 	    else
@@ -407,7 +399,49 @@ public class Ponysay
 	    }   }
 	}
 	
-	return null; // TODO implement
+	Pony pony = new Pony(height, width, null, null);
+	int y = 0, x = 0;
+	Pony.Meta[] metabuf = new Pony.Meta[256];
+	int metaptr = 0;
+	
+	for (Object obj : items)
+	    if (obj == null)
+	    {
+		if (metaptr != 0)
+		{   Pony.Meta[] metacell = new Pony.Meta[metaptr];
+		    System.arraycopy(metabuf, 0, metacell, 0, metaptr);
+		    pony.matrix[y][x] = metacell;
+		    metaptr = 0;
+		}
+		y++;
+		x = 0;
+	    }
+	    else if (obj instanceof Pony.Cell)
+	    {
+		if (metaptr != 0)
+		{   Pony.Meta[] metacell = new Pony.Meta[metaptr];
+		    System.arraycopy(metabuf, 0, metacell, 0, metaptr);
+		    pony.matrix[y][x] = metacell;
+		    metaptr = 0;
+		}
+		Pony.Cell cell = (Pony.Cell)obj;
+		pony.matrix[y][x++] = cell;
+	    }
+	    else
+	    {
+		Pony.Meta meta = (Pony.Meta)obj;
+		if (metaptr == metabuf.length)
+		    System.arraycopy(metabuf, 0, metabuf = new Pony.Meta[metaptr << 1], 0, metaptr);
+		metabuf[metaptr++] = meta;
+	    }
+	if (metaptr != 0)
+	{   Pony.Meta[] metacell = new Pony.Meta[metaptr];
+	    System.arraycopy(metabuf, 0, metacell, 0, metaptr);
+	    pony.matrix[y][x] = metacell;
+	    metaptr = 0;
+	}
+	
+	return pony;
     }
     
     /**
