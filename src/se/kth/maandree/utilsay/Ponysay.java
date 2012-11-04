@@ -172,9 +172,11 @@ public class Ponysay
 	
 	boolean dollar = false;
 	boolean escape = false;
+	boolean csi = false;
+	boolean osi = false;
 	
-	int[] dollarbuf = new int[256];
-	int dollarptr = 0;
+	int[] buf = new int[256];
+	int ptr = 0;
 	int dollareql = -1;
 	
 	int width = 0;
@@ -208,8 +210,8 @@ public class Ponysay
 		{   dollar = false;
 		    if (dollareql == -1)
 		    {
-			int[] _name = new int[dollarptr];
-			System.arraycopy(dollarbuf, 0, _name, 0, _name.length);
+			int[] _name = new int[ptr];
+			System.arraycopy(buf, 0, _name, 0, _name.length);
 			String name = utf32to16(_name);
 			if (name.equals("\\"))
 		        {   curwidth++;
@@ -239,24 +241,141 @@ public class Ponysay
 		    }
 		    else
 		    {   int[] name = new int[dollareql];
-			System.arraycopy(dollarbuf, 0, name, 0, name.length);
-			int[] value = new int[dollarptr - dollareql - 1];
-			System.arraycopy(dollarbuf, dollareql + 1, value, 0, value.length);
+			System.arraycopy(buf, 0, name, 0, name.length);
+			int[] value = new int[ptr - dollareql - 1];
+			System.arraycopy(buf, dollareql + 1, value, 0, value.length);
 			items.add(new Pony.Recall(utf32to16(name), utf32to16(value)));
 		    }
-		    dollarptr = 0;
+		    ptr = 0;
 		    dollareql = -1;
 		}
 		else
 		{   escape = false;
-		    if (dollarptr == dollarbuf.length)
-			System.arraycopy(dollarbuf, 0, dollarbuf = new int[dollarptr << 1], 0, dollarbuf);
+		    if (ptr == buf.length)
+			System.arraycopy(buf, 0, buf = new int[ptr << 1], 0, buf);
 		    if ((dollareql == -1) && (d == '='))
-			dollareql = dollarptr;
-		    dollarbuf[dollarptr++] = d;
+			dollareql = ptr;
+		    buf[ptr++] = d;
 		}
 	    else if (escape)
-		; // TODO implement
+		if (osi)
+		    if (ptr > 0)
+		    {   buf[ptr++ -1] = d;
+			if (ptr == 8)
+			{   ptr = 0;
+			    osi = escape = false;
+			    int index = (ptr[0] < 'A') ? (ptr[0] & 15) : ((ptr[0] ^ '@') + 9);
+			    int red = (ptr[1] < 'A') ? (ptr[1] & 15) : ((ptr[1] ^ '@') + 9);
+			    red = (red << 4) | ((ptr[2] < 'A') ? (ptr[2] & 15) : ((ptr[2] ^ '@') + 9));
+			    int green = (ptr[3] < 'A') ? (ptr[3] & 15) : ((ptr[3] ^ '@') + 9);
+			    green = (green << 4) | ((ptr[4] < 'A') ? (ptr[4] & 15) : ((ptr[4] ^ '@') + 9));
+			    int blue = (ptr[5] < 'A') ? (ptr[5] & 15) : ((ptr[5] ^ '@') + 9);
+			    blue = (blue << 4) | ((ptr[6] < 'A') ? (ptr[6] & 15) : ((ptr[6] ^ '@') + 9));
+			    colours[index] = new Color(red, green, blue);
+			}
+		    }
+		    else if (ptr < 0)
+		    {   if (~ptr == buf.length)
+			    System.arraycopy(buf, 0, buf = new int[~ptr << 1], 0, ~ptr);
+			if (d == '\\')
+			{   ptr = ~ptr;
+			    ptr--;
+			    if ((ptr > 8) && (buf[ptr] == '\e') && (buf[0] == ';'))
+			    {   int[] _code = new int[ptr - 1];
+				System.arraycopy(buf, 1, _code, 0, ptr - 1);
+				String[] code = utf32to16(_code).split(";");
+				if (code.length == 2)
+				{   int index = Integer.parseInt(code[0]);
+				    code = code[1].split("/");
+				    if ((code.length == 3) && (code[0].startsWith("rgb:")))
+				    {   code[0] = code[0].substring(4);
+					int red   = Integer.parseInt(code[0]);
+					int green = Integer.parseInt(code[1]);
+					int blue  = Integer.parseInt(code[2]);
+					colours[index] = new Color(red, green, blue);
+			    }   }   }
+			    ptr = 0;
+			    osi = escape = false;
+			}
+			else
+			{   buf[~ptr] = d;
+			    ptr--;
+			}
+		    }
+		    else if (d == 'P')
+			ptr = 1;
+		    else if (d == '4')
+			ptr = ~0;
+		    else
+		    {   osi = escape = false;
+			items.add(new Pony.Cell('\033', foreground, background, format));
+			items.add(new Pony.Cell(']', foreground, background, format));
+			items.add(new Pony.Cell(d, foreground, background, format));
+		    }
+		else if (csi)
+		{   if (ptr == buf.length)
+			System.arraycopy(buf, 0, buf = new int[ptr << 1], 0, ptr);
+		    buf[ptr++] = d;
+		    if ((('a' <= d) && (d <= 'z')) || (('A' <= d) && (d <= 'Z')) || (d == '~'))
+		    {   csi = escape = false;
+			ptr--;
+			if (d == 'm')
+			{   int[] _code = new int[ptr];
+			    System.arraycopy(buf, 0, _code, 0, ptr);
+			    String[] code = utf32to16(_code).split(";");
+			    int xterm256 = 0;
+			    boolean back = false;
+			    for (String seg : code)
+			    {   int value = Integer.parseInt(seg);
+				if (xterm256 == 2)
+				{   xterm256 = 0;
+				    if (back)
+					background = colours[value];
+				    else
+					foreground = colours[value];
+				}
+				else if (value == 0)
+				{   for (int i = 0; i < 9; i++)
+					format[i] = false;
+				    background = foreground = null;
+				}
+				else if (xterm256 == 1)
+				    xterm256 = value == 5 ? 2 : 0;
+				else if (value < 10)
+				    format[value - 1] = true;
+				else if ((20 < value) && (value < 30))
+				    format[value - 21] = false;
+				else if (value == 39)
+				    foreground = null;
+				else if (value == 49)
+				    background = null;
+				else if (value < 38)
+				    foreground = colours[value - 30];
+				else if (value < 48)
+				    background = colours[value - 30];
+				else if (value == 38)
+				    xterm256 = 1;
+				else if (value == 48)
+				    xterm256 = 1;
+				if (xterm256 == 1)
+				    back = value == 48;
+			    }
+			}
+			ptr = 0;
+		    }
+		}
+		else if (d == '[')
+		{   csi = true;
+		    ptr = 0;
+		}
+		else if (d == ']')
+		    osi = true;
+		else
+		{   escape = false;
+		    items.add(new Pony.Cell('\033', foreground, background, format));
+		    items.add(new Pony.Cell(d, foreground, background, format));
+		    curwidth += 2;
+		}
 	    else if (d == '\033')
 		escape = true;
 	    else if (d == '$')
