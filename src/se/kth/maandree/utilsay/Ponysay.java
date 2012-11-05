@@ -659,16 +659,46 @@ public class Ponysay
 	// TODO implement
 	if (this.left >= 0)
 	{
+	    int cur = 0;
+	    outer:
+	        for (int n = matrix[0].length; cur < n; cur++)
+		    for (int j = 0; m = matrix.length; j < m; j++)
+		    {
+			boolean cellpass = true;
+			Pony.Cell cell = matrix[j][cur];
+			if (cell != null)
+			    if ((cell.character != ' ') || (cell.background != null))
+				if ((cell.character != Pony.Cell.PIXELS) || (cell.background != null) || (cell.foreground != null))
+				    cellpass = false;
+			if (cellpass == false)
+			{   Pony.Meta[] meta = metamatrix[j][cur];
+			    if ((meta != null) && (meta.length != 0))
+			    {	for (int k = 0, l = meta.length; k < l; k++)
+				    if ((meta[k] instanceof Pony.Store) == false)
+					break outer;
+			    }
+			    else
+				break outer;
+			}
+		    }
+	    this.left -= cur;
 	}
+	else this.left = 0;
 	if (this.right >= 0)
 	{
 	}
+	else
+	    this.right = 0;
 	if (this.top >= 0)
 	{
 	}
+	else
+	    this.top = 0;
 	if (this.bottom >= 0)
 	{
 	}
+	else
+	    this.bottom = 0;
 	
 	// TODO implement
 	if (this.even == false)
