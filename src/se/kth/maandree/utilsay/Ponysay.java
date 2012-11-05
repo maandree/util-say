@@ -436,7 +436,7 @@ public class Ponysay
 				else if (value == 39)   foreground = null;
 				else if (value == 49)   background = null;
 				else if (value < 38)    foreground = colours[value - 30];
-				else if (value < 48)    background = colours[value - 30];
+				else if (value < 48)    background = colours[value - 40];
 				else if (value == 38)   xterm256 = 1;
 				else if (value == 48)   xterm256 = 1;
 				if (xterm256 == 1)
@@ -479,10 +479,13 @@ public class Ponysay
 		    items.add(new Pony.Combining(c, foreground, background, format));
 		else
 		{   curwidth++;
+		    Color fore = foreground == null ? colours[7] : foreground;
 		    if (c == '▀')
-			items.add(new Pony.Cell(Pony.Cell.PIXELS, foreground == null ? colours[7] : foreground, background, format));
+			items.add(new Pony.Cell(Pony.Cell.PIXELS, fore : foreground, background, format));
 		    else if (c == '▄')
-			items.add(new Pony.Cell(Pony.Cell.PIXELS, background, foreground == null ? colours[7] : foreground, format));
+			items.add(new Pony.Cell(Pony.Cell.PIXELS, background, fore, format));
+		    else if (c == '█')
+			items.add(new Pony.Cell(Pony.Cell.PIXELS, fore, fore, format));
 		    else if (c == ' ')
 			items.add(new Pony.Cell(Pony.Cell.PIXELS, background, background, format));
 		    else
@@ -581,8 +584,10 @@ public class Ponysay
 		    line = line.replace("$thoughts", "${thoughts}").replace("${thoughts}", "$\\$");
 		    line = line.replace("\\N{U+002580}", "▀");
 		    line = line.replace("\\N{U+002584}", "▄");
+		    line = line.replace("\\N{U+002588}", "█");
 		    line = line.replace("\\N{U+2580}", "▀");
 		    line = line.replace("\\N{U+2584}", "▄");
+		    line = line.replace("\\N{U+2588}", "█");
 		    cow.append(line);
 		    cow.append('\n');
 		}
@@ -686,6 +691,29 @@ public class Ponysay
 	else this.left = 0;
 	if (this.right >= 0)
 	{
+	    int cur = 0;
+	    outer:
+	        for (int n = matrix[0].length - n; cur <= n; cur++)
+		    for (int j = 0; m = matrix.length; j < m; j++)
+		    {
+			boolean cellpass = true;
+			Pony.Cell cell = matrix[j][n - cur];
+			if (cell != null)
+			    if ((cell.character != ' ') || (cell.background != null))
+				if ((cell.character != Pony.Cell.PIXELS) || (cell.background != null) || (cell.foreground != null))
+				    cellpass = false;
+			if (cellpass == false)
+			{   Pony.Meta[] meta = metamatrix[j][n - cur];
+			    if ((meta != null) && (meta.length != 0))
+			    {	for (int k = 0, l = meta.length; k < l; k++)
+				    if ((meta[k] instanceof Pony.Store) == false)
+					break outer;
+			    }
+			    else
+				break outer;
+			}
+		    }
+	    this.right -= cur;
 	}
 	else
 	    this.right = 0;
