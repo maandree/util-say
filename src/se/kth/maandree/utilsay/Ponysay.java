@@ -79,6 +79,8 @@ public class Ponysay
 	this.top = (flags.contains("top") == false) ? 3 : parseInteger(flags.get("top"));
 	this.bottom = (flags.contains("bottom") == false) ? 1 : parseInteger(flags.get("bottom"));
 	this.palette = (flags.contains("palette") == false) ? null : parsePalette(flags.get("palette").toUpperCase().replace("\033", "").replace("]", "").replace("P", ""));
+	this.ignoreballoon = flags.contains("ignoreballoon") && flags.get("ignoreballoon").toLowerCase().startswith("y");
+	this.ignorelink = flags.contains("ignorelink") ? flags.get("ignorelink").toLowerCase().startswith("y") : this.ignoreballoon;
     }
     
     
@@ -87,6 +89,16 @@ public class Ponysay
      * Input/output option: pony file
      */
     protected String file;
+    
+    /**
+     * Input/output option: ignore the balloon
+     */
+    protected boolean ignoreballoon;
+    
+    /**
+     * Input/output option: ignore the balloon link
+     */
+    protected boolean ignorelink;
     
     /**
      * Output option: pad right side
@@ -277,6 +289,8 @@ public class Ponysay
 		Systm.arraycopy(tags, 0, tags = new String[tagptr], 0, tagptr);
 	}
 	
+	boolean[] plain = new boolean[9];
+	
 	for (int d = 0, stored = -1, c;;)
 	{
 	    if (unmetaptr > 0)
@@ -313,15 +327,15 @@ public class Ponysay
 			String name = utf32to16(_name);
 			if (name.equals("\\"))
 		        {   curwidth++;
-			    items.add(new Pony.Cell(Pony.Cell.NNE_SSW, null, null, format));
+			    items.add(new Pony.Cell(this.ignorelink ? ' ' : Pony.Cell.NNE_SSW, null, null, plain));
 			}
 			else if (name.equals("/"))
 		        {   curwidth++;
-			    items.add(new Pony.Cell(Pony.Cell.NNW_SSE, null, null, format));
+			    items.add(new Pony.Cell(this.ignorelink ? ' ' : Pony.Cell.NNW_SSE, null, null, plain));
 			}
 			else if (name.startsWith("balloon") == false)
-			    items.add(new Recall(name, foreground, background, format));
-			else
+			    items.add(new Pony.Recall(name, foreground, background, format));
+			else if (this.ignoreballoon == false)
 			{   String[] parts = (name.substring("balloon".length()) + ",,,,,").split(",");
 			    Integer h = parts[1].isEmpty() ? null : new Integer(parts[1]);
 			    int justify = Pony.Balloon.NONE;
@@ -667,6 +681,25 @@ public class Ponysay
 	Pony.Meta[][][] metamatrix = pony.metamatrix;
 	
 	
+	if (this.ignoreballoon)
+	    for (Pony.Meta[][] row : metamatrix)
+		for (Pony.Meta[] cell : row)
+		    if (cell != null)
+			for (int i = 0, n = cell.length; i < n; i++)
+			    if ((cell[i] != null) && (cell[i] instanceof Pony.Balloon))
+				row[i] = null;
+	
+	if (this.ignorelink)
+        {   boolean[] plain = new boolean[9];
+	    for (Pony.Cell[] row : matrix)
+		for (int i = 0, n = row.length; i < n; i++)
+		{   Pony.Cell cell;
+		    if ((cell = row[i]) != null)
+			if ((cell.character == Pony.Cell.NNE_SSW) || (cell.character == Pony.Cell.NNW_SSE))
+			    row[i] = new Pony.Cell(' ', null, null, plain);
+	}       }
+	
+	
 	if (this.left >= 0)
 	{
 	    int cur = 0;
@@ -684,7 +717,7 @@ public class Ponysay
 			{   Pony.Meta[] meta = metamatrix[j][cur];
 			    if ((meta != null) && (meta.length != 0))
 			    {	for (int k = 0, l = meta.length; k < l; k++)
-				    if ((meta[k] instanceof Pony.Store) == false)
+				    if ((meta[k] != null) && ((meta[k] instanceof Pony.Store) == false))
 					break outer;
 			    }
 			    else
@@ -711,7 +744,7 @@ public class Ponysay
 			{   Pony.Meta[] meta = metamatrix[j][n - cur];
 			    if ((meta != null) && (meta.length != 0))
 			    {	for (int k = 0, l = meta.length; k < l; k++)
-				    if ((meta[k] instanceof Pony.Store) == false)
+				    if ((meta[k] != null) && ((meta[k] instanceof Pony.Store) == false))
 					break outer;
 			    }
 			    else
@@ -741,7 +774,7 @@ public class Ponysay
 			{   Pony.Meta[] meta = metarow[j];
 			    if ((meta != null) && (meta.length != 0))
 			    {	for (int k = 0, l = meta.length; k < l; k++)
-				    if ((meta[k] instanceof Pony.Store) == false)
+				    if ((meta[k] != null) && ((meta[k] instanceof Pony.Store) == false))
 					break outer;
 			    }
 			    else
@@ -771,7 +804,7 @@ public class Ponysay
 			{   Pony.Meta[] meta = metarow[j];
 			    if ((meta != null) && (meta.length != 0))
 			    {	for (int k = 0, l = meta.length; k < l; k++)
-				    if ((meta[k] instanceof Pony.Store) == false)
+				    if ((meta[k] != null) && ((meta[k] instanceof Pony.Store) == false))
 					break outer;
 			    }
 			    else
@@ -789,9 +822,10 @@ public class Ponysay
 	    for (int x = 0, w = metarow.length; x < w; x++)
 	    {   Pony.Meta[] metacell = metarow[x];
 		for (int z = 0, d = metacell.length; z < d; z++)
-		    if ((metacell[z] instanceof Pony.Store) == false)
-			databuf.append("$" + (((Pony.Store)(metacell[z])).name + "=" + ((Pony.Store)(metacell[z])).value).replace("$", "\033$") + "$");
-	}   }
+		{   Pony.Meta metaelem;
+		    if (((metaelem = metacell[z]) != null) && ((metaelem instanceof Pony.Store) == false))
+			databuf.append("$" + (((Pony.Store)(metaelem)).name + "=" + ((Pony.Store)(metaelem)).value).replace("$", "\033$") + "$");
+	}   }   }
 	
 	
 	// TODO implement
@@ -820,7 +854,7 @@ public class Ponysay
 		if (metacell != null)
 		    for (int z = 0, d = metacell.length; z < d; z++)
 		    {   Pony.Meta meta = metacell[z];
-			if ((x >= this.left) || (meta instanceof Pony.Store))
+			if ((meta != null) && ((x >= this.left) || (meta instanceof Pony.Store)))
 			    ;
 		    }
 		if ((x != w) && (x >= this.left))
@@ -831,14 +865,16 @@ public class Ponysay
 	    databuf.append('\n');
 	}
 	
+	
 	// for (int y = metamatrix.length - this.bottom, b = metamatrix.length; y < b; y++)
 	// {   Pony.Meta[][] metarow = metamatrix[y];
 	//     for (int x = 0, w = metarow.length; x < w; x++)
 	//     {   Pony.Meta[] metacell = metarow[x];
-	// 	for (int z = 0, d = metacell.length; z < d; z++)
-	// 	    if ((metacell[z] instanceof Pony.Store) == false)
-	// 		databuf.append("$" + (((Pony.Store)(metacell[z])).name + "=" + ((Pony.Store)(metacell[z])).value).replace("$", "\033$") + "$");
-	// }   }
+	//         for (int z = 0, d = metacell.length; z < d; z++)
+	//         {   Pony.Meta metaelem;
+	//             if (((metaelem = metacell[z]) != null) && ((metaelem instanceof Pony.Store) == false))
+	//                 databuf.append("$" + (((Pony.Store)(metaelem)).name + "=" + ((Pony.Store)(metaelem)).value).replace("$", "\033$") + "$");
+	// }   }   }
 	
 	
 	String data = databuf.toString();
