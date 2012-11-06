@@ -975,7 +975,41 @@ public class Ponysay
 				    break;
 				case Pony.Balloon.class:
 				    databuf.append(applyColour(colours, background, foreground, format, background = null, foreground = null, format = plain));
-				    // TODO implement
+				    
+				    Pony.Balloon balloon = (Pony.Balloon)meta;
+				    if (balloon.left != null)
+				    {
+					int justification = balloon.minWidth != null ? balloon.justification & (Pony.Balloon.LEFT | Pony.Balloon.RIGHT) : Pony.Balloon.NONE;
+					switch (justification)
+					{
+					    case Pony.Balloon.NONE:
+						char[] spaces = new char[balloon.left.intValue()];
+						Arrays.fill(spaces, ' ');
+						databuf.append(new String(spaces));
+						databuf.append("$balloon" + balloon.left.intValue());
+						break;
+					    case Pony.Balloon.LEFT:
+						databuf.append("$balloon" + balloon.left.intValue() + "l");
+						databuf.append(balloon.left.intValue() + balloon.minWidth.intValue() - 1);
+						break;
+					    case Pony.Balloon.RIGHT:
+						databuf.append("$balloon" + balloon.left.intValue() + "r");
+						databuf.append(balloon.left.intValue() + balloon.minWidth.intValue() - 1);
+						break;
+					    default:
+						databuf.append("$balloon" + balloon.left.intValue() + "c");
+						databuf.append(balloon.left.intValue() + balloon.minWidth.intValue() - 1);
+						break;
+					}
+				    }
+				    else if (balloon.minWidth != null)
+					databuf.append("$balloon" + balloon.minWidth.toString());
+				    // KEYWORD: not supported in ponysay: balloon.top != null
+				    if (balloon.minHeight != null)
+					databuf.append("," + balloon.minHeight.toString());
+				    // KEYWORD: not supported in ponysay: balloon.maxWidth != null
+				    // KEYWORD: not supported in ponysay: balloon.maxHeight != null
+				    databuf.append("\n");
 				    break;
 			    }
 		    }
