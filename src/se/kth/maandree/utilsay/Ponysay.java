@@ -757,12 +757,12 @@ public class Ponysay
 	    this.right = 0;
 	if (this.top >= 0)
 	{
-	    int cur = 0, m = matrix[0].length;
+	    int cur = 0, m = matrix[0].length - this.right;
 	    outer:
 	        for (int n = matrix.length; cur < n; cur++)
 		{   Pony.Cell[] row = matrix[cur];
 		    Pony.Meta[][] metarow = metamatrix[cur];
-		    for (int j = 0; j < m; j++)
+		    for (int j = this.left; j < m; j++)
 		    {
 			boolean cellpass = true;
 			Pony.Cell cell = row[j];
@@ -787,12 +787,12 @@ public class Ponysay
 	    this.top = 0;
 	if (this.bottom >= 0)
 	{
-	    int cur = 0, m = matrix[0].length;
+	    int cur = 0, m = matrix[0].length - this.right;
 	    outer:
-	        for (int n = matrix.length - 1; cur <= n; cur++)
+	        for (int n = matrix.length - 1 - this.top; cur <= n; cur++)
 		{   Pony.Cell[] row = matrix[n - cur];
 		    Pony.Meta[][] metarow = metamatrix[n - cur];
-		    for (int j = 0; j < m; j++)
+		    for (int j = this.left; j < m; j++)
 		    {
 			boolean cellpass = true;
 			Pony.Cell cell = row[j];
