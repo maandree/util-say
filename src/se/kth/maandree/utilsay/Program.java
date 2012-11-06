@@ -84,13 +84,9 @@ public class Program
 	    System.out.println("imgsrcrecover");
 	    System.out.println("unzebra");
 	    System.out.println("cowsay2unisay");
-	    System.out.println("Truncater");
-	    System.out.println("Wordwrap");
 	}
 	else if (args[0].equals("img2ponysay"))         img2ponysay.main(_args);
 	else if (args[0].equals("ponysay2img"))         ponysay2img.main(_args);
-	else if (args[0].equals("Truncater"))           Truncater.main(_args);
-	else if (args[0].equals("Wordwrap"))            Wordwrap.main(_args);
 	else if (args[0].equals("unzebra"))             unzebra.main(_args);
 	else if (args[0].equals("imgsrcrecover"))       imgsrcrecover.main(_args);
 	else if (args[0].equals("ponysay2ttyponysay"))  ponysay2ttyponysay.main(_args);
