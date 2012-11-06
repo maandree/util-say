@@ -1033,16 +1033,16 @@ public class Ponysay
 		    }
 		    else if (cell.character == Pony.Cell.PIXELS)
 			if (cell.lower == null)
-			{   if (cell.upper == null)
+			    if (cell.upper == null)
 			    {   databuf.append(applyColour(colours, background, foreground, format, background = null, foreground = this.spacesave ? foreground : null, format = plain));
 				databuf.append(' ');
 			    }
 			    else
 			    {   databuf.append(applyColour(colours, background, foreground, format, background = null, foreground = cell.upper, format = plain));
 				databuf.append('▀');
-			}   }
+			    }
 			else
-			{   if (cell.upper == null)
+			    if (cell.upper == null)
 			    {   databuf.append(applyColour(colours, background, foreground, format, background = cell.lower, foreground = null, format = plain));
 				databuf.append('▀');
 			    }
@@ -1062,7 +1062,7 @@ public class Ponysay
 			    else  //TODO (this.colourful && ¿can get better colour?) → flip
 			    {   databuf.append(applyColour(colours, background, foreground, format, background = cell.lower, foreground = cell.upper, format = plain));
 				databuf.append('▄');
-			}   }
+			    }
 		}
 	    }
 	    background = foreground = null;
@@ -1185,11 +1185,42 @@ public class Ponysay
      */
     protected String applyColour(Color palette, Color oldBackground, Color oldForeground, boolean[] oldFormat, Color newBackground, Color newForeground, boolean[] newFormat)
     {
-	// TODO implement
+	StringBuilder rc = new StringBuilder();
+	
+	for (int i = 0; i < 9; i++)
+	    if (newFormat[i] ^ oldFormat[i])
+		if (newFormat[i])
+		{   rc.append(";");
+		    rc.append(i);
+		}
+		else
+		{   rc.append(";2");
+		    rc.append(i);
+		}
+	
+	if ((oldBackground != null) && (newBackground == null))
+	    rc.append(";49");
+	else if ((oldBackground == null) || (oldBackground.equals(newBackground) == false))
+	{
+	    // TODO implement
+	}
+	
+	if ((oldForeground != null) && (newForeground == null))
+	    rc.append(";39");
+	else if ((oldForeground == null) || (oldForeground.equals(newForeground) == false))
+	{
+	    // TODO implement
+	}
+	
 	// boolean this.tty;
 	// double this.chroma;
 	// boolean this.fullcolour;
 	// boolean this.colourful;
+	
+	String _rc = rc.toString();
+	if (_rc.isEmpty())
+	    return "";
+	return "\033[" + _rc.substring(1) + "m";
     }
     
     
