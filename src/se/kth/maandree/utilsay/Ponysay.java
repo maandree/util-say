@@ -67,6 +67,7 @@ public class Ponysay
 	this.file = (this.file = flags.contains("file") ? flags.get("file") : null).equals("-") ? null : this.file;
 	this.even = (flags.contains("even") == false) || flags.get("even").toLowerCase().startswith("y");
 	this.tty = flags.contains("tty") && flags.get("tty").toLowerCase().startswith("y");
+	this.fullblocks = flags.contains("fullblocks") ? flags.get("fullblocks").toLowerCase().startswith("y") : this.tty;
 	this.spacesave = flags.contains("spacesave") && flags.get("spacesave").toLowerCase().startswith("y");
 	this.zebra = flags.contains("zebra") && flags.get("zebra").toLowerCase().startswith("y");
 	this.version = flags.contains("version") ? parseVersion(flags.get("version")) : VERSION_HORIZONTAL_JUSTIFICATION;
@@ -96,6 +97,11 @@ public class Ponysay
      * Output option: linux vt
      */
     protected boolean tty;
+    
+    /**
+     * Output option: allow solid block elements
+     */
+    protected boolean fullblocks;
     
     /**
      * Output option: make foreground for whitespace the same as the background
@@ -661,13 +667,12 @@ public class Ponysay
 	Pony.Meta[][][] metamatrix = pony.metamatrix;
 	
 	
-	// TODO implement
 	if (this.left >= 0)
 	{
 	    int cur = 0;
 	    outer:
 	        for (int n = matrix[0].length; cur < n; cur++)
-		    for (int j = 0; m = matrix.length; j < m; j++)
+		    for (int j = 0, m = matrix.length; j < m; j++)
 		    {
 			boolean cellpass = true;
 			Pony.Cell cell = matrix[j][cur];
@@ -693,8 +698,8 @@ public class Ponysay
 	{
 	    int cur = 0;
 	    outer:
-	        for (int n = matrix[0].length - n; cur <= n; cur++)
-		    for (int j = 0; m = matrix.length; j < m; j++)
+	        for (int n = matrix[0].length - 1; cur <= n; cur++)
+		    for (int j = 0, m = matrix.length; j < m; j++)
 		    {
 			boolean cellpass = true;
 			Pony.Cell cell = matrix[j][n - cur];
@@ -719,14 +724,79 @@ public class Ponysay
 	    this.right = 0;
 	if (this.top >= 0)
 	{
+	    int cur = 0, m = matrix[0].length;
+	    outer:
+	        for (int n = matrix.length; cur < n; cur++)
+		{   Pony.Cell[] row = matrix[cur];
+		    Pony.Meta[][] metarow = metamatrix[cur];
+		    for (int j = 0; j < m; j++)
+		    {
+			boolean cellpass = true;
+			Pony.Cell cell = row[j];
+			if (cell != null)
+			    if ((cell.character != ' ') || (cell.background != null))
+				if ((cell.character != Pony.Cell.PIXELS) || (cell.background != null) || (cell.foreground != null))
+				    cellpass = false;
+			if (cellpass == false)
+			{   Pony.Meta[] meta = metarow[j];
+			    if ((meta != null) && (meta.length != 0))
+			    {	for (int k = 0, l = meta.length; k < l; k++)
+				    if ((meta[k] instanceof Pony.Store) == false)
+					break outer;
+			    }
+			    else
+				break outer;
+			}
+		}   }
+	    this.top -= cur;
 	}
 	else
 	    this.top = 0;
 	if (this.bottom >= 0)
 	{
+	    int cur = 0, m = matrix[0].length;
+	    outer:
+	        for (int n = matrix.length - 1; cur <= n; cur++)
+		{   Pony.Cell[] row = matrix[n - cur];
+		    Pony.Meta[][] metarow = metamatrix[n - cur];
+		    for (int j = 0; j < m; j++)
+		    {
+			boolean cellpass = true;
+			Pony.Cell cell = row[j];
+			if (cell != null)
+			    if ((cell.character != ' ') || (cell.background != null))
+				if ((cell.character != Pony.Cell.PIXELS) || (cell.background != null) || (cell.foreground != null))
+				    cellpass = false;
+			if (cellpass == false)
+			{   Pony.Meta[] meta = metarow[j];
+			    if ((meta != null) && (meta.length != 0))
+			    {	for (int k = 0, l = meta.length; k < l; k++)
+				    if ((meta[k] instanceof Pony.Store) == false)
+					break outer;
+			    }
+			    else
+				break outer;
+			}
+		}   }
+	    this.bottom -= cur;
 	}
 	else
 	    this.bottom = 0;
+	
+	
+	for (int y = 0; y < this.top; y++)
+	{   Pony.Meta[][] metarow = metamatrix[y];
+	    for (int x = 0, w = metarow.length; x < w; x++)
+	    {   Pony.Meta[] metacell = metarow[x];
+		for (int z = 0, d = metacell.length; z < d; z++)
+		    if ((metacell[z] instanceof Pony.Store) == false)
+			databuf.append("$" + (((Pony.Store)(metacell[z])).name + "=" + ((Pony.Store)(metacell[z])).value).replace("$", "\033$") + "$");
+	}   }
+	
+	
+	// TODO implement
+	// this.right
+	
 	
 	// TODO implement
 	if (this.even == false)
@@ -735,12 +805,13 @@ public class Ponysay
 	
 	
 	// TODO implement
+	// boolean this.fullblocks;
 	// boolean this.spacesave;
 	// boolean this.zebra;
 	// boolean this.tty;
 	// double this.chroma;
 	// boolean this.fullcolour;
-	for (int y = 0, h = matrix.length; y < h; y++)
+	for (int y = this.top, h = matrix.length - this.bottom; y < h; y++)
 	{
 	    Pony.Cell[] row = matrix[y];
 	    Pony.Meta[][] metarow = metamatrix[y];
@@ -749,15 +820,25 @@ public class Ponysay
 		if (metacell != null)
 		    for (int z = 0, d = metacell.length; z < d; z++)
 		    {   Pony.Meta meta = metacell[z];
-			;
+			if ((x >= this.left) || (meta instanceof Pony.Store))
+			    ;
 		    }
-		if (x != w)
+		if ((x != w) && (x >= this.left))
 	        {   Pony.Cell cell = row[x];
 		    ;
 		}
 	    }
 	    databuf.append('\n');
 	}
+	
+	// for (int y = metamatrix.length - this.bottom, b = metamatrix.length; y < b; y++)
+	// {   Pony.Meta[][] metarow = metamatrix[y];
+	//     for (int x = 0, w = metarow.length; x < w; x++)
+	//     {   Pony.Meta[] metacell = metarow[x];
+	// 	for (int z = 0, d = metacell.length; z < d; z++)
+	// 	    if ((metacell[z] instanceof Pony.Store) == false)
+	// 		databuf.append("$" + (((Pony.Store)(metacell[z])).name + "=" + ((Pony.Store)(metacell[z])).value).replace("$", "\033$") + "$");
+	// }   }
 	
 	
 	String data = databuf.toString();
