@@ -817,19 +817,88 @@ public class Ponysay
 	    this.bottom = 0;
 	
 	
+	if (this.left > 0)
+	{
+	    // TODO implement
+	    this.left = 0;
+	}
+	else
+	    this.left = -this.left;
+	
+	if (this.right > 0)
+	{
+	    // TODO implement
+	    this.right = 0;
+	}
+	else
+	    this.right = -this.right;
+	
+	if (this.top > 0)
+	{
+	    int h = matrix.length;
+	    Pony.Cell[][] appendix = new Pony.Cell[this.top][matrix[0].length];
+	    System.arraycopy(matrix, this.top, matrix = new Pony.Cell[][], 0, h);
+	    System.arraycopy(matrix, 0, appendix, 0, this.top);
+	    Pony.Meta[][][] metaappendix = new Pony.Cell[this.top][metamatrix[0].length][];
+	    System.arraycopy(metamatrix, this.top, metamatrix = new Pony.Cell[][][], 0, h);
+	    System.arraycopy(metamatrix, 0, metaappendix, 0, this.top);
+	    this.top = 0;
+	}
+	else
+	    this.top = -this.top;
+	
+	if (this.bottom > 0)
+	{
+	    int h = matrix.length;
+	    Pony.Cell[][] appendix = new Pony.Cell[this.bottom][matrix[0].length];
+	    System.arraycopy(matrix, 0, matrix = new Pony.Cell[][], 0, h);
+	    System.arraycopy(matrix, h, appendix, 0, this.bottom);
+	    Pony.Meta[][][] metaappendix = new Pony.Cell[this.bottom][metamatrix[0].length][];
+	    System.arraycopy(metamatrix, 0, metamatrix = new Pony.Cell[][][], 0, h);
+	    System.arraycopy(metamatrix, h, metaappendix, 0, this.bottom);
+	    this.bottom = 0;
+	}
+	else
+	    this.bottom = -this.bottom;
+	
+	
 	for (int y = 0; y < this.top; y++)
 	{   Pony.Meta[][] metarow = metamatrix[y];
 	    for (int x = 0, w = metarow.length; x < w; x++)
 	    {   Pony.Meta[] metacell = metarow[x];
 		for (int z = 0, d = metacell.length; z < d; z++)
 		{   Pony.Meta metaelem;
-		    if (((metaelem = metacell[z]) != null) && ((metaelem instanceof Pony.Store) == false))
+		    if (((metaelem = metacell[z]) != null) && (metaelem instanceof Pony.Store))
 			databuf.append("$" + (((Pony.Store)(metaelem)).name + "=" + ((Pony.Store)(metaelem)).value).replace("$", "\033$") + "$");
 	}   }   }
 	
 	
-	// TODO implement
-	// this.right
+	if (this.right != 0)
+	{   int w = matrix[0].length, r = metamatrix[0].length - this.right;
+	    Pony.Meta[] leftovers = Pony.Meta[32];
+	    for (int y = this.top, h = matrix.length - this.bottom; y < h; y++)
+	    {
+		int ptr = 0;
+		Pony.Meta[][] metarow = metamatrix[y];
+		
+		for (int x = r; x <= w; x++)
+		    if (metarow[x] != null)
+			for (Pony.Meta meta : metarow[x])
+			    if ((meta != null) && (meta instanceof Pony.Store))
+			    {   if (ptr == leftovers.length)
+				    System.arraycopy(leftovers, 0, leftovers = new Pony.Meta[ptr << 1], 0, ptr);
+				leftovers[ptr++] = meta;
+			    }
+		
+		if (ptr != 0)
+		{   Pony.Meta[] metacell = metarow[r];
+		    System.arraycopy(metacell, 0, metarow[r] = metacell = new Pony.Meta[metacell.length + ptr], 0, metacell.length - ptr);
+		    System.arraycopy(leftovers, 0, metacell, metacell.length - ptr, ptr);
+		}
+		System.arraycopy(matrix[y], 0, matrix[y] = new Pony.Cell[w - this.right], 0, w - this.right);
+		System.arraycopy(metarow, 0, metamatrix[y] = new Pony.Meta[w - this.right + 1][], 0, w - this.right + 1);
+	    }
+	}
 	
 	
 	// TODO implement
@@ -872,7 +941,7 @@ public class Ponysay
 	//     {   Pony.Meta[] metacell = metarow[x];
 	//         for (int z = 0, d = metacell.length; z < d; z++)
 	//         {   Pony.Meta metaelem;
-	//             if (((metaelem = metacell[z]) != null) && ((metaelem instanceof Pony.Store) == false))
+	//             if (((metaelem = metacell[z]) != null) && (metaelem instanceof Pony.Store))
 	//                 databuf.append("$" + (((Pony.Store)(metaelem)).name + "=" + ((Pony.Store)(metaelem)).value).replace("$", "\033$") + "$");
 	// }   }   }
 	
