@@ -818,16 +818,24 @@ public class Ponysay
 	
 	
 	if (this.left > 0)
-	{
-	    // TODO implement
+	{   int w = matrix[0].length;
+	    for (int y = 0, h = matrix.length; y < h; y++)
+	    {
+		System.arraycopy(matrix[y], this.left, matrix[y] = new Pony.Cell[w + this.left], 0, w);
+		System.arraycopy(metamatrix[y], this.left, metamatrix[y] = new Pony.Meta[w + 1 + this.left][], 0, w + 1);
+	    }
 	    this.left = 0;
 	}
 	else
 	    this.left = -this.left;
 	
 	if (this.right > 0)
-	{
-	    // TODO implement
+	{   int w = matrix[0].length;
+	    for (int y = 0, h = matrix.length; y < h; y++)
+	    {
+		System.arraycopy(matrix[y], 0, matrix[y] = new Pony.Cell[w + this.right], 0, w);
+		System.arraycopy(metamatrix[y], 0, metamatrix[y] = new Pony.Meta[w + 1 + this.right][], 0, w + 1);
+	    }
 	    this.right = 0;
 	}
 	else
@@ -835,12 +843,12 @@ public class Ponysay
 	
 	if (this.top > 0)
 	{
-	    int h = matrix.length;
-	    Pony.Cell[][] appendix = new Pony.Cell[this.top][matrix[0].length];
-	    System.arraycopy(matrix, this.top, matrix = new Pony.Cell[][], 0, h);
+	    int h = matrix.length, w = matrix[0].length;
+	    Pony.Cell[][] appendix = new Pony.Cell[this.top][w];
+	    System.arraycopy(matrix, this.top, matrix = new Pony.Cell[h + this.top][], 0, h);
 	    System.arraycopy(matrix, 0, appendix, 0, this.top);
-	    Pony.Meta[][][] metaappendix = new Pony.Meta[this.top][metamatrix[0].length][];
-	    System.arraycopy(metamatrix, this.top, metamatrix = new Pony.Meta[][][], 0, h);
+	    Pony.Meta[][][] metaappendix = new Pony.Meta[this.top][][];
+	    System.arraycopy(metamatrix, this.top, metamatrix = new Pony.Meta[h + this.top][w + 1][], 0, h);
 	    System.arraycopy(metamatrix, 0, metaappendix, 0, this.top);
 	    this.top = 0;
 	}
@@ -849,12 +857,12 @@ public class Ponysay
 	
 	if (this.bottom > 0)
 	{
-	    int h = matrix.length;
-	    Pony.Cell[][] appendix = new Pony.Cell[this.bottom][matrix[0].length];
-	    System.arraycopy(matrix, 0, matrix = new Pony.Cell[][], 0, h);
+	    int h = matrix.length, w = matrix[0].length;
+	    Pony.Cell[][] appendix = new Pony.Cell[this.bottom][w];
+	    System.arraycopy(matrix, 0, matrix = new Pony.Cell[h + this.bottom][], 0, h);
 	    System.arraycopy(matrix, h, appendix, 0, this.bottom);
-	    Pony.Meta[][][] metaappendix = new Pony.Meta[this.bottom][metamatrix[0].length][];
-	    System.arraycopy(metamatrix, 0, metamatrix = new Pony.Meta[][][], 0, h);
+	    Pony.Meta[][][] metaappendix = new Pony.Meta[this.bottom][w + 1][];
+	    System.arraycopy(metamatrix, 0, metamatrix = new Pony.Meta[h + this.bottom][][], 0, h);
 	    System.arraycopy(metamatrix, h, metaappendix, 0, this.bottom);
 	    this.bottom = 0;
 	}
