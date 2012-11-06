@@ -81,7 +81,7 @@ public class Ponysay
 	this.palette = (flags.contains("palette") == false) ? null : parsePalette(flags.get("palette").toUpperCase().replace("\033", "").replace("]", "").replace("P", ""));
 	this.ignoreballoon = flags.contains("ignoreballoon") && flags.get("ignoreballoon").toLowerCase().startswith("y");
 	this.ignorelink = flags.contains("ignorelink") ? flags.get("ignorelink").toLowerCase().startswith("y") : this.ignoreballoon;
-	this.colourful = (flags.contains("colourful") == false) || flags.get("colourful").toLowerCase().startswith("y");
+	this.colourful = this.tty && ((flags.contains("colourful") == false) || flags.get("colourful").toLowerCase().startswith("y"));
     }
     
     
@@ -140,6 +140,8 @@ public class Ponysay
      * Output option: chroma weight, negative for sRGB distance
      */
     protected double chroma;
+    
+    // KEYWORD when colourlabs supports convertion from sRGB, enabled preceptional distance
     
     /**
      * Input/output option: ponysay version
@@ -1029,12 +1031,38 @@ public class Ponysay
 		    {   databuf.append(applyColour(colours, background, foreground, format, background = null, foreground = null, format = plain));
 			databuf.append("$/$");
 		    }
-		    else
-		    {   // TODO implement
-			// boolean this.fullblocks;
-			// boolean this.spacesave;
-			// boolean this.zebra;
-		    }
+		    else if (cell.character == Pony.Cell.PIXELS)
+			if (cell.lower == null)
+			{   if (cell.upper == null)
+			    {   databuf.append(applyColour(colours, background, foreground, format, background = null, foreground = this.spacesave ? foreground : null, format = plain));
+				databuf.append(' ');
+			    }
+			    else
+			    {   databuf.append(applyColour(colours, background, foreground, format, background = null, foreground = cell.upper, format = plain));
+				databuf.append('▀');
+			}   }
+			else
+			{   if (cell.upper == null)
+			    {   databuf.append(applyColour(colours, background, foreground, format, background = cell.lower, foreground = null, format = plain));
+				databuf.append('▀');
+			    }
+			    else if (cell.upper.equals(cell.lower))
+				if (this.zebra)
+				{   databuf.append(applyColour(colours, background, foreground, format, background = cell.lower, foreground = cell.lower, format = plain));
+				    databuf.append('▄');
+				}
+				else if (this.fullblocks /*TODO || (this.colourful && ¿can get better colour?)*/)
+				{   databuf.append(applyColour(colours, background, foreground, format, background = this.spacesave ? background : cell.lower, foreground = cell.lower, format = plain));
+				    databuf.append('█');
+				}
+				else
+				{   databuf.append(applyColour(colours, background, foreground, format, background = cell.lower, foreground = this.spacesave ? foreground : cell.lower, format = plain));
+				    databuf.append(' ');
+				}
+			    else  //TODO (this.colourful && ¿can get better colour?) → flip
+			    {   databuf.append(applyColour(colours, background, foreground, format, background = cell.lower, foreground = cell.upper, format = plain));
+				databuf.append('▄');
+			}   }
 		}
 	    }
 	    background = foreground = null;
