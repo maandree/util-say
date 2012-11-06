@@ -81,6 +81,7 @@ public class Ponysay
 	this.palette = (flags.contains("palette") == false) ? null : parsePalette(flags.get("palette").toUpperCase().replace("\033", "").replace("]", "").replace("P", ""));
 	this.ignoreballoon = flags.contains("ignoreballoon") && flags.get("ignoreballoon").toLowerCase().startswith("y");
 	this.ignorelink = flags.contains("ignorelink") ? flags.get("ignorelink").toLowerCase().startswith("y") : this.ignoreballoon;
+	this.colourful = (flags.contains("colourful") == false) || flags.get("colourful").toLowerCase().startswith("y");
     }
     
     
@@ -108,7 +109,12 @@ public class Ponysay
     /**
      * Output option: linux vt
      */
-    protected boolean tty;
+    protected boolean tty;;
+    
+    /**
+     * Output option: colourful tty
+     */
+    protected boolean colourful;
     
     /**
      * Output option: allow solid block elements
@@ -182,8 +188,11 @@ public class Ponysay
 	if (this.version == VERSION_COWSAY)
 	    return this.importCow();
 	
+	
+	boolean[] plain = new boolean[9];
+	
 	Color[] colours = new Color[256];
-	boolean[] format = new boolean[9];
+	boolean[] format = plain;
 	Color background = null, foreground = null;
 	
 	for (int i = 0; i < 256; i++)
@@ -288,8 +297,6 @@ public class Ponysay
 	    if ((tags != null) && (tagptr < tags.length))
 		Systm.arraycopy(tags, 0, tags = new String[tagptr], 0, tagptr);
 	}
-	
-	boolean[] plain = new boolean[9];
 	
 	for (int d = 0, stored = -1, c;;)
 	{
@@ -944,14 +951,6 @@ public class Ponysay
 	}
 	
 	
-	// TODO implement
-	// boolean this.fullblocks;
-	// boolean this.spacesave;
-	// boolean this.zebra;
-	// boolean this.tty;
-	// double this.chroma;
-	// boolean this.fullcolour;
-	
 	defaultcell = new Pony.Cell(' ', null, null, plain);
 	for (int y = this.top, h = matrix.length - this.bottom; y < h; y++)
 	{
@@ -964,16 +963,49 @@ public class Ponysay
 		    for (int z = 0, d = metacell.length; z < d; z++)
 		    {   Pony.Meta meta = metacell[z];
 			if ((meta != null) && ((x >= this.left) || (meta instanceof Pony.Store)))
-			    ;
+			    switch (meta.getClass())
+			    {
+				case Pony.Store.class:
+				    databuf.append("$" + (((Pony.Store)meta).name + "=" + ((Pony.Store)meta).value).replace("$", "\033$") + "$");
+				    break;
+				case Pony.Recall.class:
+				    Pony.Recall recall = (Pony.Recall)meta;
+				    databuf.append(applyColour(colours, background, foreground, format, background = recall.background, foreground = recall.foreground, recall.format));
+				    databuf.append("$" + recall.name.replace("$", "\033$") + "$");
+				    break;
+				case Pony.Balloon.class:
+				    databuf.append(applyColour(colours, background, foreground, format, background = null, foreground = null, format = plain));
+				    // TODO implement
+				    break;
+			    }
 		    }
 		if ((x != w) && (x >= this.left) && (x < ending))
 		{   Pony.Cell cell = row[x];
 		    if (cell == null)
 			cell = defaultcell;
-		    ;
+		    if (cell.character >= 0)
+		    {   databuf.append(applyColour(colours, background, foreground, format, background = cell.lower, foreground = cell.upper, format = cell.format));
+			databuf.append(cell.character);
+		    }
+		    else if (cell.character == Pony.Cell.NNE_SSW)
+		    {   databuf.append(applyColour(colours, background, foreground, format, background = null, foreground = null, format = plain));
+			databuf.append("$\\$");
+		    }
+		    else if (cell.character == Pony.Cell.NNW_SSE)
+		    {   databuf.append(applyColour(colours, background, foreground, format, background = null, foreground = null, format = plain));
+			databuf.append("$/$");
+		    }
+		    else
+		    {   // TODO implement
+			// boolean this.fullblocks;
+			// boolean this.spacesave;
+			// boolean this.zebra;
+		    }
 		}
 	    }
-	    databuf.append('\n');
+	    background = foreground = null;
+	    format = plain;
+	    databuf.append("\033[0m\n");
 	}
 	
 	
@@ -1071,10 +1103,31 @@ public class Ponysay
 	OutputStream out = System.out;
 	if (this.file != null)
 	    out = new FileOutputStream(this.file); /* buffering is not needed, everything is written at once */
-	out.write(data.getBytes("UTF-8");
+	out.write(data.getBytes("UTF-8"));
 	out.flush();
 	if (out != System.out)
 	    out.close();
+    }
+    
+    
+    /**
+     * Get ANSI colour sequence to append to the output
+     * 
+     * @param  palette        The current colour palette
+     * @param  oldBackground  The current background colour
+     * @param  oldForeground  The current foreground colour
+     * @parma  oldFormat      The current text format
+     * @param  newBackground  The new background colour
+     * @param  newForeground  The new foreground colour
+     * @parma  newFormat      The new text format
+     */
+    protected String applyColour(Color palette, Color oldBackground, Color oldForeground, boolean[] oldFormat, Color newBackground, Color newForeground, boolean[] newFormat)
+    {
+	// TODO implement
+	// boolean this.tty;
+	// double this.chroma;
+	// boolean this.fullcolour;
+	// boolean this.colourful;
     }
     
     
