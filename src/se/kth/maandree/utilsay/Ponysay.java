@@ -679,7 +679,8 @@ public class Ponysay
 	int curleft = 0, curright = 0, curtop = 0, curbottom = 0;
 	Pony.Cell[][] matrix = pony.matrix;
 	Pony.Meta[][][] metamatrix = pony.metamatrix;
-	
+	boolean[] plain = new boolean[9];
+
 	
 	if (this.ignoreballoon)
 	    for (Pony.Meta[][] row : metamatrix)
@@ -690,14 +691,13 @@ public class Ponysay
 				row[i] = null;
 	
 	if (this.ignorelink)
-        {   boolean[] plain = new boolean[9];
 	    for (Pony.Cell[] row : matrix)
 		for (int i = 0, n = row.length; i < n; i++)
 		{   Pony.Cell cell;
 		    if ((cell = row[i]) != null)
 			if ((cell.character == Pony.Cell.NNE_SSW) || (cell.character == Pony.Cell.NNW_SSE))
 			    row[i] = new Pony.Cell(' ', null, null, plain);
-	}       }
+	        }
 	
 	
 	if (this.left >= 0)
@@ -909,9 +909,38 @@ public class Ponysay
 	}
 	
 	
-	// TODO implement
+	int[] endings = null;
 	if (this.even == false)
 	{
+	    int w = matrix[0].length;
+	    endings = new int[matrix.length];
+	    for (int y = 0, h = matrix.length; y < h; y++)
+	    {
+		Pony.Cell[] row = matrix[y];
+		Pony.Meta[][] metarow = metamatrix[y];
+		int cur = 0;
+		mid:
+		    for (int n = w - 1; cur <= n; cur++)
+		    {
+			boolean cellpass = true;
+			Pony.Cell cell = row[n - cur];
+			if (cell != null)
+			    if ((cell.character != ' ') || (cell.background != null))
+				if ((cell.character != Pony.Cell.PIXELS) || (cell.background != null) || (cell.foreground != null))
+				    cellpass = false;
+			if (cellpass == false)
+			{   Pony.Meta[] meta = metarow[n - cur];
+			    if ((meta != null) && (meta.length != 0))
+			    {	for (int k = 0, l = meta.length; k < l; k++)
+				    if ((meta[k] != null) && ((meta[k] instanceof Pony.Store) == false))
+					break mid;
+			    }
+			    else
+				break mid;
+			}
+		    }
+		endings[y] = w - cur;
+	    }
 	}
 	
 	
@@ -922,10 +951,13 @@ public class Ponysay
 	// boolean this.tty;
 	// double this.chroma;
 	// boolean this.fullcolour;
+	
+	defaultcell = new Pony.Cell(' ', null, null, plain);
 	for (int y = this.top, h = matrix.length - this.bottom; y < h; y++)
 	{
 	    Pony.Cell[] row = matrix[y];
 	    Pony.Meta[][] metarow = metamatrix[y];
+	    int ending = endings == null ? row.length : endings[y];
 	    for (int x = 0, w = row.length; x <= w; x++)
 	    {   Pony.Meta[] metacell = metarow[row.length];
 		if (metacell != null)
@@ -934,8 +966,10 @@ public class Ponysay
 			if ((meta != null) && ((x >= this.left) || (meta instanceof Pony.Store)))
 			    ;
 		    }
-		if ((x != w) && (x >= this.left))
-	        {   Pony.Cell cell = row[x];
+		if ((x != w) && (x >= this.left) && (x < ending))
+		{   Pony.Cell cell = row[x];
+		    if (cell == null)
+			cell = defaultcell;
 		    ;
 		}
 	    }
