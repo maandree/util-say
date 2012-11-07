@@ -105,7 +105,87 @@ public class Image
      */
     public Pony importPony()
     {
-	return null
+	BufferedImage image = ImageIO.read(new File(file));
+	int width  = img.getWidth()  / this.magnified;
+	int height = img.getHeight() / this.magnified;
+	int div = this.magnified * this.magnified;
+	
+	Pony.Cell cell;
+	Pony pony = new Pony(height >> 1, width, null, null);
+	for (int y = 0; y < height; y += 2)
+	    for (int x = 0; x < width; x++)
+	    {
+		int a = 0, r = 0, g = 0, b = 0;
+		for (int yy = 0; yy < this.magnified; yy++)
+		    for (int xx = 0; xx < this.magnified; xx++)
+		    {   int argb = img.getRGB(x * this.magnified + xx, (y * 2) * this.magnified + yy);
+			a += (argb >> 24) & 255;
+			r += (argb >> 16) & 255;
+			g += (argb >>  8) & 255;
+			b +=  argb        & 255;
+		    }
+		a /= div; r /= div; g /= div; b /= div;
+		Pony.matrix[y][x] = cell = new Pony.Cell(Pony.Cell.PIXELS, new Color(a, r, g, b), null, null);
+		
+		if ((y * 2 + 2) * this.magnified <= img.getHeight())
+		{
+		    a = r = g = b = 0;
+		    for (int yy = 0; yy < this.magnified; yy++)
+			for (int xx = 0; xx < this.magnified; xx++)
+			{   int argb = img.getRGB(x * this.magnified + xx, (y * 2 + 1) * this.magnified + yy);
+			    a += (argb >> 24) & 255;
+			    r += (argb >> 16) & 255;
+			    g += (argb >>  8) & 255;
+			    b +=  argb        & 255;
+			}
+		    a /= div; r /= div; g /= div; b /= div;
+		    cell.lowerColour = new Color(a, r, g, b);
+		}
+		
+		if (encoded && (cell.upperColour.getAlpha() == cell.lowerColour.getAlpha()))
+		{   r = cell.upperColour.getRed();
+		    g = cell.upperColour.getGreen();
+		    b = cell.upperColour.getBlue();
+		    int r2 = cell.upperColour.getRed();
+		    int g2 = cell.upperColour.getGreen();
+		    int b2 = cell.upperColour.getBlue();
+		    switch (cell.upperColour.getAlpha())
+		    {
+			case 100:
+			    if ((r == 0) && (g == 0) && (b == 255))
+				Pony.matrix[y][x] = new Pony.Cell(Pony.Cell.NNE_SSW, null, null, null);
+			    else if ((r == 255) && (g == 0) && (b == 0))
+				Pony.matrix[y][x] = new Pony.Cell(Pony.Cell.NNW_SSE, null, null, null);
+			    break;
+			    
+		        case 99:
+			    boolean jl = (r & 128) == 128;
+			    boolean jr = (g & 128) == 128;
+			    int left = r & 127;
+			    int minw = g & 127;
+			    int maxw = b;
+			    boolean jt = (r2 & 128) == 128;
+			    boolean jb = (g2 & 128) == 128;
+			    int top = r2 & 127;
+			    int minh = g2 & 127;
+			    int maxh = b2;
+			    int justification = (jl ? Pony.Balloon.LEFT   : Pony.Balloon.NONE)
+				              | (jr ? Pony.Balloon.RIGHT  : Pony.Balloon.NONE)
+				              | (jt ? Pony.Balloon.TOP    : Pony.Balloon.NONE)
+				              | (jb ? Pony.Balloon.BOTTOM : Pony.Balloon.NONE);
+			    Pony.matrix[y][x] = null;
+			    Pony.metamatrix = new Pony.Meta[] { new Pony.Balloon(
+					      left == 0 ? null : new Integer(left), top  == 0 ? null : new Integer(top),
+					      minw == 0 ? null : new Integer(minw), minh == 0 ? null : new Integer(minh),
+					      maxw == 0 ? null : new Integer(maxw), maxh == 0 ? null : new Integer(maxh),
+					      justification) };
+			    break;
+		}   }
+	    }
+	
+	// TODO this.balloon
+	
+	return pony;
     }
     
     
