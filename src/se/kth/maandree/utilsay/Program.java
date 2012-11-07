@@ -79,19 +79,11 @@ public class Program
 	{
 	    System.out.println("img2ponysay");
 	    System.out.println("ponysay2img");
-	    System.out.println("ponysay2ttyponysay");
-	    System.out.println("tty2colourfultty");
 	    System.out.println("imgsrcrecover");
-	    System.out.println("unzebra");
-	    System.out.println("cowsay2unisay");
 	}
 	else if (args[0].equals("img2ponysay"))         img2ponysay.main(_args);
 	else if (args[0].equals("ponysay2img"))         ponysay2img.main(_args);
-	else if (args[0].equals("unzebra"))             unzebra.main(_args);
 	else if (args[0].equals("imgsrcrecover"))       imgsrcrecover.main(_args);
-	else if (args[0].equals("ponysay2ttyponysay"))  ponysay2ttyponysay.main(_args);
-	else if (args[0].equals("cowsay2unisay"))       cowsay2unisay.main(_args);
-	else if (args[0].equals("tty2colourfultty"))    tty2colourfultty.main(_args);
 	else
 	    System.err.println("util-say: error: no such utility");
     }
