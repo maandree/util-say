@@ -750,6 +750,29 @@ public class Ponysay
 	boolean[] plain = new boolean[9];
 	
 	
+	if ((pony.tags != null) || (pony.comment != null))
+	    databuf.append("$$$\n");
+	if (pony.tags != null)
+	    for (String[] tag : tags)
+	    {
+		databuf.append(tag[0].toUpperCase());
+		databuf.append(": ");
+		databuf.append(tag[1]);
+	    }
+	if (pony.comment != null)
+	{
+	    if ((pony.tags != null) && (pony.tags.length != 0))
+		databuf.append('\n');
+	    String comment = '\n' + pony.comment.trim() + '\n';
+	    while (comment.contains("\n$$$\n"))
+		comment = comment.replace("\n$$$\n", "\n$$$(!)\n");
+	    comment = comment.substring(1, comment.length - 1);
+	    databuf.append(comment);
+	}
+	if ((pony.tags != null) || (pony.comment != null))
+	    databuf.append("\n$$$\n");
+	
+	
 	if (this.ignoreballoon)
 	    for (Pony.Meta[][] row : metamatrix)
 		for (Pony.Meta[] cell : row)
@@ -1291,12 +1314,12 @@ public class Ponysay
 	    {   Color colour = palette[colourindex1back];
 		rc.append("m\033]P");
 		rc.append("0123456789ABCDEF".charAt(colourindex1back));
-		rc.append("0123456789ABCDEF".charAt(colour.red >>> 4));
-		rc.append("0123456789ABCDEF".charAt(colour.red & 15));
-		rc.append("0123456789ABCDEF".charAt(colour.green >>> 4));
-		rc.append("0123456789ABCDEF".charAt(colour.green & 15));
-		rc.append("0123456789ABCDEF".charAt(colour.blue >>> 4));
-		rc.append("0123456789ABCDEF".charAt(colour.blue & 15));
+		rc.append("0123456789ABCDEF".charAt(colour.getRed() >>> 4));
+		rc.append("0123456789ABCDEF".charAt(colour.getRed() & 15));
+		rc.append("0123456789ABCDEF".charAt(colour.getGreen() >>> 4));
+		rc.append("0123456789ABCDEF".charAt(colour.getGreen() & 15));
+		rc.append("0123456789ABCDEF".charAt(colour.getBlue() >>> 4));
+		rc.append("0123456789ABCDEF".charAt(colour.getBlue() & 15));
 		rc.append("\033[4");
 		rc.append(this.colourindex2back);
 	    }
@@ -1305,14 +1328,14 @@ public class Ponysay
 		rc.append("m\033]4;");
 		rc.append(this.colourindex2back);
 		rc.append(";rgb:");
-		rc.append("0123456789ABCDEF".charAt(colour.red >>> 4));
-		rc.append("0123456789ABCDEF".charAt(colour.red & 15));
+		rc.append("0123456789ABCDEF".charAt(colour.getRed() >>> 4));
+		rc.append("0123456789ABCDEF".charAt(colour.getRed() & 15));
 		rc.append('/');
-		rc.append("0123456789ABCDEF".charAt(colour.green >>> 4));
-		rc.append("0123456789ABCDEF".charAt(colour.green & 15));
+		rc.append("0123456789ABCDEF".charAt(colour.getGreen() >>> 4));
+		rc.append("0123456789ABCDEF".charAt(colour.getGreen() & 15));
 		rc.append('/');
-		rc.append("0123456789ABCDEF".charAt(colour.blue >>> 4));
-		rc.append("0123456789ABCDEF".charAt(colour.blue & 15));
+		rc.append("0123456789ABCDEF".charAt(colour.getBlue() >>> 4));
+		rc.append("0123456789ABCDEF".charAt(colour.getBlue() & 15));
 		rc.append("\033\\\033[4");
 		rc.append(this.colourindex2back);
 		palette[this.colourindex2back] = colour;
@@ -1331,12 +1354,12 @@ public class Ponysay
 	    {   Color colour = palette[colourindex1fore];
 		rc.append("m\033]P");
 		rc.append("0123456789ABCDEF".charAt(colourindex1fore));
-		rc.append("0123456789ABCDEF".charAt(colour.red >>> 4));
-		rc.append("0123456789ABCDEF".charAt(colour.red & 15));
-		rc.append("0123456789ABCDEF".charAt(colour.green >>> 4));
-		rc.append("0123456789ABCDEF".charAt(colour.green & 15));
-		rc.append("0123456789ABCDEF".charAt(colour.blue >>> 4));
-		rc.append("0123456789ABCDEF".charAt(colour.blue & 15));
+		rc.append("0123456789ABCDEF".charAt(colour.getRed() >>> 4));
+		rc.append("0123456789ABCDEF".charAt(colour.getRed() & 15));
+		rc.append("0123456789ABCDEF".charAt(colour.getGreen() >>> 4));
+		rc.append("0123456789ABCDEF".charAt(colour.getGreen() & 15));
+		rc.append("0123456789ABCDEF".charAt(colour.getBlue() >>> 4));
+		rc.append("0123456789ABCDEF".charAt(colour.getBlue() & 15));
 		rc.append("\033[4");
 		rc.append(this.colourindex2fore);
 	    }
@@ -1345,14 +1368,14 @@ public class Ponysay
 		rc.append("m\033]4;");
 		rc.append(this.colourindex2fore);
 		rc.append(";rgb:");
-		rc.append("0123456789ABCDEF".charAt(colour.red >>> 4));
-		rc.append("0123456789ABCDEF".charAt(colour.red & 15));
+		rc.append("0123456789ABCDEF".charAt(colour.getRed() >>> 4));
+		rc.append("0123456789ABCDEF".charAt(colour.getRed() & 15));
 		rc.append('/');
-		rc.append("0123456789ABCDEF".charAt(colour.green >>> 4));
-		rc.append("0123456789ABCDEF".charAt(colour.green & 15));
+		rc.append("0123456789ABCDEF".charAt(colour.getGreen() >>> 4));
+		rc.append("0123456789ABCDEF".charAt(colour.getGreen() & 15));
 		rc.append('/');
-		rc.append("0123456789ABCDEF".charAt(colour.blue >>> 4));
-		rc.append("0123456789ABCDEF".charAt(colour.blue & 15));
+		rc.append("0123456789ABCDEF".charAt(colour.getBlue() >>> 4));
+		rc.append("0123456789ABCDEF".charAt(colour.getBlue() & 15));
 		rc.append("\033\\\033[4");
 		rc.append(this.colourindex2fore);
 		palette[this.colourindex2fore] = colour;
