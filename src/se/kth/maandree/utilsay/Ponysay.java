@@ -82,6 +82,7 @@ public class Ponysay
 	this.ignoreballoon = flags.contains("ignoreballoon") && flags.get("ignoreballoon").toLowerCase().startswith("y");
 	this.ignorelink = flags.contains("ignorelink") ? flags.get("ignorelink").toLowerCase().startswith("y") : this.ignoreballoon;
 	this.colourful = this.tty && ((flags.contains("colourful") == false) || flags.get("colourful").toLowerCase().startswith("y"));
+	this.escesc = this.version > VERSION_COWSAY ? false : (flags.contains("escesc") && flags.get("escesc").toLowerCase().startswith("y"));
     }
     
     
@@ -154,6 +155,11 @@ public class Ponysay
     protected boolean utf8;
     
     /**
+     * Output option: escape escape charactes
+     */
+    protected boolean escesc;
+    
+    /**
      * Output option: do not limit to xterm 256 standard colours
      */
     protected boolean fullcolour;
@@ -177,6 +183,12 @@ public class Ponysay
      * Output option: bottom margin, negative for unmodified
      */
     protected int bottom;
+    
+    
+    /**
+     * Colour CIELAB value cache
+     */
+    private HashMap<Colour, double[]> labMap = new HashMap<Colour, double[]>();
     
     
     
@@ -617,6 +629,7 @@ public class Ponysay
 		    line = line.replace("\\N{U+2580}", "▀");
 		    line = line.replace("\\N{U+2584}", "▄");
 		    line = line.replace("\\N{U+2588}", "█");
+		    line = line.replace("\\e", "\033");
 		    cow.append(line);
 		    cow.append('\n');
 		}
@@ -683,7 +696,52 @@ public class Ponysay
 	if (this.palette != null)
 	    System.arraycopy(this.palette, 0, colours, 0, 16);
 	
-	
+	StringBuilder resetpalette = null;
+	if (this.tty)
+	    if (this.colourful)
+	    {   resetpalette = new StringBuilder();
+		for (int i = 0; i < 16; i++)
+		{   Colour colour = new Colour(i);
+		    resetpalette.append("\033]P");
+		    resetpalette.append("0123456789ABCDEF".charAt(i));
+		    resetpalette.append("0123456789ABCDEF".charAt(colour.red >>> 4));
+		    resetpalette.append("0123456789ABCDEF".charAt(colour.red & 15));
+		    resetpalette.append("0123456789ABCDEF".charAt(colour.green >>> 4));
+		    resetpalette.append("0123456789ABCDEF".charAt(colour.green & 15));
+		    resetpalette.append("0123456789ABCDEF".charAt(colour.blue >>> 4));
+		    resetpalette.append("0123456789ABCDEF".charAt(colour.blue & 15));
+	    }   }
+	    else
+	    {   resetpalette = new StringBuilder();
+		for (int i : new int[] { 7, 15 })
+		{   Colour colour = new Colour(i);
+		    resetpalette.append("\033]P");
+		    resetpalette.append("0123456789ABCDEF".charAt(i));
+		    resetpalette.append("0123456789ABCDEF".charAt(colour.red >>> 4));
+		    resetpalette.append("0123456789ABCDEF".charAt(colour.red & 15));
+		    resetpalette.append("0123456789ABCDEF".charAt(colour.green >>> 4));
+		    resetpalette.append("0123456789ABCDEF".charAt(colour.green & 15));
+		    resetpalette.append("0123456789ABCDEF".charAt(colour.blue >>> 4));
+		    resetpalette.append("0123456789ABCDEF".charAt(colour.blue & 15));
+	    }   }
+	else if (this.fullcolour)
+	{   resetpalette = new StringBuilder();
+	    for (int i = 0; i < 16; i++)
+	    {   Colour colour = new Colour(i);
+		resetpalette.append("\033]4;");
+		resetpalette.append(i);
+		resetpalette.append(";rgb:");
+		resetpalette.append("0123456789ABCDEF".charAt(colour.red >>> 4));
+		resetpalette.append("0123456789ABCDEF".charAt(colour.red & 15));
+		resetpalette.append('/');
+		resetpalette.append("0123456789ABCDEF".charAt(colour.green >>> 4));
+		resetpalette.append("0123456789ABCDEF".charAt(colour.green & 15));
+		resetpalette.append('/');
+		resetpalette.append("0123456789ABCDEF".charAt(colour.blue >>> 4));
+		resetpalette.append("0123456789ABCDEF".charAt(colour.blue & 15));
+		resetpalette.append("\033\\");
+	}   }
+	    
 	StringBuilder databuf = new StringBuilder();
 	int curleft = 0, curright = 0, curtop = 0, curbottom = 0;
 	Pony.Cell[][] matrix = pony.matrix;
@@ -1161,6 +1219,10 @@ public class Ponysay
 	    }
 	}
 	
+	if (resetpalette != null)
+	    data += resetpalette.toString();
+	if (this.escesc)
+	    data = data.replace("\033", "\\e");
 	
 	OutputStream out = System.out;
 	if (this.file != null)
@@ -1182,10 +1244,121 @@ public class Ponysay
      * @param  newBackground  The new background colour
      * @param  newForeground  The new foreground colour
      * @parma  newFormat      The new text format
-     */
-    protected String applyColour(Color palette, Color oldBackground, Color oldForeground, boolean[] oldFormat, Color newBackground, Color newForeground, boolean[] newFormat)
+     */ // TODO cache colour matching
+    protected String applyColour(Color[] palette, Color oldBackground, Color oldForeground, boolean[] oldFormat, Color newBackground, Color newForeground, boolean[] newFormat)
     {
 	StringBuilder rc = new StringBuilder();
+	
+	int colourindex1back = -1, colourindex2back = -1;
+	int colourindex1fore = -1, colourindex2fore = -1;
+	
+	if ((oldBackground != null) && (newBackground == null))
+	    rc.append(";49");
+	else if ((oldBackground == null) || (oldBackground.equals(newBackground) == false))
+	{
+	    if ((this.fullcolour && this.tty) == false)
+		colourindex1back = matchColour(newBackground, palette, 16, 256, this.chroma);
+	    if (this.tty || this.fullcolour)
+		colourindex2back = (this.colourful ? matchColour(this.fullcolour ? newBackground : palette[colourindex1back], palette, 0, 8, this.chroma) : 7);
+	    else
+		colourindex2back = colourindex1back
+	}
+	
+	if ((oldForeground != null) && (newForeground == null))
+	    rc.append(";39");
+	else if ((oldForeground == null) || (oldForeground.equals(newForeground) == false))
+	{
+	    if ((this.fullcolour && this.tty) == false)
+		colourindex1fore = matchColour(newBackground, palette, 16, 256, this.chroma);
+	    if (this.tty || this.fullcolour)
+		colourindex2fore = (this.colourful ? matchColour(this.fullcolour ? newForeground : palette[colourindex1fore], palette, 0, 16, this.chroma) : 15);
+	    else
+		colourindex2fore = colourindex1fore
+	    if (colourindex2fore == colourindex2back)
+		colourindex2fore |= 8;
+	}
+	
+	if (colourindex2back != -1)
+	    if (this.tty)
+	    {   Color colour = palette[colourindex1back];
+		rc.append("m\033]P");
+		rc.append("0123456789ABCDEF".charAt(colourindex1back));
+		rc.append("0123456789ABCDEF".charAt(colour.red >>> 4));
+		rc.append("0123456789ABCDEF".charAt(colour.red & 15));
+		rc.append("0123456789ABCDEF".charAt(colour.green >>> 4));
+		rc.append("0123456789ABCDEF".charAt(colour.green & 15));
+		rc.append("0123456789ABCDEF".charAt(colour.blue >>> 4));
+		rc.append("0123456789ABCDEF".charAt(colour.blue & 15));
+		rc.append("\033[4");
+		rc.append(this.colourindex2back);
+	    }
+	    else if (this.fullcolour)
+	    {   Color colour = newBackground;
+		rc.append("m\033]4;");
+		rc.append(this.colourindex2back);
+		rc.append(";rgb:");
+		rc.append("0123456789ABCDEF".charAt(colour.red >>> 4));
+		rc.append("0123456789ABCDEF".charAt(colour.red & 15));
+		rc.append('/');
+		rc.append("0123456789ABCDEF".charAt(colour.green >>> 4));
+		rc.append("0123456789ABCDEF".charAt(colour.green & 15));
+		rc.append('/');
+		rc.append("0123456789ABCDEF".charAt(colour.blue >>> 4));
+		rc.append("0123456789ABCDEF".charAt(colour.blue & 15));
+		rc.append("\033\\\033[4");
+		rc.append(this.colourindex2back);
+		palette[this.colourindex2back] = colour;
+	    }
+	    else if (this.colourindex2back < 16)
+	    {   rc.append(";4");
+		rc.append(this.colourindex2back);
+	    }
+	    else
+	    {   rc.append(";48;5;");
+		rc.append(this.colourindex2back);
+	    }
+	
+	if (colourindex2fore != -1)
+	    if (this.tty)
+	    {   Color colour = palette[colourindex1fore];
+		rc.append("m\033]P");
+		rc.append("0123456789ABCDEF".charAt(colourindex1fore));
+		rc.append("0123456789ABCDEF".charAt(colour.red >>> 4));
+		rc.append("0123456789ABCDEF".charAt(colour.red & 15));
+		rc.append("0123456789ABCDEF".charAt(colour.green >>> 4));
+		rc.append("0123456789ABCDEF".charAt(colour.green & 15));
+		rc.append("0123456789ABCDEF".charAt(colour.blue >>> 4));
+		rc.append("0123456789ABCDEF".charAt(colour.blue & 15));
+		rc.append("\033[4");
+		rc.append(this.colourindex2fore);
+	    }
+	    else if (this.fullcolour)
+	    {   Color colour = newForeground;
+		rc.append("m\033]4;");
+		rc.append(this.colourindex2fore);
+		rc.append(";rgb:");
+		rc.append("0123456789ABCDEF".charAt(colour.red >>> 4));
+		rc.append("0123456789ABCDEF".charAt(colour.red & 15));
+		rc.append('/');
+		rc.append("0123456789ABCDEF".charAt(colour.green >>> 4));
+		rc.append("0123456789ABCDEF".charAt(colour.green & 15));
+		rc.append('/');
+		rc.append("0123456789ABCDEF".charAt(colour.blue >>> 4));
+		rc.append("0123456789ABCDEF".charAt(colour.blue & 15));
+		rc.append("\033\\\033[4");
+		rc.append(this.colourindex2fore);
+		palette[this.colourindex2fore] = colour;
+	    }
+	    else if (this.colourindex2back < 16)
+	    {   rc.append(";4");
+		rc.append(this.colourindex2fore);
+	    }
+	    else
+	    {   rc.append(";48;5;");
+		rc.append(this.colourindex2fore);
+	    }
+	if (this.tty && (this.colourindex2fore >= 0))
+	    newFormat[0] = (this.colourindex2fore & 8) == 8;
 	
 	for (int i = 0; i < 9; i++)
 	    if (newFormat[i] ^ oldFormat[i])
@@ -1198,29 +1371,69 @@ public class Ponysay
 		    rc.append(i);
 		}
 	
-	if ((oldBackground != null) && (newBackground == null))
-	    rc.append(";49");
-	else if ((oldBackground == null) || (oldBackground.equals(newBackground) == false))
-	{
-	    // TODO implement
-	}
-	
-	if ((oldForeground != null) && (newForeground == null))
-	    rc.append(";39");
-	else if ((oldForeground == null) || (oldForeground.equals(newForeground) == false))
-	{
-	    // TODO implement
-	}
-	
-	// boolean this.tty;
-	// double this.chroma;
-	// boolean this.fullcolour;
-	// boolean this.colourful;
-	
 	String _rc = rc.toString();
 	if (_rc.isEmpty())
 	    return "";
 	return "\033[" + _rc.substring(1) + "m";
+    }
+    
+    
+    /**
+     * Get the closest matching colour
+     * 
+     * @param   colour        The colour to match
+     * @param   palette       The palette for which to match
+     * @param   paletteStart  The beginning of the usable part of the palette
+     * @param   paletteEnd    The exclusive end of the usable part of the palette
+     * @param   chromaWeight  The chroma weight, negative for sRGB distance
+     * @return                The index of the closest colour in the palette
+     */
+    protected static int matchColour(Color colour, Color[] palette, int paletteStart, int paletteEnd, double chromaWeight)
+    {
+	if (chromaWeight < 0.0)
+	{
+	    int bestI = paletteStart;
+	    int bestD = 4 * 256 * 256;
+	    for (int i = paletteStart; i < paletteEnd; i++)
+	    {
+		int ðr = colour.red   - palette[i].red;
+		int ðg = colour.green - palette[i].green;
+		int ðb = colour.blue  - palette[i].blue;
+		
+		int ð = ðr*ðr + ðg*ðg + ðb*ðb;
+		if (bestD > ð)
+		{   bestD = ð;
+		    bestI = i;
+		}
+	    }
+	    return bestI;
+	}
+	
+	double[] lab = labMap.get(colour);
+	if (lab == null)
+	    labMap.put(colour, lab = Colour.toLab(colour.red, colour.green, colour.blue, chromaWeight));
+	double L = lab[0], a = lab[1], b = lab[2];
+	
+	int bestI = -1;
+	double bestD = 0.0;
+	Color p;
+	for (int i = paletteStart; i < paletteEnd; i++)
+	{
+	    double[] tLab = abMap.get(p = palette[i]);
+	    if (p == null)
+		labMap.put(colour, tLab = Colour.toLab(p.red, p.green, p.blue, chromaWeight));
+	    double ðr = L - tLab[0];
+	    double ðg = a - tLab[1];
+	    double ðb = b - tLab[2];
+	    
+	    double ð = ðr*ðr + ðg*ðg + ðb*ðb;
+	    if ((bestD > ð) || (bestI < 0))
+	    {   bestD = ð;
+		bestI = i;
+	    }
+	}
+	
+	return bestI;
     }
     
     
