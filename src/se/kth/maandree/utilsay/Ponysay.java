@@ -741,13 +741,14 @@ public class Ponysay
 		resetpalette.append("0123456789ABCDEF".charAt(colour.blue & 15));
 		resetpalette.append("\033\\");
 	}   }
-	    
+	
+	
 	StringBuilder databuf = new StringBuilder();
 	int curleft = 0, curright = 0, curtop = 0, curbottom = 0;
 	Pony.Cell[][] matrix = pony.matrix;
 	Pony.Meta[][][] metamatrix = pony.metamatrix;
 	boolean[] plain = new boolean[9];
-
+	
 	
 	if (this.ignoreballoon)
 	    for (Pony.Meta[][] row : metamatrix)
@@ -762,8 +763,13 @@ public class Ponysay
 		for (int i = 0, n = row.length; i < n; i++)
 		{   Pony.Cell cell;
 		    if ((cell = row[i]) != null)
-			if ((cell.character == Pony.Cell.NNE_SSW) || (cell.character == Pony.Cell.NNW_SSE))
+			if (this.ignorelink && ((cell.character == Pony.Cell.NNE_SSW) || (cell.character == Pony.Cell.NNW_SSE)))
 			    row[i] = new Pony.Cell(' ', null, null, plain);
+			else
+			{   Color back = ((cell.lowerColour == null) || (cell.lowerColour.alpha < 112)) ? null : cell.lowerColour;
+			    Color fore = ((cell.upperColour == null) || (cell.upperColour.alpha < 112)) ? null : cell.upperColour;
+			    row[i] = new Pony.Cell(cell.character, back, fore, cell.format); /* the alpha channel does not need to be set to 255 */
+			}
 	        }
 	
 	
@@ -777,8 +783,8 @@ public class Ponysay
 			boolean cellpass = true;
 			Pony.Cell cell = matrix[j][cur];
 			if (cell != null)
-			    if ((cell.character != ' ') || (cell.background != null))
-				if ((cell.character != Pony.Cell.PIXELS) || (cell.background != null) || (cell.foreground != null))
+			    if ((cell.character != ' ') || (cell.lowerColour != null))
+				if ((cell.character != Pony.Cell.PIXELS) || (cell.lowerColour != null) || (cell.upperColour != null))
 				    cellpass = false;
 			if (cellpass == false)
 			{   Pony.Meta[] meta = metamatrix[j][cur];
@@ -804,8 +810,8 @@ public class Ponysay
 			boolean cellpass = true;
 			Pony.Cell cell = matrix[j][n - cur];
 			if (cell != null)
-			    if ((cell.character != ' ') || (cell.background != null))
-				if ((cell.character != Pony.Cell.PIXELS) || (cell.background != null) || (cell.foreground != null))
+			    if ((cell.character != ' ') || (cell.lowerColour != null))
+				if ((cell.character != Pony.Cell.PIXELS) || (cell.lowerColour != null) || (cell.upperColour != null))
 				    cellpass = false;
 			if (cellpass == false)
 			{   Pony.Meta[] meta = metamatrix[j][n - cur];
@@ -834,8 +840,8 @@ public class Ponysay
 			boolean cellpass = true;
 			Pony.Cell cell = row[j];
 			if (cell != null)
-			    if ((cell.character != ' ') || (cell.background != null))
-				if ((cell.character != Pony.Cell.PIXELS) || (cell.background != null) || (cell.foreground != null))
+			    if ((cell.character != ' ') || (cell.lowerColour != null))
+				if ((cell.character != Pony.Cell.PIXELS) || (cell.lowerColour != null) || (cell.upperColour != null))
 				    cellpass = false;
 			if (cellpass == false)
 			{   Pony.Meta[] meta = metarow[j];
@@ -864,8 +870,8 @@ public class Ponysay
 			boolean cellpass = true;
 			Pony.Cell cell = row[j];
 			if (cell != null)
-			    if ((cell.character != ' ') || (cell.background != null))
-				if ((cell.character != Pony.Cell.PIXELS) || (cell.background != null) || (cell.foreground != null))
+			    if ((cell.character != ' ') || (cell.lowerColour != null))
+				if ((cell.character != Pony.Cell.PIXELS) || (cell.lowerColour != null) || (cell.upperColour != null))
 				    cellpass = false;
 			if (cellpass == false)
 			{   Pony.Meta[] meta = metarow[j];
@@ -992,8 +998,8 @@ public class Ponysay
 			boolean cellpass = true;
 			Pony.Cell cell = row[n - cur];
 			if (cell != null)
-			    if ((cell.character != ' ') || (cell.background != null))
-				if ((cell.character != Pony.Cell.PIXELS) || (cell.background != null) || (cell.foreground != null))
+			    if ((cell.character != ' ') || (cell.lowerColour != null))
+				if ((cell.character != Pony.Cell.PIXELS) || (cell.lowerColour != null) || (cell.upperColour != null))
 				    cellpass = false;
 			if (cellpass == false)
 			{   Pony.Meta[] meta = metarow[n - cur];
@@ -1030,7 +1036,9 @@ public class Ponysay
 				    break;
 				case Pony.Recall.class:
 				    Pony.Recall recall = (Pony.Recall)meta;
-				    databuf.append(applyColour(colours, background, foreground, format, background = recall.background, foreground = recall.foreground, recall.format));
+				    Color back = ((cell.background == null) || (cell.background.alpha < 112)) ? null : cell.background;
+				    Color fore = ((cell.foreground == null) || (cell.foreground.alpha < 112)) ? null : cell.foreground;
+				    databuf.append(applyColour(colours, background, foreground, format, background = back, foreground = fore, recall.format));
 				    databuf.append("$" + recall.name.replace("$", "\033$") + "$");
 				    break;
 				case Pony.Balloon.class:
