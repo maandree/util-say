@@ -1,7 +1,7 @@
 /**
  * imgsrcrecover — Source image recover tool kit
  *
- * Copyright © 2012  Mattias Andrée (maandree@kth.se)
+ * Copyright © 2012, 2013  Mattias Andrée (maandree@kth.se)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -117,7 +117,7 @@ public class imgsrcrecover
 	    System.out.println("  ⋅  unisay");
 	    System.out.println();
 	    System.out.println();
-	    System.out.println("Copyright (C) 2012  Mattias Andrée <maandree@kth.se>");
+	    System.out.println("Copyright (C) 2012, 2013  Mattias Andrée <maandree@kth.se>");
 	    System.out.println();
 	    System.out.println("This program is free software: you can redistribute it and/or modify");
 	    System.out.println("it under the terms of the GNU General Public License as published by");
