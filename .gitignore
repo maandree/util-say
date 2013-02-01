@@ -34,8 +34,8 @@
 ##  distribution files  ##
 ##########################
 
-/dist/*/*
-!/dist/*/PKGBUILD
+/dist/*/*/*
+!/dist/*/*/PKGBUILD
 
 
 ##  non-included files  ##
