@@ -150,7 +150,7 @@ public class Pony
      */
     public interface Meta implements Meta
     {
-	// Marker intergace
+	// Marker interface
     }
     
     
