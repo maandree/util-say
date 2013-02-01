@@ -1,7 +1,7 @@
 /**
  * util-say — Utilities for cowsay and cowsay-like programs
  *
- * Copyright © 2012, 2013  Mattias Andrée (maandree@kth.se)
+ * Copyright © 2012, 2013  Mattias Andrée (maandree@member.fsf.org)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -24,7 +24,7 @@ import java.io.*;
 /**
  * Program selector for util-say
  *
- * @author  Mattias Andrée, <a href="mailto:maandree@kth.se">maandree@kth.se</a>
+ * @author  Mattias Andrée, <a href="mailto:maandree@member.fsf.org">maandree@member.fsf.org</a>
  */
 public class Program
 {
@@ -49,7 +49,7 @@ public class Program
     {
 	if ((args.length == 0) || ((args.length == 1) && args[0].equals("--help")))
 	{
-            System.out.println("Copyright (C) 2012, 2013  Mattias Andrée <maandree@kth.se>");
+            System.out.println("Copyright (C) 2012, 2013  Mattias Andrée <maandree@member.fsf.org>");
             System.out.println();
             System.out.println("You can use --list to get a list of all programs");
             System.out.println("USAGE:  util-say [--list | --help | PROGRAM ARGUMENTS...]");

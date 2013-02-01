@@ -1,7 +1,7 @@
 /**
  * img2ponysay — Image to ponysay conversion tool
  *
- * Copyright © 2012, 2013  Mattias Andrée (maandree@kth.se)
+ * Copyright © 2012, 2013  Mattias Andrée (maandree@member.fsf.org)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -28,7 +28,7 @@ import java.io.*;
 /**
  * The main class of the img2ponysay program
  *
- * @author  Mattias Andrée, <a href="mailto:maandree@kth.se">maandree@kth.se</a>
+ * @author  Mattias Andrée, <a href="mailto:maandree@member.fsf.org">maandree@member.fsf.org</a>
  */
 public class img2ponysay
 {
@@ -75,7 +75,7 @@ public class img2ponysay
 	    System.out.println("  ⋅  GIF  (first frame)");
 	    System.out.println();
 	    System.out.println();
-	    System.out.println("Copyright (C) 2012, 2013  Mattias Andrée <maandree@kth.se>");
+	    System.out.println("Copyright (C) 2012, 2013  Mattias Andrée <maandree@member.fsf.org>");
 	    System.out.println();
 	    System.out.println("This program is free software: you can redistribute it and/or modify");
 	    System.out.println("it under the terms of the GNU General Public License as published by");

@@ -1,7 +1,7 @@
 /**
  * util-say — Utilities for cowsay and cowsay-like programs
  *
- * Copyright © 2012, 2013  Mattias Andrée (maandree@kth.se)
+ * Copyright © 2012, 2013  Mattias Andrée (maandree@member.fsf.org)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -27,7 +27,7 @@ import javax.imageio.*;
 /**
  * Non-terminal image support module
  * 
- * @author  Mattias Andrée, <a href="mailto:maandree@kth.se">maandree@kth.se</a>
+ * @author  Mattias Andrée, <a href="mailto:maandree@member.fsf.org">maandree@member.fsf.org</a>
  */
 public class Image
 {
