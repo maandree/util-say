@@ -19,9 +19,9 @@
 package se.kth.maandree.utilsay;
 
 import java.io.*;
-import java.util.LinkedList;
-import java.util.HashMap;
-import java.awt.Color;
+import java.util.*;
+import java.awt.*;
+import java.awt.image.*;
 
 
 // This class should be tried to be keeped as optimised as possible for the
@@ -64,25 +64,25 @@ public class Ponysay
      */
     public Ponysay(HashMap<String, String> flags)
     {
-	this.file = (this.file = flags.contains("file") ? flags.get("file") : null).equals("-") ? null : this.file;
-	this.even = (flags.contains("even") == false) || flags.get("even").toLowerCase().startswith("y");
-	this.tty = flags.contains("tty") && flags.get("tty").toLowerCase().startswith("y");
-	this.fullblocks = flags.contains("fullblocks") ? flags.get("fullblocks").toLowerCase().startswith("y") : this.tty;
-	this.spacesave = flags.contains("spacesave") && flags.get("spacesave").toLowerCase().startswith("y");
-	this.zebra = flags.contains("zebra") && flags.get("zebra").toLowerCase().startswith("y");
-	this.version = flags.contains("version") ? parseVersion(flags.get("version")) : VERSION_HORIZONTAL_JUSTIFICATION;
-	this.utf8 = this.version > VERSION_COWSAY ? true : (flags.contains("utf8") && flags.get("utf8").toLowerCase().startswith("y"));
-	this.fullcolour = flags.contains("fullcolour") && flags.get("fullcolour").toLowerCase().startswith("y");
-	this.chroma = (flags.contains("chroma") == false) ? -1 : parseDouble(flags.get("chroma"));
-	this.left = (flags.contains("left") == false) ? 2 : parseInteger(flags.get("left"));
-	this.right = (flags.contains("right") == false) ? 0 : parseInteger(flags.get("right"));
-	this.top = (flags.contains("top") == false) ? 3 : parseInteger(flags.get("top"));
-	this.bottom = (flags.contains("bottom") == false) ? 1 : parseInteger(flags.get("bottom"));
-	this.palette = (flags.contains("palette") == false) ? null : parsePalette(flags.get("palette").toUpperCase().replace("\033", "").replace("]", "").replace("P", ""));
-	this.ignoreballoon = flags.contains("ignoreballoon") && flags.get("ignoreballoon").toLowerCase().startswith("y");
-	this.ignorelink = flags.contains("ignorelink") ? flags.get("ignorelink").toLowerCase().startswith("y") : this.ignoreballoon;
-	this.colourful = this.tty && ((flags.contains("colourful") == false) || flags.get("colourful").toLowerCase().startswith("y"));
-	this.escesc = this.version > VERSION_COWSAY ? false : (flags.contains("escesc") && flags.get("escesc").toLowerCase().startswith("y"));
+	this.file = (this.file = flags.containsKey("file") ? flags.get("file") : null).equals("-") ? null : this.file;
+	this.even = (flags.containsKey("even") == false) || flags.get("even").toLowerCase().startsWith("y");
+	this.tty = flags.containsKey("tty") && flags.get("tty").toLowerCase().startsWith("y");
+	this.fullblocks = flags.containsKey("fullblocks") ? flags.get("fullblocks").toLowerCase().startsWith("y") : this.tty;
+	this.spacesave = flags.containsKey("spacesave") && flags.get("spacesave").toLowerCase().startsWith("y");
+	this.zebra = flags.containsKey("zebra") && flags.get("zebra").toLowerCase().startsWith("y");
+	this.version = flags.containsKey("version") ? parseVersion(flags.get("version")) : VERSION_HORIZONTAL_JUSTIFICATION;
+	this.utf8 = this.version > VERSION_COWSAY ? true : (flags.containsKey("utf8") && flags.get("utf8").toLowerCase().startsWith("y"));
+	this.fullcolour = flags.containsKey("fullcolour") && flags.get("fullcolour").toLowerCase().startsWith("y");
+	this.chroma = (flags.containsKey("chroma") == false) ? -1 : parseDouble(flags.get("chroma"));
+	this.left = (flags.containsKey("left") == false) ? 2 : parseInteger(flags.get("left"));
+	this.right = (flags.containsKey("right") == false) ? 0 : parseInteger(flags.get("right"));
+	this.top = (flags.containsKey("top") == false) ? 3 : parseInteger(flags.get("top"));
+	this.bottom = (flags.containsKey("bottom") == false) ? 1 : parseInteger(flags.get("bottom"));
+	this.palette = (flags.containsKey("palette") == false) ? null : parsePalette(flags.get("palette").toUpperCase().replace("\033", "").replace("]", "").replace("P", ""));
+	this.ignoreballoon = flags.containsKey("ignoreballoon") && flags.get("ignoreballoon").toLowerCase().startsWith("y");
+	this.ignorelink = flags.containsKey("ignorelink") ? flags.get("ignorelink").toLowerCase().startsWith("y") : this.ignoreballoon;
+	this.colourful = this.tty && ((flags.containsKey("colourful") == false) || flags.get("colourful").toLowerCase().startsWith("y"));
+	this.escesc = this.version > VERSION_COWSAY ? false : (flags.containsKey("escesc") && flags.get("escesc").toLowerCase().startsWith("y"));
     }
     
     
@@ -188,7 +188,7 @@ public class Ponysay
     /**
      * Colour CIELAB value cache
      */
-    private HashMap<Colour, double[]> labMap = new HashMap<Colour, double[]>();
+    private static HashMap<Colour, double[]> labMap = new HashMap<Colour, double[]>();
     
     
     
@@ -218,7 +218,7 @@ public class Ponysay
 	
 	InputStream in = System.in;
 	if (this.file != null)
-	    in = BufferedInputStream(new FileInputStream(this.file));
+	    in = new BufferedInputStream(new FileInputStream(this.file));
 	
 	boolean dollar = false;
 	boolean escape = false;
@@ -250,9 +250,9 @@ public class Ponysay
 	    int d = 0;
 	    while ((d = in.read()) != -1)
 	    {
-		if (ptr == data.lenght)
+		if (ptr == data.length)
 		    System.arraycopy(data, 0, data = new byte[ptr << 1], 0, ptr);
-		data[ptr++] = d;
+		data[ptr++] = (byte)d;
 		if ((ptr >= 5) && (data[ptr - 1] == '\n') && (data[ptr - 2] == '$') && (data[ptr - 3] == '$') && (data[ptr - 4] == '$') && (data[ptr - 5] == '\n'))
 		{   ptr -= 5;
 		    break;
@@ -289,7 +289,7 @@ public class Ponysay
 		    if (tags == null)
 			tags = new String[32][];
 		    else if (tagptr == tags.length)
-			Systm.arraycopy(tags, 0, tags = new String[tagptr << 1], 0, tagptr);
+			System.arraycopy(tags, 0, tags = new String[tagptr << 1], 0, tagptr);
 		    tags[tagptr++] = new String[] {name.trim(), value.trim()};
 		}
 		else
@@ -309,7 +309,7 @@ public class Ponysay
 	    if (comment.isEmpty())
 		comment = null;
 	    if ((tags != null) && (tagptr < tags.length))
-		Systm.arraycopy(tags, 0, tags = new String[tagptr], 0, tagptr);
+		System.arraycopy(tags, 0, tags = new String[tagptr], 0, tagptr);
 	}
 	
 	for (int d = 0, stored = -1, c;;)
@@ -321,7 +321,7 @@ public class Ponysay
 	    }
 	    else if ((d = stored) != -1)
 		stored = -1;
-	    else if ((d == in.read()) == -1)
+	    else if ((d = in.read()) == -1)
 		break;
 	    
 	    if (((c = d) & 0x80) == 0x80)
@@ -385,7 +385,7 @@ public class Ponysay
 		else
 		{   escape = false;
 		    if (ptr == buf.length)
-			System.arraycopy(buf, 0, buf = new int[ptr << 1], 0, buf);
+			System.arraycopy(buf, 0, buf = new int[ptr << 1], 0, ptr);
 		    if ((dollareql == -1) && (d == '='))
 			dollareql = ptr;
 		    buf[ptr++] = d;
@@ -397,13 +397,13 @@ public class Ponysay
 			if (ptr == 8)
 			{   ptr = 0;
 			    osi = escape = false;
-			    int index =             (ptr[0] < 'A') ? (ptr[0] & 15) : ((ptr[0] ^ '@') + 9);
-			    int red =               (ptr[1] < 'A') ? (ptr[1] & 15) : ((ptr[1] ^ '@') + 9);
-			    red = (red << 4) |     ((ptr[2] < 'A') ? (ptr[2] & 15) : ((ptr[2] ^ '@') + 9));
-			    int green =             (ptr[3] < 'A') ? (ptr[3] & 15) : ((ptr[3] ^ '@') + 9);
-			    green = (green << 4) | ((ptr[4] < 'A') ? (ptr[4] & 15) : ((ptr[4] ^ '@') + 9));
-			    int blue =              (ptr[5] < 'A') ? (ptr[5] & 15) : ((ptr[5] ^ '@') + 9);
-			    blue = (blue << 4) |   ((ptr[6] < 'A') ? (ptr[6] & 15) : ((ptr[6] ^ '@') + 9));
+			    int index =             (buf[0] < 'A') ? (buf[0] & 15) : ((buf[0] ^ '@') + 9);
+			    int red =               (buf[1] < 'A') ? (buf[1] & 15) : ((buf[1] ^ '@') + 9);
+			    red = (red << 4) |     ((buf[2] < 'A') ? (buf[2] & 15) : ((buf[2] ^ '@') + 9));
+			    int green =             (buf[3] < 'A') ? (buf[3] & 15) : ((buf[3] ^ '@') + 9);
+			    green = (green << 4) | ((buf[4] < 'A') ? (buf[4] & 15) : ((buf[4] ^ '@') + 9));
+			    int blue =              (buf[5] < 'A') ? (buf[5] & 15) : ((buf[5] ^ '@') + 9);
+			    blue = (blue << 4) |   ((buf[6] < 'A') ? (buf[6] & 15) : ((buf[6] ^ '@') + 9));
 			    colours[index] = new Color(red, green, blue);
 			}
 		    }
@@ -413,7 +413,7 @@ public class Ponysay
 			if (d == '\\')
 			{   ptr = ~ptr;
 			    ptr--;
-			    if ((ptr > 8) && (buf[ptr] == '\e') && (buf[0] == ';'))
+			    if ((ptr > 8) && (buf[ptr] == '\033') && (buf[0] == ';'))
 			    {   int[] _code = new int[ptr - 1];
 				System.arraycopy(buf, 1, _code, 0, ptr - 1);
 				String[] code = utf32to16(_code).split(";");
@@ -522,7 +522,7 @@ public class Ponysay
 		{   curwidth++;
 		    Color fore = foreground == null ? colours[7] : foreground;
 		    if (c == '▀')
-			items.add(new Pony.Cell(Pony.Cell.PIXELS, fore : foreground, background, format));
+			items.add(new Pony.Cell(Pony.Cell.PIXELS, fore, background, format));
 		    else if (c == '▄')
 			items.add(new Pony.Cell(Pony.Cell.PIXELS, background, fore, format));
 		    else if (c == '█')
@@ -598,7 +598,7 @@ public class Ponysay
 	{
 	    InputStream in = System.in;
 	    if (this.file != null)
-		in = BufferedInputStream(new FileInputStream(this.file));
+		in = new BufferedInputStream(new FileInputStream(this.file));
 	    Scanner sc = new Scanner(in, "UTF-8");
 	    
 	    StringBuilder cow = new StringBuilder();
@@ -617,8 +617,8 @@ public class Ponysay
 		    line = line.substring(line.indexOf("#") + 1);
 		    if (line.equals("$$$"))
 			line = "$$$(!)";
-		    data.append(line)
-		    data.append('\n')
+		    data.append(line);
+		    data.append('\n');
 		}
 		else
 		{
@@ -650,7 +650,7 @@ public class Ponysay
 	    data.append("$balloon" + (pony.indexOf("$\\$") + 2) + "$\n");
 	    data.append(pony);
 	    
-	    final byte[] streamdata = data.toString().getBytes('UTF-8');
+	    final byte[] streamdata = data.toString().getBytes("UTF-8");
 	    System.setIn(new InputStream()
 		{
 		    int ptr = 0;
@@ -766,7 +766,7 @@ public class Ponysay
 	    String comment = '\n' + pony.comment.trim() + '\n';
 	    while (comment.contains("\n$$$\n"))
 		comment = comment.replace("\n$$$\n", "\n$$$(!)\n");
-	    comment = comment.substring(1, comment.length - 1);
+	    comment = comment.substring(1, comment.length() - 1);
 	    databuf.append(comment);
 	}
 	if ((pony.tags != null) || (pony.comment != null))
@@ -789,8 +789,8 @@ public class Ponysay
 			if (this.ignorelink && ((cell.character == Pony.Cell.NNE_SSW) || (cell.character == Pony.Cell.NNW_SSE)))
 			    row[i] = new Pony.Cell(' ', null, null, plain);
 			else
-			{   Color back = ((cell.lowerColour == null) || (cell.lowerColour.alpha < 112)) ? null : cell.lowerColour;
-			    Color fore = ((cell.upperColour == null) || (cell.upperColour.alpha < 112)) ? null : cell.upperColour;
+			{   Color back = ((cell.lowerColour == null) || (cell.lowerColour.getAlpha() < 112)) ? null : cell.lowerColour;
+			    Color fore = ((cell.upperColour == null) || (cell.upperColour.getAlpha() < 112)) ? null : cell.upperColour;
 			    row[i] = new Pony.Cell(cell.character, back, fore, cell.format); /* the alpha channel does not need to be set to 255 */
 			}
 	        }
@@ -979,7 +979,7 @@ public class Ponysay
 	
 	if (this.right != 0)
 	{   int w = matrix[0].length, r = metamatrix[0].length - this.right;
-	    Pony.Meta[] leftovers = Pony.Meta[32];
+	    Pony.Meta[] leftovers = new Pony.Meta[32];
 	    for (int y = this.top, h = matrix.length - this.bottom; y < h; y++)
 	    {
 		int ptr = 0;
@@ -1059,8 +1059,8 @@ public class Ponysay
 				    break;
 				case Pony.Recall.class:
 				    Pony.Recall recall = (Pony.Recall)meta;
-				    Color back = ((cell.background == null) || (cell.background.alpha < 112)) ? null : cell.background;
-				    Color fore = ((cell.foreground == null) || (cell.foreground.alpha < 112)) ? null : cell.foreground;
+				    Color back = ((cell.background == null) || (cell.background.getAlpha() < 112)) ? null : cell.background;
+				    Color fore = ((cell.foreground == null) || (cell.foreground.getAlpha() < 112)) ? null : cell.foreground;
 				    databuf.append(applyColour(colours, background, foreground, format, background = back, foreground = fore, recall.format));
 				    databuf.append("$" + recall.name.replace("$", "\033$") + "$");
 				    break;
@@ -1218,7 +1218,7 @@ public class Ponysay
 		databuf.append(data.substring(0, pos));
 		StringBuilder dollarbuf = null;
 		boolean esc = false;
-		for (int n = data.length; i < n;)
+		for (int n = data.length(); i < n;)
 		{
 		    char c = data.charAt(i++);
 		    if (dollarbuf != null)
@@ -1235,9 +1235,9 @@ public class Ponysay
 			    else
 			    {   data.append("$balloon");
 				dollar = dollar.substring(8);
-				if      (dollar.contains("l"))  dollar = dollar,substring(dollar.indexOf('l') + 1);
-				else if (dollar.contains("r"))  dollar = dollar,substring(dollar.indexOf('r') + 1);
-				else if (dollar.contains("c"))  dollar = dollar,substring(dollar.indexOf('c') + 1);
+				if      (dollar.contains("l"))  dollar = dollar.substring(dollar.indexOf('l') + 1);
+				else if (dollar.contains("r"))  dollar = dollar.substring(dollar.indexOf('r') + 1);
+				else if (dollar.contains("c"))  dollar = dollar.substring(dollar.indexOf('c') + 1);
 				data.append(dollar);
 			}   }
 		    }
@@ -1292,7 +1292,7 @@ public class Ponysay
 	    if (this.tty || this.fullcolour)
 		colourindex2back = (this.colourful ? matchColour(this.fullcolour ? newBackground : palette[colourindex1back], palette, 0, 8, this.chroma) : 7);
 	    else
-		colourindex2back = colourindex1back
+		colourindex2back = colourindex1back;
 	}
 	
 	if ((oldForeground != null) && (newForeground == null))
@@ -1304,7 +1304,7 @@ public class Ponysay
 	    if (this.tty || this.fullcolour)
 		colourindex2fore = (this.colourful ? matchColour(this.fullcolour ? newForeground : palette[colourindex1fore], palette, 0, 16, this.chroma) : 15);
 	    else
-		colourindex2fore = colourindex1fore
+		colourindex2fore = colourindex1fore;
 	    if (colourindex2fore == colourindex2back)
 		colourindex2fore |= 8;
 	}
@@ -1427,9 +1427,9 @@ public class Ponysay
 	    int bestD = 4 * 256 * 256;
 	    for (int i = paletteStart; i < paletteEnd; i++)
 	    {
-		int ðr = colour.red   - palette[i].red;
-		int ðg = colour.green - palette[i].green;
-		int ðb = colour.blue  - palette[i].blue;
+		int ðr = colour.getRed()   - palette[i].getRed();
+		int ðg = colour.getGreen() - palette[i].getGreen();
+		int ðb = colour.getBlue()  - palette[i].getBlue();
 		
 		int ð = ðr*ðr + ðg*ðg + ðb*ðb;
 		if (bestD > ð)
@@ -1442,7 +1442,7 @@ public class Ponysay
 	
 	double[] lab = labMap.get(colour);
 	if (lab == null)
-	    labMap.put(colour, lab = Colour.toLab(colour.red, colour.green, colour.blue, chromaWeight));
+	    labMap.put(colour, lab = Colour.toLab(colour.getRed(), colour.getGreen(), colour.getBlue(), chromaWeight));
 	double L = lab[0], a = lab[1], b = lab[2];
 	
 	int bestI = -1;
@@ -1450,9 +1450,9 @@ public class Ponysay
 	Color p;
 	for (int i = paletteStart; i < paletteEnd; i++)
 	{
-	    double[] tLab = abMap.get(p = palette[i]);
+	    double[] tLab = labMap.get(p = palette[i]);
 	    if (p == null)
-		labMap.put(colour, tLab = Colour.toLab(p.red, p.green, p.blue, chromaWeight));
+		labMap.put(colour, tLab = Colour.toLab(p.getRed(), p.getGreen(), p.getBlue(), chromaWeight));
 	    double ðr = L - tLab[0];
 	    double ðg = a - tLab[1];
 	    double ðb = b - tLab[2];
@@ -1533,7 +1533,7 @@ public class Ponysay
 	String defvalue = "00000001AA0000200AA003AA550040000AA5AA00AA600AAAA7AAAAAA"
 	                + "85555559FF5555A55FF55BFFFF55C5555FFDFF55FFE55FFFFFFFFFFF";
 	Color[] palette = new Color[16];
-	while (int ptr = 0, n = defvalue.length(); ptr < n; ptr += 7)
+        for (int ptr = 0, n = defvalue.length(); ptr < n; ptr += 7)
 	{
 	    int index = Integer.parseInt(defvalue.substring(ptr + 0, 1), 16);
 	    int red   = Integer.parseInt(defvalue.substring(ptr + 1, 2), 16);
@@ -1541,7 +1541,7 @@ public class Ponysay
 	    int blue  = Integer.parseInt(defvalue.substring(ptr + 5, 2), 16);
 	    palette[index] = new Color(red, green, blue);
 	}
-	while (int ptr = 0, n = value.length(); ptr < n; ptr += 7)
+	for (int ptr = 0, n = value.length(); ptr < n; ptr += 7)
 	{
 	    int index = Integer.parseInt(value.substring(ptr + 0, 1), 16);
 	    int red   = Integer.parseInt(value.substring(ptr + 1, 2), 16);

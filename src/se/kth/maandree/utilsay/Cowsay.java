@@ -18,6 +18,9 @@
  */
 package se.kth.maandree.utilsay;
 
+import java.io.*;
+import java.util.*;
+
 
 /**
  * Cowsay support module
@@ -55,7 +58,7 @@ public class Cowsay extends Ponysay
     {
 	InputStream in = System.in;
 	if (this.file != null)
-	    in = BufferedInputStream(new FileInputStream(this.file));
+	    in = new BufferedInputStream(new FileInputStream(this.file));
 	Scanner sc = new Scanner(in, "UTF-8");
 	
 	
@@ -80,8 +83,8 @@ public class Cowsay extends Ponysay
 		line = line.substring(line.indexOf("#") + 1);
 		if (line.equals("$$$"))
 		    line = "$$$(!)";
-		data.append(line + "\n")
-		data.append('\n')
+		data.append(line + "\n");
+		data.append('\n');
 	    }
 	    else
 	    {
@@ -112,7 +115,7 @@ public class Cowsay extends Ponysay
 	InputStream stdin = System.in;
 	try
 	{
-	    final byte[] streamdata = data.toString().getBytes('UTF-8');
+	    final byte[] streamdata = data.toString().getBytes("UTF-8");
 	    System.setIn(new InputStream()
 		{
 		    int ptr = 0;

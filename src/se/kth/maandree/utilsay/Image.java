@@ -21,6 +21,7 @@ package se.kth.maandree.utilsay;
 import java.io.*;
 import java.awt.Color;
 import java.awt.image.*;
+import java.util.*;
 import javax.imageio.*;
 
 
@@ -38,15 +39,15 @@ public class Image
      */
     public Image(HashMap<String, String> flags)
     {
-	this.file = (this.file = flags.contains("file") ? flags.get("file") : null).equals("-") ? null : this.file;
-	this.left = (flags.contains("left") == false) ? -1 : Integer.parseInt(flags.get("left"));
-	this.right = (flags.contains("right") == false) ? -1 : Integer.parseInt(flags.get("right"));
-	this.top = (flags.contains("top") == false) ? -1 : Integer.parseInt(flags.get("top"));
-	this.bottom = (flags.contains("bottom") == false) ? -1 : Integer.parseInt(flags.get("bottom"));
-	this.magnified = (flags.contains("magnified") == false) ? 2 : Integer.parseInt(flags.get("magnified"));
-	this.encoded = flags.contains("encoded") && flags.get("encoded").toLowerCase().startsWith("y");
-	this.balloon = this.encoded ? false : ((flags.contains("balloon") == false) || flags.get("balloon").toLowerCase().startsWith("y"));
-	this.format = flags.contains("format") ? flags.get("format") : "png";
+	this.file = (this.file = flags.containsKey("file") ? flags.get("file") : null).equals("-") ? null : this.file;
+	this.left = (flags.containsKey("left") == false) ? -1 : Integer.parseInt(flags.get("left"));
+	this.right = (flags.containsKey("right") == false) ? -1 : Integer.parseInt(flags.get("right"));
+	this.top = (flags.containsKey("top") == false) ? -1 : Integer.parseInt(flags.get("top"));
+	this.bottom = (flags.containsKey("bottom") == false) ? -1 : Integer.parseInt(flags.get("bottom"));
+	this.magnified = (flags.containsKey("magnified") == false) ? 2 : Integer.parseInt(flags.get("magnified"));
+	this.encoded = flags.containsKey("encoded") && flags.get("encoded").toLowerCase().startsWith("y");
+	this.balloon = this.encoded ? false : ((flags.containsKey("balloon") == false) || flags.get("balloon").toLowerCase().startsWith("y"));
+	this.format = flags.containsKey("format") ? flags.get("format") : "png";
     }
     
     
@@ -106,8 +107,8 @@ public class Image
     public Pony importPony()
     {
 	BufferedImage image = ImageIO.read(new File(file));
-	int width  = img.getWidth()  / this.magnified;
-	int height = img.getHeight() / this.magnified;
+	int width  = image.getWidth()  / this.magnified;
+	int height = image.getHeight() / this.magnified;
 	int div = this.magnified * this.magnified;
 	
 	Pony.Cell cell;
@@ -118,21 +119,21 @@ public class Image
 		int a = 0, r = 0, g = 0, b = 0;
 		for (int yy = 0; yy < this.magnified; yy++)
 		    for (int xx = 0; xx < this.magnified; xx++)
-		    {   int argb = img.getRGB(x * this.magnified + xx, (y * 2) * this.magnified + yy);
+		    {   int argb = image.getRGB(x * this.magnified + xx, (y * 2) * this.magnified + yy);
 			a += (argb >> 24) & 255;
 			r += (argb >> 16) & 255;
 			g += (argb >>  8) & 255;
 			b +=  argb        & 255;
 		    }
 		a /= div; r /= div; g /= div; b /= div;
-		Pony.matrix[y][x] = cell = new Pony.Cell(Pony.Cell.PIXELS, new Color(a, r, g, b), null, null);
+		pony.matrix[y][x] = cell = new Pony.Cell(Pony.Cell.PIXELS, new Color(a, r, g, b), null, null);
 		
-		if ((y * 2 + 2) * this.magnified <= img.getHeight())
+		if ((y * 2 + 2) * this.magnified <= image.getHeight())
 		{
 		    a = r = g = b = 0;
 		    for (int yy = 0; yy < this.magnified; yy++)
 			for (int xx = 0; xx < this.magnified; xx++)
-			{   int argb = img.getRGB(x * this.magnified + xx, (y * 2 + 1) * this.magnified + yy);
+			{   int argb = image.getRGB(x * this.magnified + xx, (y * 2 + 1) * this.magnified + yy);
 			    a += (argb >> 24) & 255;
 			    r += (argb >> 16) & 255;
 			    g += (argb >>  8) & 255;
@@ -153,9 +154,9 @@ public class Image
 		    {
 			case 100:
 			    if ((r == 0) && (g == 0) && (b == 255))
-				Pony.matrix[y][x] = new Pony.Cell(Pony.Cell.NNE_SSW, null, null, null);
+				pony.matrix[y][x] = new Pony.Cell(Pony.Cell.NNE_SSW, null, null, null);
 			    else if ((r == 255) && (g == 0) && (b == 0))
-				Pony.matrix[y][x] = new Pony.Cell(Pony.Cell.NNW_SSE, null, null, null);
+				pony.matrix[y][x] = new Pony.Cell(Pony.Cell.NNW_SSE, null, null, null);
 			    break;
 			    
 		        case 99:
@@ -173,8 +174,8 @@ public class Image
 				              | (jr ? Pony.Balloon.RIGHT  : Pony.Balloon.NONE)
 				              | (jt ? Pony.Balloon.TOP    : Pony.Balloon.NONE)
 				              | (jb ? Pony.Balloon.BOTTOM : Pony.Balloon.NONE);
-			    Pony.matrix[y][x] = null;
-			    Pony.metamatrix = new Pony.Meta[] { new Pony.Balloon(
+			    pony.matrix[y][x] = null;
+			    pony.metamatrix = new Pony.Meta[] { new Pony.Balloon(
 					      left == 0 ? null : new Integer(left), top  == 0 ? null : new Integer(top),
 					      minw == 0 ? null : new Integer(minw), minh == 0 ? null : new Integer(minh),
 					      maxw == 0 ? null : new Integer(maxw), maxh == 0 ? null : new Integer(maxh),

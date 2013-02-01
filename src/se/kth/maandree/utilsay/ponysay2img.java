@@ -173,7 +173,7 @@ public class ponysay2img
 		    if (d == '$')
 			if (System.in.read() == '$')
 			{
-			    if (System.in.read() == '\n') && (metabuf[3] == -1)
+			    if ((System.in.read() == '\n') && (metabuf[3] == -1))
 			    {
 				metabuf[4] = '\n';
 				metadata = true;
