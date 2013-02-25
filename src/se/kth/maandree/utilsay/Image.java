@@ -175,11 +175,11 @@ public class Image
 				              | (jt ? Pony.Balloon.TOP    : Pony.Balloon.NONE)
 				              | (jb ? Pony.Balloon.BOTTOM : Pony.Balloon.NONE);
 			    pony.matrix[y][x] = null;
-			    pony.metamatrix = new Pony.Meta[] { new Pony.Balloon(
-					      left == 0 ? null : new Integer(left), top  == 0 ? null : new Integer(top),
-					      minw == 0 ? null : new Integer(minw), minh == 0 ? null : new Integer(minh),
-					      maxw == 0 ? null : new Integer(maxw), maxh == 0 ? null : new Integer(maxh),
-					      justification) };
+			    pony.metamatrix[y][x] = new Pony.Meta[] { new Pony.Balloon(
+					            left == 0 ? null : new Integer(left), top  == 0 ? null : new Integer(top),
+						    minw == 0 ? null : new Integer(minw), minh == 0 ? null : new Integer(minh),
+						    maxw == 0 ? null : new Integer(maxw), maxh == 0 ? null : new Integer(maxh),
+						    justification) };
 			    break;
 		}   }
 	    }

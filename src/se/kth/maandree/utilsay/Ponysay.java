@@ -289,7 +289,7 @@ public class Ponysay
 		    if (tags == null)
 			tags = new String[32][];
 		    else if (tagptr == tags.length)
-			System.arraycopy(tags, 0, tags = new String[tagptr << 1], 0, tagptr);
+			System.arraycopy(tags, 0, tags = new String[tagptr << 1][], 0, tagptr);
 		    tags[tagptr++] = new String[] {name.trim(), value.trim()};
 		}
 		else
@@ -309,7 +309,7 @@ public class Ponysay
 	    if (comment.isEmpty())
 		comment = null;
 	    if ((tags != null) && (tagptr < tags.length))
-		System.arraycopy(tags, 0, tags = new String[tagptr], 0, tagptr);
+		System.arraycopy(tags, 0, tags = new String[tagptr][], 0, tagptr);
 	}
 	
 	for (int d = 0, stored = -1, c;;)
@@ -377,7 +377,7 @@ public class Ponysay
 			System.arraycopy(buf, 0, name, 0, name.length);
 			int[] value = new int[ptr - dollareql - 1];
 			System.arraycopy(buf, dollareql + 1, value, 0, value.length);
-			items.add(new Pony.Recall(utf32to16(name), utf32to16(value)));
+			items.add(new Pony.Store(utf32to16(name), utf32to16(value)));
 		    }
 		    ptr = 0;
 		    dollareql = -1;
@@ -550,7 +550,7 @@ public class Ponysay
 		if (metaptr != 0)
 		{   Pony.Meta[] metacell = new Pony.Meta[metaptr];
 		    System.arraycopy(metabuf, 0, metacell, 0, metaptr);
-		    pony.matrix[y][x] = metacell;
+		    pony.metamatrix[y][x] = metacell;
 		    metaptr = 0;
 		}
 		y++;
@@ -561,7 +561,7 @@ public class Ponysay
 		if (metaptr != 0)
 		{   Pony.Meta[] metacell = new Pony.Meta[metaptr];
 		    System.arraycopy(metabuf, 0, metacell, 0, metaptr);
-		    pony.matrix[y][x] = metacell;
+		    pony.metamatrix[y][x] = metacell;
 		    metaptr = 0;
 		}
 		Pony.Cell cell = (Pony.Cell)obj;
@@ -577,7 +577,7 @@ public class Ponysay
 	if (metaptr != 0)
 	{   Pony.Meta[] metacell = new Pony.Meta[metaptr];
 	    System.arraycopy(metabuf, 0, metacell, 0, metaptr);
-	    pony.matrix[y][x] = metacell;
+	    pony.metamatrix[y][x] = metacell;
 	    metaptr = 0;
 	}
 	
@@ -753,7 +753,7 @@ public class Ponysay
 	if ((pony.tags != null) || (pony.comment != null))
 	    databuf.append("$$$\n");
 	if (pony.tags != null)
-	    for (String[] tag : tags)
+	    for (String[] tag : pony.tags)
 	    {
 		databuf.append(tag[0].toUpperCase());
 		databuf.append(": ");
@@ -1040,7 +1040,7 @@ public class Ponysay
 	}
 	
 	
-	defaultcell = new Pony.Cell(' ', null, null, plain);
+	Pony.Cell defaultcell = new Pony.Cell(' ', null, null, plain);
 	for (int y = this.top, h = matrix.length - this.bottom; y < h; y++)
 	{
 	    Pony.Cell[] row = matrix[y];
@@ -1052,64 +1052,56 @@ public class Ponysay
 		    for (int z = 0, d = metacell.length; z < d; z++)
 		    {   Pony.Meta meta = metacell[z];
 			if ((meta != null) && ((x >= this.left) || (meta instanceof Pony.Store)))
-			    switch (meta.getClass())
-			    {
-				case Pony.Store.class:
-				    databuf.append("$" + (((Pony.Store)meta).name + "=" + ((Pony.Store)meta).value).replace("$", "\033$") + "$");
-				    break;
-				case Pony.Recall.class:
-				    Pony.Recall recall = (Pony.Recall)meta;
-				    Color back = ((cell.background == null) || (cell.background.getAlpha() < 112)) ? null : cell.background;
-				    Color fore = ((cell.foreground == null) || (cell.foreground.getAlpha() < 112)) ? null : cell.foreground;
-				    databuf.append(applyColour(colours, background, foreground, format, background = back, foreground = fore, recall.format));
-				    databuf.append("$" + recall.name.replace("$", "\033$") + "$");
-				    break;
-				case Pony.Balloon.class:
-				    databuf.append(applyColour(colours, background, foreground, format, background = null, foreground = null, format = plain));
-				    
-				    Pony.Balloon balloon = (Pony.Balloon)meta;
-				    if (balloon.left != null)
-				    {
-					int justification = balloon.minWidth != null ? balloon.justification & (Pony.Balloon.LEFT | Pony.Balloon.RIGHT) : Pony.Balloon.NONE;
-					switch (justification)
-					{
-					    case Pony.Balloon.NONE:
-						char[] spaces = new char[balloon.left.intValue()];
-						Arrays.fill(spaces, ' ');
-						databuf.append(new String(spaces));
-						databuf.append("$balloon" + balloon.left.intValue());
-						break;
-					    case Pony.Balloon.LEFT:
-						databuf.append("$balloon" + balloon.left.intValue() + "l");
-						databuf.append(balloon.left.intValue() + balloon.minWidth.intValue() - 1);
-						break;
-					    case Pony.Balloon.RIGHT:
-						databuf.append("$balloon" + balloon.left.intValue() + "r");
-						databuf.append(balloon.left.intValue() + balloon.minWidth.intValue() - 1);
-						break;
-					    default:
-						databuf.append("$balloon" + balloon.left.intValue() + "c");
-						databuf.append(balloon.left.intValue() + balloon.minWidth.intValue() - 1);
-						break;
-					}
-				    }
-				    else if (balloon.minWidth != null)
-					databuf.append("$balloon" + balloon.minWidth.toString());
-				    // KEYWORD: not supported in ponysay: balloon.top != null
-				    if (balloon.minHeight != null)
-					databuf.append("," + balloon.minHeight.toString());
-				    // KEYWORD: not supported in ponysay: balloon.maxWidth != null
-				    // KEYWORD: not supported in ponysay: balloon.maxHeight != null
-				    databuf.append("\n");
-				    break;
+			{   Class<?> metaclass = meta.getClass();
+			    if (metaclass == Pony.Store.class)
+				databuf.append("$" + (((Pony.Store)meta).name + "=" + ((Pony.Store)meta).value).replace("$", "\033$") + "$");
+			    else if (metaclass == Pony.Recall.class)
+			    {   Pony.Recall recall = (Pony.Recall)meta;
+				Color back = ((recall.backgroundColour == null) || (recall.backgroundColour.getAlpha() < 112)) ? null : recall.backgroundColour;
+				Color fore = ((recall.foregroundColour == null) || (recall.foregroundColour.getAlpha() < 112)) ? null : recall.foregroundColour;
+				databuf.append(applyColour(colours, background, foreground, format, background = back, foreground = fore, recall.format));
+				databuf.append("$" + recall.name.replace("$", "\033$") + "$");
 			    }
-		    }
+			    else if (metaclass == Pony.Balloon.class)
+			    {   databuf.append(applyColour(colours, background, foreground, format, background = null, foreground = null, format = plain));
+				Pony.Balloon balloon = (Pony.Balloon)meta;
+				if (balloon.left != null)
+				{   int justification = balloon.minWidth != null ? balloon.justification & (Pony.Balloon.LEFT | Pony.Balloon.RIGHT) : Pony.Balloon.NONE;
+				    switch (justification)
+				    {	case Pony.Balloon.NONE:
+					    char[] spaces = new char[balloon.left.intValue()];
+					    Arrays.fill(spaces, ' ');
+					    databuf.append(new String(spaces));
+					    databuf.append("$balloon" + balloon.left.intValue());
+					    break;
+					case Pony.Balloon.LEFT:
+					    databuf.append("$balloon" + balloon.left.intValue() + "l");
+					    databuf.append(balloon.left.intValue() + balloon.minWidth.intValue() - 1);
+					    break;
+					case Pony.Balloon.RIGHT:
+					    databuf.append("$balloon" + balloon.left.intValue() + "r");
+					    databuf.append(balloon.left.intValue() + balloon.minWidth.intValue() - 1);
+					    break;
+					default:
+					    databuf.append("$balloon" + balloon.left.intValue() + "c");
+					    databuf.append(balloon.left.intValue() + balloon.minWidth.intValue() - 1);
+					    break;
+				}   }
+				else if (balloon.minWidth != null)
+				    databuf.append("$balloon" + balloon.minWidth.toString());
+				// KEYWORD: not supported in ponysay: balloon.top != null
+				if (balloon.minHeight != null)
+				    databuf.append("," + balloon.minHeight.toString());
+				// KEYWORD: not supported in ponysay: balloon.maxWidth != null
+				// KEYWORD: not supported in ponysay: balloon.maxHeight != null
+				databuf.append("\n");
+		    }	}   }
 		if ((x != w) && (x >= this.left) && (x < ending))
 		{   Pony.Cell cell = row[x];
 		    if (cell == null)
 			cell = defaultcell;
 		    if (cell.character >= 0)
-		    {   databuf.append(applyColour(colours, background, foreground, format, background = cell.lower, foreground = cell.upper, format = cell.format));
+		    {   databuf.append(applyColour(colours, background, foreground, format, background = cell.lowerColour, foreground = cell.upperColour, format = cell.format));
 			databuf.append(cell.character);
 		    }
 		    else if (cell.character == Pony.Cell.NNE_SSW)
@@ -1121,35 +1113,35 @@ public class Ponysay
 			databuf.append("$/$");
 		    }
 		    else if (cell.character == Pony.Cell.PIXELS)
-			if (cell.lower == null)
-			    if (cell.upper == null)
+			if (cell.lowerColour == null)
+			    if (cell.upperColour == null)
 			    {   databuf.append(applyColour(colours, background, foreground, format, background = null, foreground = this.spacesave ? foreground : null, format = plain));
 				databuf.append(' ');
 			    }
 			    else
-			    {   databuf.append(applyColour(colours, background, foreground, format, background = null, foreground = cell.upper, format = plain));
+			    {   databuf.append(applyColour(colours, background, foreground, format, background = null, foreground = cell.upperColour, format = plain));
 				databuf.append('▀');
 			    }
 			else
-			    if (cell.upper == null)
-			    {   databuf.append(applyColour(colours, background, foreground, format, background = cell.lower, foreground = null, format = plain));
+			    if (cell.upperColour == null)
+			    {   databuf.append(applyColour(colours, background, foreground, format, background = cell.lowerColour, foreground = null, format = plain));
 				databuf.append('▀');
 			    }
-			    else if (cell.upper.equals(cell.lower))
+			    else if (cell.upperColour.equals(cell.lowerColour))
 				if (this.zebra)
-				{   databuf.append(applyColour(colours, background, foreground, format, background = cell.lower, foreground = cell.lower, format = plain));
+				{   databuf.append(applyColour(colours, background, foreground, format, background = cell.lowerColour, foreground = cell.lowerColour, format = plain));
 				    databuf.append('▄');
 				}
 				else if (this.fullblocks /*TODO || (this.colourful && ¿can get better colour?)*/)
-				{   databuf.append(applyColour(colours, background, foreground, format, background = this.spacesave ? background : cell.lower, foreground = cell.lower, format = plain));
+				{   databuf.append(applyColour(colours, background, foreground, format, background = this.spacesave ? background : cell.lowerColour, foreground = cell.lowerColour, format = plain));
 				    databuf.append('█');
 				}
 				else
-				{   databuf.append(applyColour(colours, background, foreground, format, background = cell.lower, foreground = this.spacesave ? foreground : cell.lower, format = plain));
+				{   databuf.append(applyColour(colours, background, foreground, format, background = cell.lowerColour, foreground = this.spacesave ? foreground : cell.lowerColour, format = plain));
 				    databuf.append(' ');
 				}
 			    else  //TODO (this.colourful && ¿can get better colour?) → flip
-			    {   databuf.append(applyColour(colours, background, foreground, format, background = cell.lower, foreground = cell.upper, format = plain));
+			    {   databuf.append(applyColour(colours, background, foreground, format, background = cell.lowerColour, foreground = cell.upperColour, format = plain));
 				databuf.append('▄');
 			    }
 		}
@@ -1218,7 +1210,7 @@ public class Ponysay
 		databuf.append(data.substring(0, pos));
 		StringBuilder dollarbuf = null;
 		boolean esc = false;
-		for (int n = data.length(); i < n;)
+		for (int i = 0, n = data.length(); i < n;)
 		{
 		    char c = data.charAt(i++);
 		    if (dollarbuf != null)
