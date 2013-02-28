@@ -1313,12 +1313,12 @@ public class Ponysay
 		rc.append("0123456789ABCDEF".charAt(colour.getBlue() >>> 4));
 		rc.append("0123456789ABCDEF".charAt(colour.getBlue() & 15));
 		rc.append("\033[4");
-		rc.append(this.colourindex2back);
+		rc.append(colourindex2back);
 	    }
 	    else if (this.fullcolour)
 	    {   Color colour = newBackground;
 		rc.append("m\033]4;");
-		rc.append(this.colourindex2back);
+		rc.append(colourindex2back);
 		rc.append(";rgb:");
 		rc.append("0123456789ABCDEF".charAt(colour.getRed() >>> 4));
 		rc.append("0123456789ABCDEF".charAt(colour.getRed() & 15));
@@ -1329,16 +1329,16 @@ public class Ponysay
 		rc.append("0123456789ABCDEF".charAt(colour.getBlue() >>> 4));
 		rc.append("0123456789ABCDEF".charAt(colour.getBlue() & 15));
 		rc.append("\033\\\033[4");
-		rc.append(this.colourindex2back);
-		palette[this.colourindex2back] = colour;
+		rc.append(colourindex2back);
+		palette[colourindex2back] = colour;
 	    }
-	    else if (this.colourindex2back < 16)
+	    else if (colourindex2back < 16)
 	    {   rc.append(";4");
-		rc.append(this.colourindex2back);
+		rc.append(colourindex2back);
 	    }
 	    else
 	    {   rc.append(";48;5;");
-		rc.append(this.colourindex2back);
+		rc.append(colourindex2back);
 	    }
 	
 	if (colourindex2fore != -1)
@@ -1369,19 +1369,19 @@ public class Ponysay
 		rc.append("0123456789ABCDEF".charAt(colour.getBlue() >>> 4));
 		rc.append("0123456789ABCDEF".charAt(colour.getBlue() & 15));
 		rc.append("\033\\\033[4");
-		rc.append(this.colourindex2fore);
-		palette[this.colourindex2fore] = colour;
+		rc.append(colourindex2fore);
+		palette[colourindex2fore] = colour;
 	    }
-	    else if (this.colourindex2back < 16)
+	    else if (colourindex2back < 16)
 	    {   rc.append(";4");
-		rc.append(this.colourindex2fore);
+		rc.append(colourindex2fore);
 	    }
 	    else
 	    {   rc.append(";48;5;");
-		rc.append(this.colourindex2fore);
+		rc.append(colourindex2fore);
 	    }
-	if (this.tty && (this.colourindex2fore >= 0))
-	    newFormat[0] = (this.colourindex2fore & 8) == 8;
+	if (this.tty && (colourindex2fore >= 0))
+	    newFormat[0] = (colourindex2fore & 8) == 8;
 	
 	for (int i = 0; i < 9; i++)
 	    if (newFormat[i] ^ oldFormat[i])
