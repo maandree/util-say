@@ -1,7 +1,7 @@
 /**
  * util-say — Utilities for cowsay and cowsay-like programs
  *
- * Copyright © 2012  Mattias Andrée (maandree@kth.se)
+ * Copyright © 2012, 2013  Mattias Andrée (maandree@member.fsf.org)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,11 +18,14 @@
  */
 package se.kth.maandree.utilsay;
 
+import java.io.*;
+import java.util.*;
+
 
 /**
  * Cowsay support module
  * 
- * @author  Mattias Andrée, <a href="mailto:maandree@kth.se">maandree@kth.se</a>
+ * @author  Mattias Andrée, <a href="mailto:maandree@member.fsf.org">maandree@member.fsf.org</a>
  */
 public class Cowsay extends Ponysay
 {
@@ -50,12 +53,14 @@ public class Cowsay extends Ponysay
      * Import the pony from file
      * 
      * @return  The pony
+     * 
+     * @throws  IOException  On I/O error
      */
-    public Pony importCow()
+    public Pony importCow() throws IOException
     {
 	InputStream in = System.in;
 	if (this.file != null)
-	    in = BufferedInputStream(new FileInputStream(this.file));
+	    in = new BufferedInputStream(new FileInputStream(this.file));
 	Scanner sc = new Scanner(in, "UTF-8");
 	
 	
@@ -80,8 +85,8 @@ public class Cowsay extends Ponysay
 		line = line.substring(line.indexOf("#") + 1);
 		if (line.equals("$$$"))
 		    line = "$$$(!)";
-		data.append(line + "\n")
-		data.append('\n')
+		data.append(line + "\n");
+		data.append('\n');
 	    }
 	    else
 	    {
@@ -112,7 +117,7 @@ public class Cowsay extends Ponysay
 	InputStream stdin = System.in;
 	try
 	{
-	    final byte[] streamdata = data.toString().getBytes('UTF-8');
+	    final byte[] streamdata = data.toString().getBytes("UTF-8");
 	    System.setIn(new InputStream()
 		{
 		    int ptr = 0;

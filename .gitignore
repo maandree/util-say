@@ -34,8 +34,8 @@
 ##  distribution files  ##
 ##########################
 
-/dist/*/src/
-/dist/*/util-say-*.tar.*
+/dist/*/*/*
+!/dist/*/*/PKGBUILD
 
 
 ##  non-included files  ##

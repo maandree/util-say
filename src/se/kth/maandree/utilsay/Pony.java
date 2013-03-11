@@ -1,7 +1,7 @@
 /**
  * util-say — Utilities for cowsay and cowsay-like programs
  *
- * Copyright © 2012  Mattias Andrée (maandree@kth.se)
+ * Copyright © 2012, 2013  Mattias Andrée (maandree@member.fsf.org)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -24,7 +24,7 @@ import java.awt.Color;
 /**
  * I'm a pony!
  * 
- * @author  Mattias Andrée, <a href="mailto:maandree@kth.se">maandree@kth.se</a>
+ * @author  Mattias Andrée, <a href="mailto:maandree@member.fsf.org">maandree@member.fsf.org</a>
  */
 public class Pony
 {
@@ -84,7 +84,7 @@ public class Pony
     /**
      * A charcter cell in the pony
      */
-    public class Cell
+    public static class Cell
     {
 	/**
 	 * Pixel pair
@@ -148,9 +148,9 @@ public class Pony
     /**
      * Weird stuff going on before a cell
      */
-    public interface Meta implements Meta
+    public interface Meta
     {
-	// Marker intergace
+	// Marker interface
     }
     
     
@@ -158,7 +158,7 @@ public class Pony
     /**
      * Combining character
      */
-    public class Combining implements Meta
+    public static class Combining implements Meta
     {
 	/**
 	 * Constructor
@@ -204,7 +204,7 @@ public class Pony
     /**
      * Variable usage
      */
-    public class Recall implements Meta
+    public static class Recall implements Meta
     {
 	/**
 	 * Constructor
@@ -250,7 +250,7 @@ public class Pony
     /**
      * Variable storing
      */
-    public class Store implements Meta
+    public static class Store implements Meta
     {
 	/**
 	 * Constructor
@@ -282,7 +282,7 @@ public class Pony
     /**
      * Balloon
      */
-    public class Balloon implements Meta
+    public static class Balloon implements Meta
     {
 	/**
 	 * No justification applied
@@ -363,7 +363,7 @@ public class Pony
 	/**
 	 * The minimum height of the balloon
 	 */
-	public Integer minHeigth;
+	public Integer minHeight;
 	
 	/**
 	 * The maximum width of the balloon
@@ -373,7 +373,7 @@ public class Pony
 	/**
 	 * The maximum height of the balloon
 	 */
-	public Integer maxHeigth;
+	public Integer maxHeight;
 	
 	/**
 	 * Balloon placement justification
