@@ -53,8 +53,10 @@ public class Cowsay extends Ponysay
      * Import the pony from file
      * 
      * @return  The pony
+     * 
+     * @throws  IOException  On I/O error
      */
-    public Pony importCow()
+    public Pony importCow() throws IOException
     {
 	InputStream in = System.in;
 	if (this.file != null)

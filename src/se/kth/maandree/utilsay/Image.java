@@ -103,8 +103,10 @@ public class Image
      * Import the pony from file
      * 
      * @return  The pony
+     * 
+     * @throws  IOException  On I/O error
      */
-    public Pony importPony()
+    public Pony importPony() throws IOException
     {
 	BufferedImage image = ImageIO.read(new File(file));
 	int width  = image.getWidth()  / this.magnified;

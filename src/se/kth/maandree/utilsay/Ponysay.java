@@ -188,7 +188,7 @@ public class Ponysay
     /**
      * Colour CIELAB value cache
      */
-    private static HashMap<Colour, double[]> labMap = new HashMap<Colour, double[]>();
+    private static HashMap<Color, double[]> labMap = new HashMap<Color, double[]>();
     
     
     
@@ -196,8 +196,10 @@ public class Ponysay
      * Import the pony from file
      * 
      * @return  The pony
+     * 
+     * @throws  IOException  On I/O error
      */
-    public Pony importPony()
+    public Pony importPony() throws IOException
     {
 	if (this.version == VERSION_COWSAY)
 	    return this.importCow();
@@ -589,8 +591,10 @@ public class Ponysay
      * Import the pony from file using the cowsay format
      * 
      * @return  The pony
+     * 
+     * @throws  IOException  On I/O error
      */
-    protected Pony importCow()
+    protected Pony importCow() throws IOException
     {
 	this.version++;
 	InputStream stdin = System.in;
@@ -682,8 +686,10 @@ public class Ponysay
      * Export a pony to the file
      * 
      * @param  pony  The pony
+     * 
+     * @throws  IOException  On I/O error
      */
-    public void exportPony(Pony pony)
+    public void exportPony(Pony pony) throws IOException
     {
 	Color[] colours = new Color[256];
 	boolean[] format = new boolean[9];
@@ -1171,13 +1177,14 @@ public class Ponysay
 	    String metadata = null;
 	    if (data.startsWith("$$$\n"))
 	    {
-		String metadata = data.substring(4);
+		metadata = data.substring(4);
 		if (metadata.startsWith("$$$\n"))
 		    metadata = null;
 		else
-		    metadata = metadata.substring(0, metadata.indexOf("\n$$$\n"));
-		data = data.substring(data.indexOf("\n$$$\n") + 5);
-		metadata = '#' + metadata.replace("\n", "\n#");
+		{   metadata = metadata.substring(0, metadata.indexOf("\n$$$\n") + 5);
+		    data = data.substring(data.indexOf("\n$$$\n") + 5);
+		    metadata = '#' + metadata.replace("\n", "\n#");
+		}
 	    }
 	    String eop = "\nEOP";
 	    while (data.contains(eop + '\n'))
@@ -1223,14 +1230,14 @@ public class Ponysay
 			    String dollar = dollarbuf.toString();
 			    dollarbuf = null;
 			    if (dollar.startsWith("$balloon") == false)
-				data.append(dollar);
+				databuf.append(dollar);
 			    else
-			    {   data.append("$balloon");
+			    {   databuf.append("$balloon");
 				dollar = dollar.substring(8);
 				if      (dollar.contains("l"))  dollar = dollar.substring(dollar.indexOf('l') + 1);
 				else if (dollar.contains("r"))  dollar = dollar.substring(dollar.indexOf('r') + 1);
 				else if (dollar.contains("c"))  dollar = dollar.substring(dollar.indexOf('c') + 1);
-				data.append(dollar);
+				databuf.append(dollar);
 			}   }
 		    }
 		    else if (c == '$')
@@ -1353,12 +1360,12 @@ public class Ponysay
 		rc.append("0123456789ABCDEF".charAt(colour.getBlue() >>> 4));
 		rc.append("0123456789ABCDEF".charAt(colour.getBlue() & 15));
 		rc.append("\033[4");
-		rc.append(this.colourindex2fore);
+		rc.append(colourindex2fore);
 	    }
 	    else if (this.fullcolour)
 	    {   Color colour = newForeground;
 		rc.append("m\033]4;");
-		rc.append(this.colourindex2fore);
+		rc.append(colourindex2fore);
 		rc.append(";rgb:");
 		rc.append("0123456789ABCDEF".charAt(colour.getRed() >>> 4));
 		rc.append("0123456789ABCDEF".charAt(colour.getRed() & 15));
