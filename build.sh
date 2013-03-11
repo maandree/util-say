@@ -15,7 +15,8 @@ done
 if [[ $paramBuild = 1 ]]; then
     ## build scripts
     for prog in $(java -jar util-say.jar --list); do
-	echo 'java -jar /usr/bin/util-say.jar '"$prog"' "$@"' > ./$prog
+	echo '#!/usr/bin/env bash' > ./$prog
+	echo 'java -jar /usr/bin/util-say.jar '"$prog"' "$@"' >> ./$prog
 	chmod 755 $prog
     done
 elif [[ $paramBuild = 2 ]]; then
