@@ -359,7 +359,7 @@ public class Ponysay
 			else if (name.startsWith("balloon") == false)
 			    items.add(new Pony.Recall(name, foreground, background, format));
 			else if (this.ignoreballoon == false)
-			{   String[] parts = (name.substring("balloon".length()) + ",,,,,").split(",");
+			{   String[] parts = (name.substring("balloon".length()) + ",,,,,,-").split(",");
 			    Integer h = parts[1].isEmpty() ? null : new Integer(parts[1]);
 			    int justify = Pony.Balloon.NONE;
 			    if      (parts[0].contains("l"))  justify = Pony.Balloon.LEFT;
@@ -478,10 +478,10 @@ public class Ponysay
 				    format[value - 21] = false;
 				else if (value == 39)   foreground = null;
 				else if (value == 49)   background = null;
-				else if (value < 38)    foreground = colours[value - 30];
-				else if (value < 48)    background = colours[value - 40];
 				else if (value == 38)   xterm256 = 1;
 				else if (value == 48)   xterm256 = 1;
+				else if (value < 38)    foreground = colours[value - 30];
+				else if (value < 48)    background = colours[value - 40];
 				if (xterm256 == 1)
 				    back = value == 48;
 			    }
