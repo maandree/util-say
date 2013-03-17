@@ -1,3 +1,9 @@
+##  Non-staging area  ##
+########################
+
+_/
+
+
 ##  compiled files  ##
 ######################
 
@@ -5,21 +11,6 @@
 /doc/javadoc/
 *.class
 /*.jar
-
-/Truncater
-/Wordwrap
-/cowsay2unisay
-/img2ponysay
-/img2unisay
-/imgsrcrecover
-/ponysay2img
-/ponysay2ttyponysay
-/ponysay2unisay
-/tty2colourfultty
-/unisay2img
-/unisay2ponysay
-/unisay2ttyunisay
-/unzebra
 
 
 ##  backup files  ##
@@ -29,6 +20,7 @@
 \#*\#
 .\#*
 *.swp
+*.bak
 
 
 ##  distribution files  ##
