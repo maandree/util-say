@@ -116,7 +116,10 @@ public class Pony
 	    this.character = character;
 	    this.upperColour = upperColour;
 	    this.lowerColour = lowerColour;
-	    System.arraycopy(format, 0, this.format = new boolean[9], 0, 9);
+	    if (format == null)
+		this.format = new boolean[9];
+	    else
+		System.arraycopy(format, 0, this.format = new boolean[9], 0, 9);
 	}
 	
 	
@@ -173,7 +176,10 @@ public class Pony
 	    this.character = character;
 	    this.foregroundColour = foregroundColour;
 	    this.backgroundColour = backgroundColour;
-	    System.arraycopy(format, 0, this.format = new boolean[9], 0, 9);
+	    if (format == null)
+		this.format = new boolean[9];
+	    else
+		System.arraycopy(format, 0, this.format = new boolean[9], 0, 9);
 	}
 	
 	
@@ -219,7 +225,10 @@ public class Pony
 	    this.name = name;
 	    this.foregroundColour = foregroundColour;
 	    this.backgroundColour = backgroundColour;
-	    System.arraycopy(format, 0, this.format = new boolean[9], 0, 9);
+	    if (format == null)
+		this.format = new boolean[9];
+	    else
+		System.arraycopy(format, 0, this.format = new boolean[9], 0, 9);
 	}
 	
 	

@@ -39,7 +39,7 @@ public class Image
      */
     public Image(HashMap<String, String> flags)
     {
-	this.file = (this.file = flags.containsKey("file") ? flags.get("file") : null).equals("-") ? null : this.file;
+	this.file = (flags.containsKey("file") ? (this.file = flags.get("file")).equals("-") : true) ? null : this.file;
 	this.left = (flags.containsKey("left") == false) ? -1 : Integer.parseInt(flags.get("left"));
 	this.right = (flags.containsKey("right") == false) ? -1 : Integer.parseInt(flags.get("right"));
 	this.top = (flags.containsKey("top") == false) ? -1 : Integer.parseInt(flags.get("top"));
@@ -108,41 +108,41 @@ public class Image
      */
     public Pony importPony() throws IOException
     {
-	BufferedImage image = ImageIO.read(new File(file));
+	BufferedImage image = ImageIO.read(new File(this.file));
 	int width  = image.getWidth()  / this.magnified;
 	int height = image.getHeight() / this.magnified;
 	int div = this.magnified * this.magnified;
 	
 	Pony.Cell cell;
 	Pony pony = new Pony(height >> 1, width, null, null);
-	for (int y = 0; y < height; y += 2)
+	for (int y = 0; y < height - 1; y += 2)
 	    for (int x = 0; x < width; x++)
 	    {
 		int a = 0, r = 0, g = 0, b = 0;
 		for (int yy = 0; yy < this.magnified; yy++)
 		    for (int xx = 0; xx < this.magnified; xx++)
-		    {   int argb = image.getRGB(x * this.magnified + xx, (y * 2) * this.magnified + yy);
+		    {   int argb = image.getRGB(x * this.magnified + xx, y * this.magnified + yy);
 			a += (argb >> 24) & 255;
 			r += (argb >> 16) & 255;
 			g += (argb >>  8) & 255;
 			b +=  argb        & 255;
 		    }
 		a /= div; r /= div; g /= div; b /= div;
-		pony.matrix[y][x] = cell = new Pony.Cell(Pony.Cell.PIXELS, new Color(a, r, g, b), null, null);
+		pony.matrix[y >> 1][x] = cell = new Pony.Cell(Pony.Cell.PIXELS, new Color(r, g, b, a), null, null);
 		
-		if ((y * 2 + 2) * this.magnified <= image.getHeight())
+		if ((y + 2) * this.magnified <= image.getHeight())
 		{
 		    a = r = g = b = 0;
 		    for (int yy = 0; yy < this.magnified; yy++)
 			for (int xx = 0; xx < this.magnified; xx++)
-			{   int argb = image.getRGB(x * this.magnified + xx, (y * 2 + 1) * this.magnified + yy);
+			{   int argb = image.getRGB(x * this.magnified + xx, (y + 1) * this.magnified + yy);
 			    a += (argb >> 24) & 255;
 			    r += (argb >> 16) & 255;
 			    g += (argb >>  8) & 255;
 			    b +=  argb        & 255;
 			}
 		    a /= div; r /= div; g /= div; b /= div;
-		    cell.lowerColour = new Color(a, r, g, b);
+		    cell.lowerColour = new Color(r, g, b, a);
 		}
 		
 		if (encoded && (cell.upperColour.getAlpha() == cell.lowerColour.getAlpha()))
