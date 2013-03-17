@@ -699,7 +699,7 @@ public class imgsrcrecover
 		    final InputStream stdin = System.in;
 		    System.setIn(new BufferedInputStream(new FileInputStream(new File(dir + file))));
 		    
-		    ponysay2img.main("--", dir + file);
+		    /* TODO ponysay2img.main("--", dir + file); */
 		    
 		    img = ImageIO.read(new File(dir + file));
 		    System.setIn(stdin);

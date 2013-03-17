@@ -77,12 +77,8 @@ public class Program
 	
 	if (args[0].equals("--list"))
 	{
-	    System.out.println("img2ponysay");
-	    System.out.println("ponysay2img");
 	    System.out.println("imgsrcrecover");
 	}
-	else if (args[0].equals("img2ponysay"))         img2ponysay.main(_args);
-	else if (args[0].equals("ponysay2img"))         ponysay2img.main(_args);
 	else if (args[0].equals("imgsrcrecover"))       imgsrcrecover.main(_args);
 	else
 	    System.err.println("util-say: error: no such utility");
