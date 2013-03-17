@@ -121,7 +121,7 @@ public class Image
 		int a = 0, r = 0, g = 0, b = 0;
 		for (int yy = 0; yy < this.magnified; yy++)
 		    for (int xx = 0; xx < this.magnified; xx++)
-		    {   int argb = image.getRGB(x * this.magnified + xx, (y * 2) * this.magnified + yy);
+		    {   int argb = image.getRGB(x * this.magnified + xx, y * this.magnified + yy);
 			a += (argb >> 24) & 255;
 			r += (argb >> 16) & 255;
 			g += (argb >>  8) & 255;
@@ -130,12 +130,12 @@ public class Image
 		a /= div; r /= div; g /= div; b /= div;
 		pony.matrix[y][x] = cell = new Pony.Cell(Pony.Cell.PIXELS, new Color(a, r, g, b), null, null);
 		
-		if ((y * 2 + 2) * this.magnified <= image.getHeight())
+		if ((y + 2) * this.magnified <= image.getHeight())
 		{
 		    a = r = g = b = 0;
 		    for (int yy = 0; yy < this.magnified; yy++)
 			for (int xx = 0; xx < this.magnified; xx++)
-			{   int argb = image.getRGB(x * this.magnified + xx, (y * 2 + 1) * this.magnified + yy);
+			{   int argb = image.getRGB(x * this.magnified + xx, (y + 1) * this.magnified + yy);
 			    a += (argb >> 24) & 255;
 			    r += (argb >> 16) & 255;
 			    g += (argb >>  8) & 255;
