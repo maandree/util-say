@@ -115,7 +115,7 @@ public class Image
 	
 	Pony.Cell cell;
 	Pony pony = new Pony(height >> 1, width, null, null);
-	for (int y = 0; y < height; y += 2)
+	for (int y = 0; y < height - 1; y += 2)
 	    for (int x = 0; x < width; x++)
 	    {
 		int a = 0, r = 0, g = 0, b = 0;
@@ -128,7 +128,7 @@ public class Image
 			b +=  argb        & 255;
 		    }
 		a /= div; r /= div; g /= div; b /= div;
-		pony.matrix[y][x] = cell = new Pony.Cell(Pony.Cell.PIXELS, new Color(a, r, g, b), null, null);
+		pony.matrix[y >> 1][x] = cell = new Pony.Cell(Pony.Cell.PIXELS, new Color(r, g, b, a), null, null);
 		
 		if ((y + 2) * this.magnified <= image.getHeight())
 		{
@@ -142,7 +142,7 @@ public class Image
 			    b +=  argb        & 255;
 			}
 		    a /= div; r /= div; g /= div; b /= div;
-		    cell.lowerColour = new Color(a, r, g, b);
+		    cell.lowerColour = new Color(r, g, b, a);
 		}
 		
 		if (encoded && (cell.upperColour.getAlpha() == cell.lowerColour.getAlpha()))

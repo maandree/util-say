@@ -205,10 +205,10 @@ public class Ponysay
 	    return this.importCow();
 	
 	
-	boolean[] plain = new boolean[9];
+	boolean[] PLAIN = new boolean[9];
 	
 	Color[] colours = new Color[256];
-	boolean[] format = plain;
+	boolean[] format = PLAIN;
 	Color background = null, foreground = null;
 	
 	for (int i = 0; i < 256; i++)
@@ -350,11 +350,11 @@ public class Ponysay
 			String name = utf32to16(_name);
 			if (name.equals("\\"))
 		        {   curwidth++;
-			    items.add(new Pony.Cell(this.ignorelink ? ' ' : Pony.Cell.NNE_SSW, null, null, plain));
+			    items.add(new Pony.Cell(this.ignorelink ? ' ' : Pony.Cell.NNE_SSW, null, null, PLAIN));
 			}
 			else if (name.equals("/"))
 		        {   curwidth++;
-			    items.add(new Pony.Cell(this.ignorelink ? ' ' : Pony.Cell.NNW_SSE, null, null, plain));
+			    items.add(new Pony.Cell(this.ignorelink ? ' ' : Pony.Cell.NNW_SSE, null, null, PLAIN));
 			}
 			else if (name.startsWith("balloon") == false)
 			    items.add(new Pony.Recall(name, foreground, background, format));
@@ -753,7 +753,7 @@ public class Ponysay
 	int curleft = 0, curright = 0, curtop = 0, curbottom = 0;
 	Pony.Cell[][] matrix = pony.matrix;
 	Pony.Meta[][][] metamatrix = pony.metamatrix;
-	boolean[] plain = new boolean[9];
+	boolean[] PLAIN = new boolean[9];
 	
 	
 	if ((pony.tags != null) || (pony.comment != null))
@@ -793,7 +793,7 @@ public class Ponysay
 		{   Pony.Cell cell;
 		    if ((cell = row[i]) != null)
 			if (this.ignorelink && ((cell.character == Pony.Cell.NNE_SSW) || (cell.character == Pony.Cell.NNW_SSE)))
-			    row[i] = new Pony.Cell(' ', null, null, plain);
+			    row[i] = new Pony.Cell(' ', null, null, PLAIN);
 			else
 			{   Color back = ((cell.lowerColour == null) || (cell.lowerColour.getAlpha() < 112)) ? null : cell.lowerColour;
 			    Color fore = ((cell.upperColour == null) || (cell.upperColour.getAlpha() < 112)) ? null : cell.upperColour;
@@ -923,8 +923,8 @@ public class Ponysay
 	{   int w = matrix[0].length;
 	    for (int y = 0, h = matrix.length; y < h; y++)
 	    {
-		System.arraycopy(matrix[y], this.left, matrix[y] = new Pony.Cell[w + this.left], 0, w);
-		System.arraycopy(metamatrix[y], this.left, metamatrix[y] = new Pony.Meta[w + 1 + this.left][], 0, w + 1);
+		System.arraycopy(matrix[y], 0, matrix[y] = new Pony.Cell[w + this.left], this.left, w);
+		System.arraycopy(metamatrix[y], 0, metamatrix[y] = new Pony.Meta[w + 1 + this.left][], this.left, w + 1);
 	    }
 	    this.left = 0;
 	}
@@ -947,11 +947,11 @@ public class Ponysay
 	{
 	    int h = matrix.length, w = matrix[0].length;
 	    Pony.Cell[][] appendix = new Pony.Cell[this.top][w];
-	    System.arraycopy(matrix, this.top, matrix = new Pony.Cell[h + this.top][], 0, h);
-	    System.arraycopy(matrix, 0, appendix, 0, this.top);
-	    Pony.Meta[][][] metaappendix = new Pony.Meta[this.top][][];
-	    System.arraycopy(metamatrix, this.top, metamatrix = new Pony.Meta[h + this.top][w + 1][], 0, h);
-	    System.arraycopy(metamatrix, 0, metaappendix, 0, this.top);
+	    System.arraycopy(matrix, 0, matrix = new Pony.Cell[h + this.top][], this.top, h);
+	    System.arraycopy(appendix, 0, matrix, 0, this.top);
+	    Pony.Meta[][][] metaappendix = new Pony.Meta[this.top][w + 1][];
+	    System.arraycopy(metamatrix, 0, metamatrix = new Pony.Meta[h + this.top][w + 1][], this.top, h);
+	    System.arraycopy(metaappendix, 0, metamatrix, 0, this.top);
 	    this.top = 0;
 	}
 	else
@@ -962,10 +962,10 @@ public class Ponysay
 	    int h = matrix.length, w = matrix[0].length;
 	    Pony.Cell[][] appendix = new Pony.Cell[this.bottom][w];
 	    System.arraycopy(matrix, 0, matrix = new Pony.Cell[h + this.bottom][], 0, h);
-	    System.arraycopy(matrix, h, appendix, 0, this.bottom);
+	    System.arraycopy(appendix, 0, matrix, h, this.bottom);
 	    Pony.Meta[][][] metaappendix = new Pony.Meta[this.bottom][w + 1][];
 	    System.arraycopy(metamatrix, 0, metamatrix = new Pony.Meta[h + this.bottom][][], 0, h);
-	    System.arraycopy(metamatrix, h, metaappendix, 0, this.bottom);
+	    System.arraycopy(metaappendix, 0, metamatrix, h, this.bottom);
 	    this.bottom = 0;
 	}
 	else
@@ -1046,14 +1046,14 @@ public class Ponysay
 	}
 	
 	
-	Pony.Cell defaultcell = new Pony.Cell(' ', null, null, plain);
+	Pony.Cell defaultcell = new Pony.Cell(' ', null, null, PLAIN);
 	for (int y = this.top, h = matrix.length - this.bottom; y < h; y++)
 	{
 	    Pony.Cell[] row = matrix[y];
 	    Pony.Meta[][] metarow = metamatrix[y];
 	    int ending = endings == null ? row.length : endings[y];
 	    for (int x = 0, w = row.length; x <= w; x++)
-	    {   Pony.Meta[] metacell = metarow[row.length];
+	    {   Pony.Meta[] metacell = metarow[x];
 		if (metacell != null)
 		    for (int z = 0, d = metacell.length; z < d; z++)
 		    {   Pony.Meta meta = metacell[z];
@@ -1069,7 +1069,7 @@ public class Ponysay
 				databuf.append("$" + recall.name.replace("$", "\033$") + "$");
 			    }
 			    else if (metaclass == Pony.Balloon.class)
-			    {   databuf.append(applyColour(colours, background, foreground, format, background = null, foreground = null, format = plain));
+			    {   databuf.append(applyColour(colours, background, foreground, format, background = null, foreground = null, format = PLAIN));
 				Pony.Balloon balloon = (Pony.Balloon)meta;
 				if (balloon.left != null)
 				{   int justification = balloon.minWidth != null ? balloon.justification & (Pony.Balloon.LEFT | Pony.Balloon.RIGHT) : Pony.Balloon.NONE;
@@ -1111,49 +1111,49 @@ public class Ponysay
 			databuf.append(cell.character);
 		    }
 		    else if (cell.character == Pony.Cell.NNE_SSW)
-		    {   databuf.append(applyColour(colours, background, foreground, format, background = null, foreground = null, format = plain));
+		    {   databuf.append(applyColour(colours, background, foreground, format, background = null, foreground = null, format = PLAIN));
 			databuf.append("$\\$");
 		    }
 		    else if (cell.character == Pony.Cell.NNW_SSE)
-		    {   databuf.append(applyColour(colours, background, foreground, format, background = null, foreground = null, format = plain));
+		    {   databuf.append(applyColour(colours, background, foreground, format, background = null, foreground = null, format = PLAIN));
 			databuf.append("$/$");
 		    }
 		    else if (cell.character == Pony.Cell.PIXELS)
 			if (cell.lowerColour == null)
 			    if (cell.upperColour == null)
-			    {   databuf.append(applyColour(colours, background, foreground, format, background = null, foreground = this.spacesave ? foreground : null, format = plain));
+			    {   databuf.append(applyColour(colours, background, foreground, format, background = null, foreground = this.spacesave ? foreground : null, format = PLAIN));
 				databuf.append(' ');
 			    }
 			    else
-			    {   databuf.append(applyColour(colours, background, foreground, format, background = null, foreground = cell.upperColour, format = plain));
+			    {   databuf.append(applyColour(colours, background, foreground, format, background = null, foreground = cell.upperColour, format = PLAIN));
 				databuf.append('▀');
 			    }
 			else
 			    if (cell.upperColour == null)
-			    {   databuf.append(applyColour(colours, background, foreground, format, background = cell.lowerColour, foreground = null, format = plain));
+			    {   databuf.append(applyColour(colours, background, foreground, format, background = cell.lowerColour, foreground = null, format = PLAIN));
 				databuf.append('▀');
 			    }
 			    else if (cell.upperColour.equals(cell.lowerColour))
 				if (this.zebra)
-				{   databuf.append(applyColour(colours, background, foreground, format, background = cell.lowerColour, foreground = cell.lowerColour, format = plain));
+				{   databuf.append(applyColour(colours, background, foreground, format, background = cell.lowerColour, foreground = cell.lowerColour, format = PLAIN));
 				    databuf.append('▄');
 				}
 				else if (this.fullblocks /*TODO || (this.colourful && ¿can get better colour?)*/)
-				{   databuf.append(applyColour(colours, background, foreground, format, background = this.spacesave ? background : cell.lowerColour, foreground = cell.lowerColour, format = plain));
+				{   databuf.append(applyColour(colours, background, foreground, format, background = this.spacesave ? background : cell.lowerColour, foreground = cell.lowerColour, format = PLAIN));
 				    databuf.append('█');
 				}
 				else
-				{   databuf.append(applyColour(colours, background, foreground, format, background = cell.lowerColour, foreground = this.spacesave ? foreground : cell.lowerColour, format = plain));
+				{   databuf.append(applyColour(colours, background, foreground, format, background = cell.lowerColour, foreground = this.spacesave ? foreground : cell.lowerColour, format = PLAIN));
 				    databuf.append(' ');
 				}
 			    else  //TODO (this.colourful && ¿can get better colour?) → flip
-			    {   databuf.append(applyColour(colours, background, foreground, format, background = cell.lowerColour, foreground = cell.upperColour, format = plain));
+			    {   databuf.append(applyColour(colours, background, foreground, format, background = cell.lowerColour, foreground = cell.upperColour, format = PLAIN));
 				databuf.append('▄');
 			    }
 		}
 	    }
 	    background = foreground = null;
-	    format = plain;
+	    format = PLAIN;
 	    databuf.append("\033[0m\n");
 	}
 	
@@ -1285,28 +1285,30 @@ public class Ponysay
 	if ((oldBackground != null) && (newBackground == null))
 	    rc.append(";49");
 	else if ((oldBackground == null) || (oldBackground.equals(newBackground) == false))
-	{
-	    if ((this.fullcolour && this.tty) == false)
-		colourindex1back = matchColour(newBackground, palette, 16, 256, this.chroma);
-	    if (this.tty || this.fullcolour)
-		colourindex2back = (this.colourful ? matchColour(this.fullcolour ? newBackground : palette[colourindex1back], palette, 0, 8, this.chroma) : 7);
-	    else
-		colourindex2back = colourindex1back;
-	}
+	    if (newBackground != null)
+	    {
+		if ((this.fullcolour && this.tty) == false)
+		    colourindex1back = matchColour(newBackground, palette, 16, 256, this.chroma);
+		if (this.tty || this.fullcolour)
+		    colourindex2back = (this.colourful ? matchColour(this.fullcolour ? newBackground : palette[colourindex1back], palette, 0, 8, this.chroma) : 7);
+		else
+		    colourindex2back = colourindex1back;
+	    }
 	
 	if ((oldForeground != null) && (newForeground == null))
 	    rc.append(";39");
 	else if ((oldForeground == null) || (oldForeground.equals(newForeground) == false))
-	{
-	    if ((this.fullcolour && this.tty) == false)
-		colourindex1fore = matchColour(newBackground, palette, 16, 256, this.chroma);
-	    if (this.tty || this.fullcolour)
-		colourindex2fore = (this.colourful ? matchColour(this.fullcolour ? newForeground : palette[colourindex1fore], palette, 0, 16, this.chroma) : 15);
-	    else
-		colourindex2fore = colourindex1fore;
-	    if (colourindex2fore == colourindex2back)
-		colourindex2fore |= 8;
-	}
+	    if (newForeground != null)
+	    {
+		if ((this.fullcolour && this.tty) == false)
+		    colourindex1fore = matchColour(newBackground, palette, 16, 256, this.chroma);
+		if (this.tty || this.fullcolour)
+		    colourindex2fore = (this.colourful ? matchColour(this.fullcolour ? newForeground : palette[colourindex1fore], palette, 0, 16, this.chroma) : 15);
+		else
+		    colourindex2fore = colourindex1fore;
+		if (colourindex2fore == colourindex2back)
+		    colourindex2fore |= 8;
+	    }
 	
 	if (colourindex2back != -1)
 	    if (this.tty)
