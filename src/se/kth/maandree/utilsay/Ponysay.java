@@ -509,7 +509,7 @@ public class Ponysay
 	    {   if (width < curwidth)
 		    width = curwidth;
 		curwidth = 0;
-		height = 0;
+		height++;
 		items.add(null);
 	    }
 	    else
