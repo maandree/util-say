@@ -64,7 +64,7 @@ public class Ponysay
      */
     public Ponysay(HashMap<String, String> flags)
     {
-	this.file = (this.file = flags.containsKey("file") ? flags.get("file") : null).equals("-") ? null : this.file;
+	this.file = (flags.containsKey("file") ? (this.file = flags.get("file")).equals("-") : true) ? null : this.file;
 	this.even = (flags.containsKey("even") == false) || flags.get("even").toLowerCase().startsWith("y");
 	this.tty = flags.containsKey("tty") && flags.get("tty").toLowerCase().startsWith("y");
 	this.fullblocks = flags.containsKey("fullblocks") ? flags.get("fullblocks").toLowerCase().startsWith("y") : this.tty;

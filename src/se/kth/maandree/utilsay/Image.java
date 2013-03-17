@@ -39,7 +39,7 @@ public class Image
      */
     public Image(HashMap<String, String> flags)
     {
-	this.file = (this.file = flags.containsKey("file") ? flags.get("file") : null).equals("-") ? null : this.file;
+	this.file = (flags.containsKey("file") ? (this.file = flags.get("file")).equals("-") : true) ? null : this.file;
 	this.left = (flags.containsKey("left") == false) ? -1 : Integer.parseInt(flags.get("left"));
 	this.right = (flags.containsKey("right") == false) ? -1 : Integer.parseInt(flags.get("right"));
 	this.top = (flags.containsKey("top") == false) ? -1 : Integer.parseInt(flags.get("top"));
