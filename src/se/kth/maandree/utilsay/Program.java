@@ -87,15 +87,13 @@ public class Program
 		pname = arg.intern();
 	    }
 	    else if ((pname == "--in") || (pname == "--import"))
-	    {	inparams = params;
+	    {	inparams = params = new HashMap<String, String>();
 		intype = arg.toLowerCase().intern();
-		params = new HashMap<String, String>();
 		pname = null;
 	    }
 	    else if ((pname == "--out") || (pname == "--export"))
-	    {   outparams.add(params);
+	    {   outparams.add(params = new HashMap<String, String>());
 		outtypes.add(arg.toLowerCase().intern());
-		params = new HashMap<String, String>();
 		pname = null;
 	    }
 	    else if (arg.startsWith("--") || (pname == null))

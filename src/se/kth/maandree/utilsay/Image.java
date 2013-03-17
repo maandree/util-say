@@ -108,7 +108,7 @@ public class Image
      */
     public Pony importPony() throws IOException
     {
-	BufferedImage image = ImageIO.read(new File(file));
+	BufferedImage image = ImageIO.read(new File(this.file));
 	int width  = image.getWidth()  / this.magnified;
 	int height = image.getHeight() / this.magnified;
 	int div = this.magnified * this.magnified;
