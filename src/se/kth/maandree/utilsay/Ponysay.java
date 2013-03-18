@@ -764,6 +764,7 @@ public class Ponysay
 		databuf.append(tag[0].toUpperCase());
 		databuf.append(": ");
 		databuf.append(tag[1]);
+		databuf.append("\n");
 	    }
 	if (pony.comment != null)
 	{
