@@ -1338,7 +1338,7 @@ public class Ponysay
 	    if (newForeground != null)
 	    {
 		if ((this.fullcolour && this.tty) == false)
-		    colourindex1fore = matchColour(newBackground, palette, 16, 256, this.chroma);
+		    colourindex1fore = matchColour(newForeground, palette, 16, 256, this.chroma);
 		if (this.tty || this.fullcolour)
 		    colourindex2fore = (this.colourful ? matchColour(this.fullcolour ? newForeground : palette[colourindex1fore], palette, 0, 16, this.chroma) : 15);
 		else
