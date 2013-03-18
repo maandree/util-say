@@ -1147,7 +1147,7 @@ public class Ponysay
 			cell = defaultcell;
 		    if (cell.character >= 0)
 		    {   databuf.append(applyColour(colours, background, foreground, format, background = cell.lowerColour, foreground = cell.upperColour, format = cell.format));
-			databuf.append(cell.character);
+			databuf.append(utf32to16(cell.character));
 		    }
 		    else if (cell.character == Pony.Cell.NNE_SSW)
 		    {   databuf.append(applyColour(colours, background, foreground, format, background = null, foreground = null, format = PLAIN));
