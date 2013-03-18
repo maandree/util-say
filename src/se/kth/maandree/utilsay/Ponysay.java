@@ -831,7 +831,9 @@ public class Ponysay
 		{
 		    int w = matrix[0].length;
 		    for (int j = 0, n = matrix.length; j < n; j++)
-			System.arraycopy(matrix[j], 0, matrix[j] = new Pony.Cell[w - this.left], -this.left, w);
+		    {	System.arraycopy(matrix[j], 0, matrix[j] = new Pony.Cell[w - this.left], -this.left, w);
+			System.arraycopy(metamatrix[j], 0, metamatrix[j] = new Pony.Meta[w + 1 - this.left][], -this.left, w + 1);
+		    }
 		    this.left = 0;
 		}
 	}
@@ -866,7 +868,9 @@ public class Ponysay
 		{
 		    int w = matrix[0].length;
 		    for (int j = 0, n = matrix.length; j < n; j++)
-			System.arraycopy(matrix[j], 0, matrix[j] = new Pony.Cell[w - this.right], 0, w);
+		    {	System.arraycopy(matrix[j], 0, matrix[j] = new Pony.Cell[w - this.right], 0, w);
+			System.arraycopy(metamatrix[j], 0, metamatrix[j] = new Pony.Meta[w + 1 - this.right][], 0, w + 1);
+		    }
 		    this.right = 0;
 		}
 	}
@@ -904,6 +908,8 @@ public class Ponysay
 		    int w = matrix[0].length;
 		    System.arraycopy(matrix, 0, matrix = new Pony.Cell[matrix.length - this.top][], -this.top, matrix.length);
 		    System.arraycopy(new Pony.Cell[-this.top][w], 0, matrix, 0, -this.top);
+		    System.arraycopy(metamatrix, 0, metamatrix = new Pony.Meta[metamatrix.length - this.top][][], -this.top, metamatrix.length);
+		    System.arraycopy(new Pony.Meta[-this.top][w + 1][], 0, metamatrix, 0, -this.top);
 		    this.top = 0;
 		}
 	}
@@ -941,6 +947,8 @@ public class Ponysay
 		    int h = matrix.length;
 		    System.arraycopy(matrix, 0, matrix = new Pony.Cell[matrix.length - this.bottom][], 0, matrix.length);
 		    System.arraycopy(new Pony.Cell[-this.bottom][matrix[0].length], 0, matrix, h, -this.bottom);
+		    System.arraycopy(metamatrix, 0, metamatrix = new Pony.Meta[metamatrix.length - this.bottom][][], 0, metamatrix.length);
+		    System.arraycopy(new Pony.Meta[-this.bottom][metamatrix[0].length][], 0, metamatrix, h, -this.bottom);
 		    this.bottom = 0;
 		}
 	}
