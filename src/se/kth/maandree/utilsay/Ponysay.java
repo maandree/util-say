@@ -111,7 +111,7 @@ public class Ponysay
     /**
      * Output option: linux vt
      */
-    protected boolean tty;;
+    protected boolean tty;
     
     /**
      * Output option: colourful tty
@@ -1085,7 +1085,7 @@ public class Ponysay
 	}
 	
 	
-	Pony.Cell defaultcell = new Pony.Cell(' ', null, null, PLAIN);
+	Pony.Cell defaultcell = new Pony.Cell(Pony.Cell.PIXELS, null, null, PLAIN);
 	for (int y = this.top, h = matrix.length - this.bottom; y < h; y++)
 	{
 	    Pony.Cell[] row = matrix[y];
@@ -1169,8 +1169,8 @@ public class Ponysay
 			    }
 			else
 			    if (cell.upperColour == null)
-			    {   databuf.append(applyColour(colours, background, foreground, format, background = cell.lowerColour, foreground = null, format = PLAIN));
-				databuf.append('▀');
+			    {   databuf.append(applyColour(colours, background, foreground, format, background = null, foreground = cell.lowerColour, format = PLAIN));
+				databuf.append('▄');
 			    }
 			    else if (cell.upperColour.equals(cell.lowerColour))
 				if (this.zebra)
@@ -1186,7 +1186,7 @@ public class Ponysay
 				    databuf.append(' ');
 				}
 			    else  //TODO (this.colourful && ¿can get better colour?) → flip
-			    {   databuf.append(applyColour(colours, background, foreground, format, background = cell.lowerColour, foreground = cell.upperColour, format = PLAIN));
+			    {   databuf.append(applyColour(colours, background, foreground, format, background = cell.upperColour, foreground = cell.lowerColour, format = PLAIN));
 				databuf.append('▄');
 			    }
 		}
@@ -1416,16 +1416,16 @@ public class Ponysay
 		rc.append('/');
 		rc.append("0123456789ABCDEF".charAt(colour.getBlue() >>> 4));
 		rc.append("0123456789ABCDEF".charAt(colour.getBlue() & 15));
-		rc.append("\033\\\033[4");
+		rc.append("\033\\\033[3");
 		rc.append(colourindex2fore);
 		palette[colourindex2fore] = colour;
 	    }
-	    else if (colourindex2back < 16)
-	    {   rc.append(";4");
+	    else if (colourindex2fore < 16)
+	    {   rc.append(";3");
 		rc.append(colourindex2fore);
 	    }
 	    else
-	    {   rc.append(";48;5;");
+	    {   rc.append(";38;5;");
 		rc.append(colourindex2fore);
 	    }
 	if (this.tty && (colourindex2fore >= 0))

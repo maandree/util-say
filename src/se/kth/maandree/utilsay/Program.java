@@ -116,6 +116,7 @@ public class Program
 	else if (intype == "unisay")   pony = (new Unisay (inparams)).importPony();
 	else if (intype == "cowsay")   pony = (new Cowsay (inparams)).importPony();
 	else if (intype == "image")    pony = (new Image  (inparams)).importPony();
+	else if (intype == "test")     pony = (new Test   (inparams)).importPony();
 	
 	for (int i = 0, n = outtypes.size(); i < n; i++)
 	{   final String outtype = outtypes.get(i);
@@ -125,6 +126,7 @@ public class Program
 	    else if (outtype == "unisay")   (new Unisay (params)).exportPony(pony);
 	    else if (outtype == "cowsay")   (new Cowsay (params)).exportPony(pony);
 	    else if (outtype == "image")    (new Image  (params)).exportPony(pony);
+	    else if (outtype == "test")     (new Test   (params)).exportPony(pony);
 	}
     }
 }
