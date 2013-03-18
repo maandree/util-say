@@ -1138,7 +1138,7 @@ public class Ponysay
 				    databuf.append("," + balloon.minHeight.toString());
 				// KEYWORD: not supported in ponysay: balloon.maxWidth != null
 				// KEYWORD: not supported in ponysay: balloon.maxHeight != null
-				databuf.append("\n");
+				databuf.append("$\n");
 		    }	}   }
 		if ((x != w) && (x >= this.left) && (x < ending))
 		{   Pony.Cell cell = row[x];
