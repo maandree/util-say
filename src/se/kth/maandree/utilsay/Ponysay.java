@@ -827,8 +827,16 @@ public class Ponysay
 			}
 		    }
 	    this.left -= cur;
+	    if (this.left < 0)
+		{
+		    int w = matrix[0].length;
+		    for (int j = 0, n = matrix.length; j < n; j++)
+			System.arraycopy(matrix[j], 0, matrix[j] = new Pony.Cell[w - this.left], -this.left, w);
+		    this.left = 0;
+		}
 	}
-	else this.left = 0;
+	else
+	    this.left = 0;
 	if (this.right >= 0)
 	{
 	    int cur = 0;
@@ -854,6 +862,13 @@ public class Ponysay
 			}
 		    }
 	    this.right -= cur;
+	    if (this.right < 0)
+		{
+		    int w = matrix[0].length;
+		    for (int j = 0, n = matrix.length; j < n; j++)
+			System.arraycopy(matrix[j], 0, matrix[j] = new Pony.Cell[w - this.right], 0, w);
+		    this.right = 0;
+		}
 	}
 	else
 	    this.right = 0;
@@ -884,6 +899,13 @@ public class Ponysay
 			}
 		}   }
 	    this.top -= cur;
+	    if (this.top < 0)
+		{
+		    int w = matrix[0].length;
+		    System.arraycopy(matrix, 0, matrix = new Pony.Cell[matrix.length - this.top][], -this.top, matrix.length);
+		    System.arraycopy(new Pony.Cell[-this.top][w], 0, matrix, 0, -this.top);
+		    this.top = 0;
+		}
 	}
 	else
 	    this.top = 0;
@@ -914,6 +936,13 @@ public class Ponysay
 			}
 		}   }
 	    this.bottom -= cur;
+	    if (this.bottom < 0)
+		{
+		    int h = matrix.length;
+		    System.arraycopy(matrix, 0, matrix = new Pony.Cell[matrix.length - this.bottom][], 0, matrix.length);
+		    System.arraycopy(new Pony.Cell[-this.bottom][matrix[0].length], 0, matrix, h, -this.bottom);
+		    this.bottom = 0;
+		}
 	}
 	else
 	    this.bottom = 0;
