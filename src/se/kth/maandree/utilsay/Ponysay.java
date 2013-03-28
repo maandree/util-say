@@ -85,6 +85,7 @@ public class Ponysay
 	this.escesc = this.version > VERSION_COWSAY ? false : (flags.containsKey("escesc") && flags.get("escesc").toLowerCase().startsWith("y"));
     }
     // TODO padding should not move the balloon
+    // TODO add option to add balloon and link
     
     
     
@@ -803,7 +804,7 @@ public class Ponysay
 			}
 	        }
 	
-	
+        
 	if (this.left >= 0)
 	{
 	    int cur = 0;
@@ -829,15 +830,15 @@ public class Ponysay
 			}
 		    }
 	    this.left -= cur;
-	    if (this.left < 0)
-		{
-		    int w = matrix[0].length;
-		    for (int j = 0, n = matrix.length; j < n; j++)
-		    {	System.arraycopy(matrix[j], 0, matrix[j] = new Pony.Cell[w - this.left], -this.left, w);
-			System.arraycopy(metamatrix[j], 0, metamatrix[j] = new Pony.Meta[w + 1 - this.left][], -this.left, w + 1);
-		    }
-		    this.left = 0;
-		}
+	    // if (this.left < 0)
+	    // {
+	    //     int w = matrix[0].length;
+	    //	   for (int j = 0, n = matrix.length; j < n; j++)
+	    //	   {   System.arraycopy(matrix[j], 0, matrix[j] = new Pony.Cell[w - this.left], -this.left, w);
+	    //	       System.arraycopy(metamatrix[j], 0, metamatrix[j] = new Pony.Meta[w + 1 - this.left][], -this.left, w + 1);
+	    //	   }
+	    //	   this.left = 0;
+	    // }
 	}
 	else
 	    this.left = 0;
@@ -866,26 +867,26 @@ public class Ponysay
 			}
 		    }
 	    this.right -= cur;
-	    if (this.right < 0)
-		{
-		    int w = matrix[0].length;
-		    for (int j = 0, n = matrix.length; j < n; j++)
-		    {	System.arraycopy(matrix[j], 0, matrix[j] = new Pony.Cell[w - this.right], 0, w);
-			System.arraycopy(metamatrix[j], 0, metamatrix[j] = new Pony.Meta[w + 1 - this.right][], 0, w + 1);
-		    }
-		    this.right = 0;
-		}
+	    // if (this.right < 0)
+	    // {
+	    //     int w = matrix[0].length;
+	    //     for (int j = 0, n = matrix.length; j < n; j++)
+	    //     {   System.arraycopy(matrix[j], 0, matrix[j] = new Pony.Cell[w - this.right], 0, w);
+	    //         System.arraycopy(metamatrix[j], 0, metamatrix[j] = new Pony.Meta[w + 1 - this.right][], 0, w + 1);
+	    //     }
+	    //     this.right = 0;
+	    // }
 	}
 	else
 	    this.right = 0;
 	if (this.top >= 0)
 	{
-	    int cur = 0, m = matrix[0].length - this.right;
+	    int cur = 0, m = Math.min(matrix[0].length - this.right, matrix[0].length);
 	    outer:
 	        for (int n = matrix.length; cur < n; cur++)
 		{   Pony.Cell[] row = matrix[cur];
 		    Pony.Meta[][] metarow = metamatrix[cur];
-		    for (int j = this.left; j < m; j++)
+		    for (int j = Math.max(this.left, 0); j < m; j++)
 		    {
 			boolean cellpass = true;
 			Pony.Cell cell = row[j];
@@ -905,26 +906,27 @@ public class Ponysay
 			}
 		}   }
 	    this.top -= cur;
-	    if (this.top < 0)
-		{
-		    int w = matrix[0].length;
-		    System.arraycopy(matrix, 0, matrix = new Pony.Cell[matrix.length - this.top][], -this.top, matrix.length);
-		    System.arraycopy(new Pony.Cell[-this.top][w], 0, matrix, 0, -this.top);
-		    System.arraycopy(metamatrix, 0, metamatrix = new Pony.Meta[metamatrix.length - this.top][][], -this.top, metamatrix.length);
-		    System.arraycopy(new Pony.Meta[-this.top][w + 1][], 0, metamatrix, 0, -this.top);
-		    this.top = 0;
-		}
+	    //if (this.top < 0)
+	    // {
+	    //     int w = matrix[0].length;
+	    //     System.arraycopy(matrix, 0, matrix = new Pony.Cell[matrix.length - this.top][], -this.top, matrix.length + this.top);
+	    //     System.arraycopy(new Pony.Cell[-this.top][w], 0, matrix, 0, -this.top);
+	    //     System.arraycopy(metamatrix, 0, metamatrix = new Pony.Meta[metamatrix.length - this.top][][], -this.top, metamatrix.length + this.top);
+	    //     System.arraycopy(new Pony.Meta[-this.top][w + 1][], 0, metamatrix, 0, -this.top);
+	    //     this.top = 0;
+	    // }
 	}
 	else
 	    this.top = 0;
 	if (this.bottom >= 0)
 	{
-	    int cur = 0, m = matrix[0].length - this.right;
+	    int cur = 0, m = Math.min(matrix[0].length - this.right, matrix[0].length);
 	    outer:
-	        for (int n = matrix.length - 1 - this.top; cur <= n; cur++)
+	    for (int n = matrix.length - 1 - this.top; cur <= n; cur++)
+		if (n - cur < matrix.length)
 		{   Pony.Cell[] row = matrix[n - cur];
 		    Pony.Meta[][] metarow = metamatrix[n - cur];
-		    for (int j = this.left; j < m; j++)
+		    for (int j = Math.max(this.left, 0); j < m; j++)
 		    {
 			boolean cellpass = true;
 			Pony.Cell cell = row[j];
@@ -944,15 +946,15 @@ public class Ponysay
 			}
 		}   }
 	    this.bottom -= cur;
-	    if (this.bottom < 0)
-		{
-		    int h = matrix.length;
-		    System.arraycopy(matrix, 0, matrix = new Pony.Cell[matrix.length - this.bottom][], 0, matrix.length);
-		    System.arraycopy(new Pony.Cell[-this.bottom][matrix[0].length], 0, matrix, h, -this.bottom);
-		    System.arraycopy(metamatrix, 0, metamatrix = new Pony.Meta[metamatrix.length - this.bottom][][], 0, metamatrix.length);
-		    System.arraycopy(new Pony.Meta[-this.bottom][metamatrix[0].length][], 0, metamatrix, h, -this.bottom);
-		    this.bottom = 0;
-		}
+	    // if (this.bottom < 0)
+	    // {
+	    //     int h = matrix.length;
+	    //     System.arraycopy(matrix, 0, matrix = new Pony.Cell[matrix.length - this.bottom][], 0, matrix.length + this.bottom);
+	    //     System.arraycopy(new Pony.Cell[-this.bottom][matrix[0].length], 0, matrix, h, -this.bottom);
+	    //     System.arraycopy(metamatrix, 0, metamatrix = new Pony.Meta[metamatrix.length - this.bottom][][], 0, metamatrix.length + this.bottom);
+	    //     System.arraycopy(new Pony.Meta[-this.bottom][metamatrix[0].length][], 0, metamatrix, h, -this.bottom);
+	    //     this.bottom = 0;
+	    // }
 	}
 	else
 	    this.bottom = 0;
@@ -1010,7 +1012,7 @@ public class Ponysay
 	else
 	    this.bottom = -this.bottom;
 	
-	
+	/*
 	for (int y = 0; y < this.top; y++)
 	{   Pony.Meta[][] metarow = metamatrix[y];
 	    for (int x = 0, w = metarow.length; x < w; x++)
@@ -1020,7 +1022,7 @@ public class Ponysay
 		    if (((metaelem = metacell[z]) != null) && (metaelem instanceof Pony.Store))
 			databuf.append("$" + (((Pony.Store)(metaelem)).name + "=" + ((Pony.Store)(metaelem)).value).replace("$", "\033$") + "$");
 	}   }   }
-	
+	*/
 	
 	if (this.right != 0)
 	{   int w = matrix[0].length, r = metamatrix[0].length - this.right;
@@ -1083,7 +1085,6 @@ public class Ponysay
 		endings[y] = w - cur;
 	    }
 	}
-	
 	
 	Pony.Cell defaultcell = new Pony.Cell(Pony.Cell.PIXELS, null, null, PLAIN);
 	for (int y = this.top, h = matrix.length - this.bottom; y < h; y++)

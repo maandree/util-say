@@ -53,14 +53,20 @@ public class Test
     {
 	int Y = 10, X = 20;
 	Pony pony = new Pony(Y, X, "Test pony", new String[][] {{"PONY", "test"}});
-	
+	/**/
 	for (int y = 0; y < Y; y++)
 	    for (int x = 0; x < X; x++)
-		if (x == X - 1)
-		    pony.matrix[y][x] = new Pony.Cell(Pony.Cell.PIXELS, Color.RED, Color.BLUE, null);
+		if ((y < 5) ^ (x < 10))
+		    if ((x & 2) == 2)
+			pony.matrix[y][x] = new Pony.Cell(Pony.Cell.PIXELS, Color.BLUE, Color.RED, null);
+		    else
+			pony.matrix[y][x] = new Pony.Cell(Pony.Cell.PIXELS, Color.RED, Color.BLUE, null);
 		else
-		    pony.matrix[y][x] = new Pony.Cell(Pony.Cell.PIXELS, null, null, null);
-	
+		    if ((x & 2) == 2)
+			pony.matrix[y][x] = new Pony.Cell(Pony.Cell.PIXELS, Color.GREEN, Color.YELLOW, null);
+		    else
+			pony.matrix[y][x] = new Pony.Cell(Pony.Cell.PIXELS, Color.YELLOW, Color.GREEN, null);
+	/**/
 	return pony;
     }
     
