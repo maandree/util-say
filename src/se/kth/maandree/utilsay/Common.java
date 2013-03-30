@@ -96,6 +96,235 @@ public class Common
 	    pony.metamatrix[0][0][0] = speechballoon;
 	}
     }
+    
+    
+    /**
+     * Change the margins in a {@link Pony}
+     * 
+     * @param   pony    The the pony, the attributes {@link Pony#matrix} and {@link Pony#metamatrix} but not {@link Pony#height} nor  {@link Pony#width} will be updated
+     * @param   left    The left margin, negative for unmodified
+     * @param   right   The right margin, negative for unmodified
+     * @param   top     The top margin, negative for unmodified
+     * @param   bottom  The bottom margin, negative for unmodified
+     * @return          The update {@code {left, right, top, bottom}}
+     */
+    public static int[] changeMargins(Pony pony, int left, int right, int top, int bottom)
+    {
+	Pony.Cell[][] matrix = pony.matrix;
+	Pony.Meta[][][] metamatrix = pony.metamatrix;
+	
+	if (left >= 0)
+	{
+	    int cur = 0;
+	    outer:
+	        for (int n = matrix[0].length; cur < n; cur++)
+		    for (int j = 0, m = matrix.length; j < m; j++)
+		    {
+			boolean cellpass = true;
+			Pony.Cell cell = matrix[j][cur];
+			if (cell != null)
+			    if ((cell.character != ' ') || (cell.lowerColour != null))
+				if ((cell.character != Pony.Cell.PIXELS) || (cell.lowerColour != null) || (cell.upperColour != null))
+				    cellpass = false;
+			Pony.Meta[] meta = metamatrix[j][cur];
+			if ((meta != null) && (meta.length != 0))
+			{   for (int k = 0, l = meta.length; k < l; k++)
+				if ((meta[k] != null) && ((meta[k] instanceof Pony.Store) == false))
+				    if ((cellpass == false) || (meta[k] instanceof Pony.Balloon))
+					break outer;
+			}
+			else
+			    if (cellpass == false)
+				break outer;
+		    }
+	    left -= cur;
+	    // if (left < 0)
+	    // {
+	    //     int w = matrix[0].length;
+	    //	   for (int j = 0, n = matrix.length; j < n; j++)
+	    //	   {   System.arraycopy(matrix[j], 0, matrix[j] = new Pony.Cell[w - left], -left, w);
+	    //	       System.arraycopy(metamatrix[j], 0, metamatrix[j] = new Pony.Meta[w + 1 - left][], -left, w + 1);
+	    //	   }
+	    //	   left = 0;
+	    // }
+	}
+	else
+	    left = 0;
+	if (right >= 0)
+	{
+	    int cur = 0;
+	    outer:
+	        for (int n = matrix[0].length - 1; cur <= n; cur++)
+		    for (int j = 0, m = matrix.length; j < m; j++)
+		    {
+			boolean cellpass = true;
+			Pony.Cell cell = matrix[j][n - cur];
+			if (cell != null)
+			    if ((cell.character != ' ') || (cell.lowerColour != null))
+				if ((cell.character != Pony.Cell.PIXELS) || (cell.lowerColour != null) || (cell.upperColour != null))
+				    cellpass = false;
+			Pony.Meta[] meta = metamatrix[j][n - cur];
+			if ((meta != null) && (meta.length != 0))
+			{   for (int k = 0, l = meta.length; k < l; k++)
+				if ((meta[k] != null) && ((meta[k] instanceof Pony.Store) == false))
+				    if ((cellpass == false) || (meta[k] instanceof Pony.Balloon))
+					break outer;
+			}
+			else
+			    if (cellpass == false)
+				break outer;
+		    }
+	    right -= cur;
+	    // if (right < 0)
+	    // {
+	    //     int w = matrix[0].length;
+	    //     for (int j = 0, n = matrix.length; j < n; j++)
+	    //     {   System.arraycopy(matrix[j], 0, matrix[j] = new Pony.Cell[w - right], 0, w);
+	    //         System.arraycopy(metamatrix[j], 0, metamatrix[j] = new Pony.Meta[w + 1 - right][], 0, w + 1);
+	    //     }
+	    //     right = 0;
+	    // }
+	}
+	else
+	    right = 0;
+	if (top >= 0)
+	{
+	    int cur = 0, m = Math.min(matrix[0].length + right, matrix[0].length);
+	    outer:
+	        for (int n = matrix.length; cur < n; cur++)
+		{   Pony.Cell[] row = matrix[cur];
+		    Pony.Meta[][] metarow = metamatrix[cur];
+		    for (int j = Math.max(-left, 0); j < m; j++)
+		    {
+			boolean cellpass = true;
+			Pony.Cell cell = row[j];
+			if (cell != null)
+			    if ((cell.character != ' ') || (cell.lowerColour != null))
+				if ((cell.character != Pony.Cell.PIXELS) || (cell.lowerColour != null) || (cell.upperColour != null))
+				    cellpass = false;
+			Pony.Meta[] meta = metarow[j];
+			if ((meta != null) && (meta.length != 0))
+			{   for (int k = 0, l = meta.length; k < l; k++)
+				if ((meta[k] != null) && ((meta[k] instanceof Pony.Store) == false))
+				    if ((cellpass == false) || (meta[k] instanceof Pony.Balloon))
+					break outer;
+			}
+			else
+			    if (cellpass == false)
+				break outer;
+		}   }
+	    top -= cur;
+	    //if (top < 0)
+	    // {
+	    //     int w = matrix[0].length;
+	    //     System.arraycopy(matrix, 0, matrix = new Pony.Cell[matrix.length - top][], -top, matrix.length + top);
+	    //     System.arraycopy(new Pony.Cell[-top][w], 0, matrix, 0, -top);
+	    //     System.arraycopy(metamatrix, 0, metamatrix = new Pony.Meta[metamatrix.length - top][][], -top, metamatrix.length + top);
+	    //     System.arraycopy(new Pony.Meta[-top][w + 1][], 0, metamatrix, 0, -top);
+	    //     top = 0;
+	    // }
+	}
+	else
+	    top = 0;
+	if (bottom >= 0)
+	{
+	    int cur = 0, m = Math.min(matrix[0].length + right, matrix[0].length);
+	    outer:
+	    for (int n = matrix.length - 1 + top; cur <= n; cur++)
+		if (n - cur < matrix.length)
+		{   Pony.Cell[] row = matrix[n - cur];
+		    Pony.Meta[][] metarow = metamatrix[n - cur];
+		    for (int j = Math.max(-left, 0); j < m; j++)
+		    {
+			boolean cellpass = true;
+			Pony.Cell cell = row[j];
+			if (cell != null)
+			    if ((cell.character != ' ') || (cell.lowerColour != null))
+				if ((cell.character != Pony.Cell.PIXELS) || (cell.lowerColour != null) || (cell.upperColour != null))
+				    cellpass = false;
+			Pony.Meta[] meta = metarow[j];
+			if ((meta != null) && (meta.length != 0))
+			{   for (int k = 0, l = meta.length; k < l; k++)
+				if ((meta[k] != null) && ((meta[k] instanceof Pony.Store) == false))
+				    if ((cellpass == false) || (meta[k] instanceof Pony.Balloon))
+					break outer;
+			}
+			else
+			    if (cellpass == false)
+				break outer;
+		}   }
+	    bottom -= cur;
+	    // if (bottom < 0)
+	    // {
+	    //     int h = matrix.length;
+	    //     System.arraycopy(matrix, 0, matrix = new Pony.Cell[matrix.length - bottom][], 0, matrix.length + bottom);
+	    //     System.arraycopy(new Pony.Cell[-bottom][matrix[0].length], 0, matrix, h, -bottom);
+	    //     System.arraycopy(metamatrix, 0, metamatrix = new Pony.Meta[metamatrix.length - bottom][][], 0, metamatrix.length + bottom);
+	    //     System.arraycopy(new Pony.Meta[-bottom][metamatrix[0].length][], 0, metamatrix, h, -bottom);
+	    //     bottom = 0;
+	    // }
+	}
+	else
+	    bottom = 0;
+	
+	
+	if (left > 0)
+	{   int w = matrix[0].length;
+	    for (int y = 0, h = matrix.length; y < h; y++)
+	    {
+		System.arraycopy(matrix[y], 0, matrix[y] = new Pony.Cell[w + left], left, w);
+		System.arraycopy(metamatrix[y], 0, metamatrix[y] = new Pony.Meta[w + 1 + left][], left, w + 1);
+	    }
+	    left = 0;
+	}
+	else
+	    left = -left;
+	
+	if (right > 0)
+	{   int w = matrix[0].length;
+	    for (int y = 0, h = matrix.length; y < h; y++)
+	    {
+		System.arraycopy(matrix[y], 0, matrix[y] = new Pony.Cell[w + right], 0, w);
+		System.arraycopy(metamatrix[y], 0, metamatrix[y] = new Pony.Meta[w + 1 + right][], 0, w + 1);
+	    }
+	    right = 0;
+	}
+	else
+	    right = -right;
+	
+	if (top > 0)
+	{
+	    int h = matrix.length, w = matrix[0].length;
+	    Pony.Cell[][] appendix = new Pony.Cell[top][w];
+	    System.arraycopy(matrix, 0, matrix = new Pony.Cell[h + top][], top, h);
+	    System.arraycopy(appendix, 0, matrix, 0, top);
+	    Pony.Meta[][][] metaappendix = new Pony.Meta[top][w + 1][];
+	    System.arraycopy(metamatrix, 0, metamatrix = new Pony.Meta[h + top][w + 1][], top, h);
+	    System.arraycopy(metaappendix, 0, metamatrix, 0, top);
+	    top = 0;
+	}
+	else
+	    top = -top;
+	
+	if (bottom > 0)
+	{
+	    int h = matrix.length, w = matrix[0].length;
+	    Pony.Cell[][] appendix = new Pony.Cell[bottom][w];
+	    System.arraycopy(matrix, 0, matrix = new Pony.Cell[h + bottom][], 0, h);
+	    System.arraycopy(appendix, 0, matrix, h, bottom);
+	    Pony.Meta[][][] metaappendix = new Pony.Meta[bottom][w + 1][];
+	    System.arraycopy(metamatrix, 0, metamatrix = new Pony.Meta[h + bottom][][], 0, h);
+	    System.arraycopy(metaappendix, 0, metamatrix, h, bottom);
+	    bottom = 0;
+	}
+	else
+	    bottom = -bottom;
+	
+	pony.matrix = matrix;
+	pony.metamatrix = metamatrix;
+	return new int[] { left, right, top, bottom };
+    }
+    
+    
 }
-
 

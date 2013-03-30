@@ -60,23 +60,23 @@ public class Image
     /**
      * Output option: left margin, negative for unmodified
      */
-    protected int left; // TODO add support
+    protected int left;
     
     /**
      * Output option: right margin, negative for unmodified
      */
-    protected int right; // TODO add support
+    protected int right;
     
     /**
      * <p>Output option: top margin, negative for unmodified</p>
      * <p>Input option: Extra number of lines between the pony and balloon (must not be negative)</p>
      */
-    protected int top; // TODO add support
+    protected int top;
     
     /**
      * Output option: bottom margin, negative for unmodified
      */
-    protected int bottom; // TODO add support
+    protected int bottom;
     
     /**
      * Input/output option: pixel magnification
@@ -205,6 +205,8 @@ public class Image
     {
 	BufferedImage img = new BufferedImage(pony.width * this.magnified, (pony.height << 1) * this.magnified, BufferedImage.TYPE_INT_ARGB);
 	Color TRANSPARENT = new Color(0, 0, 0, 0);
+	
+	Common.changeMargins(pony, this.left, this.right, this.top, this.bottom);
 	
 	int h = pony.height, w = pony.width;
 	for (int y = 0; y < h; y++)
