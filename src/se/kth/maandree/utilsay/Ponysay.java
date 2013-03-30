@@ -76,7 +76,7 @@ public class Ponysay
 	this.chroma = (flags.containsKey("chroma") == false) ? -1 : parseDouble(flags.get("chroma"));
 	this.left = (flags.containsKey("left") == false) ? 2 : parseInteger(flags.get("left"));
 	this.right = (flags.containsKey("right") == false) ? 0 : parseInteger(flags.get("right"));
-	this.top = (flags.containsKey("top") == false) ? 3 : parseInteger(flags.get("top"));
+	this.top = (flags.containsKey("top") == false) ? 0 : parseInteger(flags.get("top"));
 	this.bottom = (flags.containsKey("bottom") == false) ? 1 : parseInteger(flags.get("bottom"));
 	this.palette = (flags.containsKey("palette") == false) ? null : parsePalette(flags.get("palette").toUpperCase().replace("\033", "").replace("]", "").replace("P", ""));
 	this.ignoreballoon = flags.containsKey("ignoreballoon") && flags.get("ignoreballoon").toLowerCase().startsWith("y");
@@ -85,7 +85,7 @@ public class Ponysay
 	this.escesc = this.version > VERSION_COWSAY ? false : (flags.containsKey("escesc") && flags.get("escesc").toLowerCase().startsWith("y"));
     }
     // TODO padding should not move the balloon
-    // TODO add option to add balloon and link
+    // TODO add option to add balloon and link (in which case: default top to 3)
     
     
     
