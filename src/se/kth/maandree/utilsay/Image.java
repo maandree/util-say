@@ -40,13 +40,13 @@ public class Image
     public Image(HashMap<String, String> flags)
     {
 	this.file = (flags.containsKey("file") ? (this.file = flags.get("file")).equals("-") : true) ? null : this.file;
+	this.balloon = this.encoded ? false : ((flags.containsKey("balloon") == false) || flags.get("balloon").toLowerCase().startsWith("y"));
 	this.left = (flags.containsKey("left") == false) ? -1 : Integer.parseInt(flags.get("left"));
 	this.right = (flags.containsKey("right") == false) ? -1 : Integer.parseInt(flags.get("right"));
-	this.top = (flags.containsKey("top") == false) ? -1 : Integer.parseInt(flags.get("top"));
+	this.top = (flags.containsKey("top") == false) ? (this.balloon ? 3 : -1) : Integer.parseInt(flags.get("top"));
 	this.bottom = (flags.containsKey("bottom") == false) ? -1 : Integer.parseInt(flags.get("bottom"));
 	this.magnified = (flags.containsKey("magnified") == false) ? 2 : Integer.parseInt(flags.get("magnified"));
 	this.encoded = flags.containsKey("encoded") && flags.get("encoded").toLowerCase().startsWith("y");
-	this.balloon = this.encoded ? false : ((flags.containsKey("balloon") == false) || flags.get("balloon").toLowerCase().startsWith("y"));
 	this.format = flags.containsKey("format") ? flags.get("format") : "png";
     }
     
@@ -68,7 +68,8 @@ public class Image
     protected int right;
     
     /**
-     * Output option: top margin, negative for unmodified
+     * <p>Output option: top margin, negative for unmodified</p>
+     * <p>Input option: Extra number of lines between the pony and balloon (must not be negative)</p>
      */
     protected int top;
     
@@ -155,10 +156,10 @@ public class Image
 		    switch (cell.upperColour.getAlpha())
 		    {
 			case 100:
-			    if ((r == 0) && (g == 0) && (b == 255))
-				pony.matrix[y][x] = new Pony.Cell(Pony.Cell.NNE_SSW, null, null, null);
-			    else if ((r == 255) && (g == 0) && (b == 0))
+			    if ((r == 255) && (g == 0) && (b == 0))
 				pony.matrix[y][x] = new Pony.Cell(Pony.Cell.NNW_SSE, null, null, null);
+			    else if ((r == 0) && (g == 0) && (b == 255))
+				pony.matrix[y][x] = new Pony.Cell(Pony.Cell.NNE_SSW, null, null, null);
 			    break;
 			    
 		        case 99:
@@ -186,7 +187,59 @@ public class Image
 		}   }
 	    }
 	
-	// TODO this.balloon
+	if (this.balloon)
+	{   int y = 0, x = 0;
+	    outer:
+	        for (int h = pony.height; y <= h; y++)
+		{   if (y == h)
+		    {   y = x = -1;
+			break;
+		    }
+		    for (x = 0; x < width; x++)
+		    {   cell = pony.matrix[y][x];
+			int character = cell == null ? ' ' : cell.character;
+			if (character >= 0)
+			{   if ((character != ' ') && (character != ' '))
+				break outer;
+			}
+			else if (character == Pony.Cell.PIXELS)
+			    if ((cell.upperColour != null) && (cell.lowerColour != null))
+				break outer;
+		}   }
+	    
+	    if (y >= 0)
+	    {	System.arraycopy(pony.matrix, 0, pony.matrix = new Pony.Cell[pony.height + 1 + this.top][], 1 + this.top, pony.height);
+		System.arraycopy(pony.metamatrix, 0, pony.metamatrix = new Pony.Meta[pony.height + 1 + this.top][][], 1 + this.top, pony.height);
+		for (int i = 0, w = pony.width, mw = pony.width + 1; i <= this.top; i++)
+		{   pony.matrix[i] = new Pony.Cell[w];
+		    pony.metamatrix[i] = new Pony.Meta[mw][];
+		}
+		pony.height += 1 + this.top;
+		y += 1 + this.top;
+		if (y > x)
+		    for (int i = 0, my = y + 1, w = pony.width, mw = pony.width + 1, h = pony.height; i <= h; i++)
+		    {	System.arraycopy(pony.matrix[i], 0, pony.matrix[i] = new Pony.Cell[y], 0, w);
+			System.arraycopy(pony.metamatrix[i], 0, pony.metamatrix[i] = new Pony.Meta[my][], 0, mw);
+		    }
+		x -= y;
+		
+		for (int i = 1; i < y; i++)
+		    pony.matrix[i][x + i] = new Pony.Cell(Pony.Cell.NNW_SSE, null, null, null);
+	    }
+	    else if ((pony.height == 0) || (pony.width == 0))
+	    {	pony.height = pony.width = 1;
+		pony.matrix = new Pony.Cell[1][1];
+		pony.metamatrix = new Pony.Meta[1][1][];
+	    }
+	    
+	    Pony.Balloon speechballoon = new Pony.Balloon(null, null, new Integer(Math.max(x, 5)), null, null, null, Pony.Balloon.NONE);
+	    if (pony.metamatrix[0][0] == null)
+		pony.metamatrix[0][0] = new Pony.Meta[] { speechballoon };
+	    else
+	    {   System.arraycopy(pony.metamatrix[0][0], 0, pony.metamatrix[0][0] = new Pony.Meta[pony.metamatrix[0][0].length + 1], 1, pony.metamatrix[0][0].length - 1);
+		pony.metamatrix[0][0][0] = speechballoon;
+	    }
+	}
 	
 	return pony;
     }

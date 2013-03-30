@@ -359,11 +359,11 @@ public class Ponysay
 			String name = utf32to16(_name);
 			if (name.equals("\\"))
 		        {   curwidth++;
-			    items.add(new Pony.Cell(this.ignorelink ? ' ' : Pony.Cell.NNE_SSW, null, null, PLAIN));
+			    items.add(new Pony.Cell(this.ignorelink ? ' ' : Pony.Cell.NNW_SSE, null, null, PLAIN));
 			}
 			else if (name.equals("/"))
 		        {   curwidth++;
-			    items.add(new Pony.Cell(this.ignorelink ? ' ' : Pony.Cell.NNW_SSE, null, null, PLAIN));
+			    items.add(new Pony.Cell(this.ignorelink ? ' ' : Pony.Cell.NNE_SSW, null, null, PLAIN));
 			}
 			else if (name.startsWith("balloon") == false)
 			    items.add(new Pony.Recall(name, foreground, background, format));
@@ -1178,7 +1178,7 @@ public class Ponysay
 			    databuf.append(applyColour(colours, this.palette, background, foreground, format, background = cell.lowerColour, foreground = cell.upperColour, format = cell.format));
 			    databuf.append(utf32to16(cell.character));
 			}
-		    else if (cell.character == Pony.Cell.NNE_SSW)
+		    else if (cell.character == Pony.Cell.NNW_SSE)
 		    {   if (balloonend >= 0)
 			{   databuf.append(applyColour(colours, this.palette, background, foreground, format, background = null, foreground = null, format = PLAIN));
 			    for (int i = 0; i < balloonend; i++)
@@ -1188,7 +1188,7 @@ public class Ponysay
 			databuf.append(applyColour(colours, this.palette, background, foreground, format, background = null, foreground = null, format = PLAIN));
 			databuf.append("$\\$");
 		    }
-		    else if (cell.character == Pony.Cell.NNW_SSE)
+		    else if (cell.character == Pony.Cell.NNE_SSW)
 		    {   if (balloonend >= 0)
 			{   databuf.append(applyColour(colours, this.palette, background, foreground, format, background = null, foreground = null, format = PLAIN));
 			    for (int i = 0; i < balloonend; i++)
