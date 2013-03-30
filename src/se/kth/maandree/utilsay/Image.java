@@ -47,7 +47,7 @@ public class Image
 	this.bottom = (flags.containsKey("bottom") == false) ? -1 : Integer.parseInt(flags.get("bottom"));
 	this.magnified = (flags.containsKey("magnified") == false) ? 2 : Integer.parseInt(flags.get("magnified"));
 	this.encoded = flags.containsKey("encoded") && flags.get("encoded").toLowerCase().startsWith("y");
-	this.format = flags.containsKey("format") ? flags.get("format") : "png";
+	this.format = flags.containsKey("format") ? flags.get("format") : null;
     }
     
     
@@ -288,7 +288,12 @@ public class Image
 	else if ((pony.tags != null) && (pony.tags.length != 0))
 	    System.err.println("\033[01;31mutil-say: warning: not capable of exporting metadata to images\033[00m");
 	
-	ImageIO.write(img, "png", new File(this.file)); /* TODO add support for piping */
+	String fmt = this.format;
+	if (fmt == null)
+	{   fmt = this.file.contains("/") ? this.file.substring(this.file.lastIndexOf("/") + 1) : this.file;
+	    fmt = this.file.contains(".") ? this.file.substring(this.file.lastIndexOf(".") + 1) : "png";
+	}
+	ImageIO.write(img, fmt, new File(this.file)); /* TODO add support for piping */
     }
     
 }
