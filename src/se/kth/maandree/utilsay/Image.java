@@ -60,23 +60,23 @@ public class Image
     /**
      * Output option: left margin, negative for unmodified
      */
-    protected int left;
+    protected int left; // TODO add support
     
     /**
      * Output option: right margin, negative for unmodified
      */
-    protected int right;
+    protected int right; // TODO add support
     
     /**
      * <p>Output option: top margin, negative for unmodified</p>
      * <p>Input option: Extra number of lines between the pony and balloon (must not be negative)</p>
      */
-    protected int top;
+    protected int top; // TODO add support
     
     /**
      * Output option: bottom margin, negative for unmodified
      */
-    protected int bottom;
+    protected int bottom; // TODO add support
     
     /**
      * Input/output option: pixel magnification
@@ -109,7 +109,7 @@ public class Image
      */
     public Pony importPony() throws IOException
     {
-	BufferedImage image = ImageIO.read(new File(this.file));
+	BufferedImage image = ImageIO.read(new File(this.file)); /* TODO add support for piping */
 	int width  = image.getWidth()  / this.magnified;
 	int height = image.getHeight() / this.magnified;
 	int div = this.magnified * this.magnified;
@@ -198,9 +198,95 @@ public class Image
      * Export a pony to the file
      * 
      * @param  pony  The pony
+     * 
+     * @throws  IOException  On image export error
      */
-    public void exportPony(Pony pony)
+    public void exportPony(Pony pony) throws IOException
     {
+	BufferedImage img = new BufferedImage(pony.width * this.magnified, (pony.height << 1) * this.magnified, BufferedImage.TYPE_INT_ARGB);
+	Color TRANSPARENT = new Color(0, 0, 0, 0);
+	
+	int h = pony.height, w = pony.width;
+	for (int y = 0; y < h; y++)
+	{   Pony.Cell[] row = pony.matrix[y];
+	    Pony.Meta[][] metarow = pony.metamatrix[y];
+	    x_loop: for (int x = 0; x <= w; x++)
+	    {   Pony.Meta[] metacell = metarow[x];
+		if (metacell != null)
+		    for (Pony.Meta meta : metacell)
+			if (meta.getClass() == Pony.Recall.class)
+			    System.err.println("\033[01;31mutil-say: warning: ignoring recall in image, no way to parse in an image module\033[00m");
+			else if (meta.getClass() == Pony.Combining.class)
+			    System.err.println("\033[01;31mutil-say: warning: cannot include text in images\033[00m");
+			else if (this.encoded && (meta.getClass() == Pony.Balloon.class))
+			{
+			    Pony.Balloon balloon = (Pony.Balloon)meta;
+			    int r = 0, g = 0, b = 0, r2 = 0, g2 = 0, b2 = 0, j = balloon.justification;
+			    if ((j & Pony.Balloon.LEFT)   != 0)  r  |= 128;
+			    if ((j & Pony.Balloon.RIGHT)  != 0)  g  |= 128;
+			    if ((j & Pony.Balloon.TOP)    != 0)  r2 |= 128;
+			    if ((j & Pony.Balloon.BOTTOM) != 0)  g2 |= 128;
+			    r |= balloon.left == null ? 0 : (balloon.left.intValue() & 127);
+			    g |= balloon.minWidth == null ? 0 : (balloon.minWidth.intValue() & 127);
+			    b |= balloon.maxWidth == null ? 0 : (balloon.maxWidth.intValue() & 255);
+			    r2 |= balloon.top == null ? 0 : (balloon.top.intValue() & 127);
+			    g2 |= balloon.minHeight == null ? 0 : (balloon.minHeight.intValue() & 127);
+			    b2 |= balloon.maxHeight == null ? 0 : (balloon.maxHeight.intValue() & 255);
+			    Color upper = new Color(r, g, b, 99);
+			    Color lower = new Color(r2, g2, b2, 99);
+			    int _x = x * this.magnified;
+			    int uy = (y << 1) * this.magnified;
+			    int ly = ((y << 1) | 1) * this.magnified;
+			    int u = upper.getRGB(), l = lower.getRGB();
+			    for (int my = 0; my < this.magnified; my++)
+				for (int mx = 0; mx < this.magnified; mx++)
+				{   img.setRGB(_x + mx, uy + my, u);
+				    img.setRGB(_x + mx, ly + my, l);
+				}
+			    // TODO add warning for if cells should override this
+			    continue x_loop;
+			}
+		        /*else if (meta.getClass() == Pony.Store.class)
+			    ; // Do nothing*/
+		
+		if (x != w)
+		{
+		    Pony.Cell cell = row[x];
+		    Color upper, lower;
+		    if (cell == null)
+			upper = lower = TRANSPARENT;
+		    else
+		    {   boolean whitespace = (cell.character == ' ') || (cell.character == ' ');
+			upper = whitespace ? cell.lowerColour : cell.upperColour;
+			lower = cell.lowerColour;
+			whitespace |= cell.character == Pony.Cell.PIXELS;
+			if (cell.character == Pony.Cell.NNW_SSE)
+			    upper = lower = this.encoded ? new Color(255, 0, 0, 100) : TRANSPARENT;
+			else if (cell.character == Pony.Cell.NNE_SSW)
+			    upper = lower = this.encoded ? new Color(0, 0, 255, 100) : TRANSPARENT;
+			else
+			{   if (!whitespace)
+				System.err.println("\033[01;31mutil-say: warning: cannot include text in images\033[00m");
+			    if ((upper == null) || !whitespace)  upper = TRANSPARENT;
+			    if ((lower == null) || !whitespace)  lower = TRANSPARENT;
+		    }	}
+		    int _x = x * this.magnified;
+		    int uy = (y << 1) * this.magnified;
+		    int ly = ((y << 1) | 1) * this.magnified;
+		    int u = upper.getRGB(), l = lower.getRGB();
+		    for (int my = 0; my < this.magnified; my++)
+			for (int mx = 0; mx < this.magnified; mx++)
+			{   img.setRGB(_x + mx, uy + my, u);
+			    img.setRGB(_x + mx, ly + my, l);
+			}
+	}   }   }
+	
+	if ((pony.comment != null) && (pony.comment.length() != 0))
+	    System.err.println("\033[01;31mutil-say: warning: not capable of exporting metadata to images\033[00m");
+	else if ((pony.tags != null) && (pony.tags.length != 0))
+	    System.err.println("\033[01;31mutil-say: warning: not capable of exporting metadata to images\033[00m");
+	
+	ImageIO.write(img, "png", new File(this.file)); /* TODO add support for piping */
     }
     
 }

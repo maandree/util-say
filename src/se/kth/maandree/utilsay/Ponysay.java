@@ -1133,6 +1133,11 @@ public class Ponysay
 				databuf.append(applyColour(colours, this.palette, background, foreground, format, background = back, foreground = fore, recall.format));
 				databuf.append("$" + recall.name.replace("$", "\033$") + "$");
 			    }
+			    else if (metaclass == Pony.Combining.class)
+			    {   Pony.Combining combining = (Pony.Combining)meta;
+				databuf.append(applyColour(colours, this.palette, background, foreground, format, background = combining.backgroundColour, foreground = combining.foregroundColour, format = combining.format));
+				databuf.append(combining.character);
+			    }
 			    else if (metaclass == Pony.Balloon.class)
 			    {   databuf.append(applyColour(colours, this.palette, background, foreground, format, background = null, foreground = null, format = PLAIN));
 				Pony.Balloon balloon = (Pony.Balloon)meta;
