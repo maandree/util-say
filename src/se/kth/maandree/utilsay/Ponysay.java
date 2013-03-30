@@ -1410,7 +1410,7 @@ public class Ponysay
 		if ((this.fullcolour && this.tty) == false)
 		    colourindex1back = matchColour(newBackground, palette, 16, 256, this.chroma);
 		if (this.tty || this.fullcolour)
-		    colourindex2back = (this.colourful ? matchColour(this.fullcolour ? newBackground : palette[colourindex1back], palette, 0, 8, this.chroma) : 7);
+		    colourindex2back = (this.colourful ? matchColour(this.fullcolour ? newBackground : palette[colourindex1back], this.tty ? ttypalette : palette, 0, 8, this.chroma) : 7);
 		else
 		    colourindex2back = colourindex1back;
 	    }
@@ -1423,19 +1423,16 @@ public class Ponysay
 		if ((this.fullcolour && this.tty) == false)
 		    colourindex1fore = matchColour(newForeground, palette, 16, 256, this.chroma);
 		if (this.tty || this.fullcolour)
-		    colourindex2fore = (this.colourful ? matchColour(this.fullcolour ? newForeground : palette[colourindex1fore], palette, 0, 16, this.chroma) : 15);
+		    colourindex2fore = (this.colourful ? matchColour(this.fullcolour ? newForeground : palette[colourindex1fore], this.tty ? ttypalette : palette, 8, 16, this.chroma) : 15);
 		else
 		    colourindex2fore = colourindex1fore;
-		if (this.tty)
-		    if (colourindex2fore == colourindex2back)
-			colourindex2fore |= 8;
 	    }
 	
 	if (colourindex2back != -1)
 	    if (this.tty)
 	    {   Color colour = palette[colourindex1back];
 		rc.append("m\033]P");
-		rc.append("0123456789ABCDEF".charAt(colourindex1back));
+		rc.append("0123456789ABCDEF".charAt(colourindex2back));
 		rc.append("0123456789ABCDEF".charAt(colour.getRed() >>> 4));
 		rc.append("0123456789ABCDEF".charAt(colour.getRed() & 15));
 		rc.append("0123456789ABCDEF".charAt(colour.getGreen() >>> 4));
@@ -1475,7 +1472,7 @@ public class Ponysay
 	    if (this.tty)
 	    {   Color colour = palette[colourindex1fore];
 		rc.append("m\033]P");
-		rc.append("0123456789ABCDEF".charAt(colourindex1fore));
+		rc.append("0123456789ABCDEF".charAt(colourindex2fore));
 		rc.append("0123456789ABCDEF".charAt(colour.getRed() >>> 4));
 		rc.append("0123456789ABCDEF".charAt(colour.getRed() & 15));
 		rc.append("0123456789ABCDEF".charAt(colour.getGreen() >>> 4));
@@ -1527,7 +1524,7 @@ public class Ponysay
 	String _rc = rc.toString();
 	if (_rc.isEmpty())
 	    return "";
-	return "\033[" + _rc.substring(1) + "m";
+	return ("\033[" + _rc.substring(1)).replace("\033[\033]", "\033]") + "m";
     }
     
     
@@ -1664,18 +1661,18 @@ public class Ponysay
 	Color[] palette = new Color[16];
         for (int ptr = 0, n = defvalue.length(); ptr < n; ptr += 7)
 	{
-	    int index = Integer.parseInt(defvalue.substring(ptr + 0, 1), 16);
-	    int red   = Integer.parseInt(defvalue.substring(ptr + 1, 2), 16);
-	    int green = Integer.parseInt(defvalue.substring(ptr + 3, 2), 16);
-	    int blue  = Integer.parseInt(defvalue.substring(ptr + 5, 2), 16);
+	    int index = Integer.parseInt(defvalue.substring(ptr + 0, ptr + 1), 16);
+	    int red   = Integer.parseInt(defvalue.substring(ptr + 1, ptr + 3), 16);
+	    int green = Integer.parseInt(defvalue.substring(ptr + 3, ptr + 5), 16);
+	    int blue  = Integer.parseInt(defvalue.substring(ptr + 5, ptr + 7), 16);
 	    palette[index] = new Color(red, green, blue);
 	}
 	for (int ptr = 0, n = value.length(); ptr < n; ptr += 7)
 	{
-	    int index = Integer.parseInt(value.substring(ptr + 0, 1), 16);
-	    int red   = Integer.parseInt(value.substring(ptr + 1, 2), 16);
-	    int green = Integer.parseInt(value.substring(ptr + 3, 2), 16);
-	    int blue  = Integer.parseInt(value.substring(ptr + 5, 2), 16);
+	    int index = Integer.parseInt(value.substring(ptr + 0, ptr + 1), 16);
+	    int red   = Integer.parseInt(value.substring(ptr + 1, ptr + 3), 16);
+	    int green = Integer.parseInt(value.substring(ptr + 3, ptr + 5), 16);
+	    int blue  = Integer.parseInt(value.substring(ptr + 5, ptr + 7), 16);
 	    palette[index] = new Color(red, green, blue);
 	}
 	return palette;
