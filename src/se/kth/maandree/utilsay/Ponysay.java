@@ -85,7 +85,6 @@ public class Ponysay
 	this.colourful = this.tty && ((flags.containsKey("colourful") == false) || flags.get("colourful").toLowerCase().startsWith("y"));
 	this.escesc = this.version > VERSION_COWSAY ? false : (flags.containsKey("escesc") && flags.get("escesc").toLowerCase().startsWith("y"));
     }
-    // TODO padding should not move the balloon
     
     
     
