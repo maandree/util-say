@@ -128,7 +128,7 @@ public class Image
 			b +=  argb        & 255;
 		    }
 		a /= div; r /= div; g /= div; b /= div;
-		pony.matrix[y >> 1][x] = cell = new Pony.Cell(Pony.Cell.PIXELS, new Color(r, g, b, a), null, null);
+		pony.matrix[y >> 1][x] = cell = new Pony.Cell(Pony.Cell.PIXELS, a == 0 ? null : new Color(r, g, b, a), null, null);
 		
 		if ((y + 2) * this.magnified <= image.getHeight())
 		{
@@ -142,7 +142,7 @@ public class Image
 			    b +=  argb        & 255;
 			}
 		    a /= div; r /= div; g /= div; b /= div;
-		    cell.lowerColour = new Color(r, g, b, a);
+		    cell.lowerColour = a == 0 ? null : new Color(r, g, b, a);
 		}
 		
 		if (encoded && (cell.upperColour.getAlpha() == cell.lowerColour.getAlpha()))

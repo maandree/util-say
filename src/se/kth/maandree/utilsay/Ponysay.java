@@ -190,7 +190,12 @@ public class Ponysay
     /**
      * Colour CIELAB value cache
      */
-    private static HashMap<Color, double[]> labMap = new HashMap<Color, double[]>();
+    private static ThreadLocal<HashMap<Color, double[]>> labMap = new ThreadLocal<HashMap<Color, double[]>>();
+    
+    /**
+     * Chroma weight using in {@link #labMap}
+     */
+    private static ThreadLocal<Double> labMapWeight = new ThreadLocal<Double>();
     
     
     
@@ -277,8 +282,7 @@ public class Ponysay
 		String name = null, value = null;
 		block: {
 		    if (istag)
-		    {
-			istag = false;
+		    {	istag = false;
 			name = line.substring(0, colon);
 			value = line.substring(colon + 1);
 			char c;
@@ -289,16 +293,14 @@ public class Ponysay
 			istag = true;
 		    }}
 		if (istag)
-		{
-		    if (tags == null)
+		{   if (tags == null)
 			tags = new String[32][];
 		    else if (tagptr == tags.length)
 			System.arraycopy(tags, 0, tags = new String[tagptr << 1][], 0, tagptr);
 		    tags[tagptr++] = new String[] {name.trim(), value.trim()};
 		}
 		else
-		{
-		    commentbuf.append(line);
+		{   commentbuf.append(line);
 		    commentbuf.append('\n');
 		}
 	    }
@@ -336,8 +338,7 @@ public class Ponysay
 		}
 		c = (c & 255) >> n--;
 		while (((d = (unmetaptr > 0 ? unmetabuf[3 - --unmetaptr] : in.read())) & 0xC0) == 0x80)
-	        {
-		    c = (c << 6) | (d & 0x3F);
+	        {   c = (c << 6) | (d & 0x3F);
 		    n--;
 		}
 		if (n != 0)
@@ -1553,9 +1554,16 @@ public class Ponysay
 	    return bestI;
 	}
 	
-	double[] lab = labMap.get(colour);
-	if (lab == null)
-	    labMap.put(colour, lab = Colour.toLab(colour.getRed(), colour.getGreen(), colour.getBlue(), chromaWeight));
+	Double _chroma = labMapWeight.get();
+	HashMap<Color, double[]> _labMap = ((_chroma == null) || (_chroma.doubleValue() != chromaWeight)) ? null : labMap.get();
+	if (_labMap == null)
+	{   labMap.set(_labMap = new HashMap<Color, double[]>());
+	    labMapWeight.set(new Double(chromaWeight));
+	}
+	
+	double[] lab = _labMap.get(colour);
+	/* if (lab == null) */ // FIXME Why does this not work!?
+	    _labMap.put(colour, lab = Colour.toLab(colour.getRed(), colour.getGreen(), colour.getBlue(), chromaWeight));
 	double L = lab[0], a = lab[1], b = lab[2];
 	
 	int bestI = -1;
@@ -1563,14 +1571,14 @@ public class Ponysay
 	Color p;
 	for (int i = paletteStart; i < paletteEnd; i++)
 	{
-	    double[] tLab = labMap.get(p = palette[i]);
-	    if (p == null)
-		labMap.put(colour, tLab = Colour.toLab(p.getRed(), p.getGreen(), p.getBlue(), chromaWeight));
-	    double ðr = L - tLab[0];
-	    double ðg = a - tLab[1];
+	    double[] tLab = _labMap.get(p = palette[i]);
+	    /* if (tLab == null) */ // FIXME Why does this not work!?
+		_labMap.put(colour, tLab = Colour.toLab(p.getRed(), p.getGreen(), p.getBlue(), chromaWeight));
+	    double ðL = L - tLab[0];
+	    double ða = a - tLab[1];
 	    double ðb = b - tLab[2];
 	    
-	    double ð = ðr*ðr + ðg*ðg + ðb*ðb;
+	    double ð = ðL*ðL + ða*ða + ðb*ðb;
 	    if ((bestD > ð) || (bestI < 0))
 	    {   bestD = ð;
 		bestI = i;
