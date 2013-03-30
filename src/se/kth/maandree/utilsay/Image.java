@@ -109,7 +109,7 @@ public class Image
      */
     public Pony importPony() throws IOException
     {
-	BufferedImage image = ImageIO.read(new File(this.file)); /* TODO add support for piping */
+	BufferedImage image = ImageIO.read(new BufferedInputStream(this.file == null ? System.in : new FileInputStream(this.file)));
 	int width  = image.getWidth()  / this.magnified;
 	int height = image.getHeight() / this.magnified;
 	int div = this.magnified * this.magnified;
@@ -290,10 +290,13 @@ public class Image
 	
 	String fmt = this.format;
 	if (fmt == null)
-	{   fmt = this.file.contains("/") ? this.file.substring(this.file.lastIndexOf("/") + 1) : this.file;
-	    fmt = this.file.contains(".") ? this.file.substring(this.file.lastIndexOf(".") + 1) : "png";
-	}
-	ImageIO.write(img, fmt, new File(this.file)); /* TODO add support for piping */
+	    if (this.file == null)
+		fmt = "png";
+	    else
+	    {   fmt = this.file.contains("/") ? this.file.substring(this.file.lastIndexOf("/") + 1) : this.file;
+		fmt = this.file.contains(".") ? this.file.substring(this.file.lastIndexOf(".") + 1) : "png";
+	    }
+	ImageIO.write(img, fmt, new BufferedOutputStream(this.file == null ? System.out : new FileOutputStream(this.file)));
     }
     
 }
