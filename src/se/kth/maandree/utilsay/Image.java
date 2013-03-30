@@ -89,7 +89,7 @@ public class Image
     protected boolean encoded;
     
     /**
-     * Input option: insert balloon into the image
+     * Input/output option: insert balloon into the image
      */
     protected boolean balloon;
     
@@ -115,7 +115,7 @@ public class Image
 	int div = this.magnified * this.magnified;
 	
 	Pony.Cell cell;
-	Pony pony = new Pony(height >> 1, width, null, null);
+	Pony pony = new Pony((height >> 1) + (height & 1), width, null, null);
 	for (int y = 0; y < height - 1; y += 2)
 	    for (int x = 0; x < width; x++)
 	    {
