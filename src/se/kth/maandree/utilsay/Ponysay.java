@@ -334,16 +334,20 @@ public class Ponysay
 		{   c <<= 1;
 		    n++;
 		}
-		c = (c & 255) >> n;
-		while (((d = in.read()) & 0xC0) == 0x80)
+		c = (c & 255) >> n--;
+		while (((d = (unmetaptr > 0 ? unmetabuf[3 - --unmetaptr] : in.read())) & 0xC0) == 0x80)
+	        {
 		    c = (c << 6) | (d & 0x3F);
+		    n--;
+		}
+		if (n != 0)
+		    System.err.println("\033[01;31mutil-say: warning: UTF-8 decoding balance should be 0 but is: " + n + "\033[00m");
 		stored = d;
 	    }
-	    
 	    if (dollar)
-		if ((d == '\033') && !escape)
+		if ((c == '\033') && !escape)
 		    escape = true;
-		else if ((d == '$') && !escape)
+		else if ((c == '$') && !escape)
 		{   dollar = false;
 		    if (dollareql == -1)
 		    {
@@ -390,14 +394,14 @@ public class Ponysay
 		{   escape = false;
 		    if (ptr == buf.length)
 			System.arraycopy(buf, 0, buf = new int[ptr << 1], 0, ptr);
-		    if ((dollareql == -1) && (d == '='))
+		    if ((dollareql == -1) && (c == '='))
 			dollareql = ptr;
-		    buf[ptr++] = d;
+		    buf[ptr++] = c;
 		}
 	    else if (escape)
 		if (osi)
 		    if (ptr > 0)
-		    {   buf[ptr++ -1] = d;
+		    {   buf[ptr++ -1] = c;
 			if (ptr == 8)
 			{   ptr = 0;
 			    osi = escape = false;
@@ -414,7 +418,7 @@ public class Ponysay
 		    else if (ptr < 0)
 		    {   if (~ptr == buf.length)
 			    System.arraycopy(buf, 0, buf = new int[~ptr << 1], 0, ~ptr);
-			if (d == '\\')
+			if (c == '\\')
 			{   ptr = ~ptr;
 			    ptr--;
 			    if ((ptr > 8) && (buf[ptr] == '\033') && (buf[0] == ';'))
@@ -435,26 +439,27 @@ public class Ponysay
 			    osi = escape = false;
 			}
 			else
-			{   buf[~ptr] = d;
+			{   buf[~ptr] = c;
 			    ptr--;
 			}
 		    }
-		    else if (d == 'P')  ptr = 1;
-		    else if (d == '4')  ptr = ~0;
+		    else if (c == 'P')  ptr = 1;
+		    else if (c == '4')  ptr = ~0;
 		    else
 		    {   osi = escape = false;
 			items.add(new Pony.Cell('\033', foreground, background, format));
 			items.add(new Pony.Cell(']', foreground, background, format));
-			items.add(new Pony.Cell(d, foreground, background, format));
+			items.add(new Pony.Cell(c, foreground, background, format));
+			System.err.println("\033[01;31mutil-say: warning: bad escape sequence: OSI 0x" + Integer.toString(c) + "\033[00m");
 		    }
 		else if (csi)
 		{   if (ptr == buf.length)
 			System.arraycopy(buf, 0, buf = new int[ptr << 1], 0, ptr);
-		    buf[ptr++] = d;
-		    if ((('a' <= d) && (d <= 'z')) || (('A' <= d) && (d <= 'Z')) || (d == '~'))
+		    buf[ptr++] = c;
+		    if ((('a' <= c) && (c <= 'z')) || (('A' <= c) && (c <= 'Z')) || (c == '~'))
 		    {   csi = escape = false;
 			ptr--;
-			if (d == 'm')
+			if (c == 'm')
 			{   int[] _code = new int[ptr];
 			    System.arraycopy(buf, 0, _code, 0, ptr);
 			    String[] code = utf32to16(_code).split(";");
@@ -491,23 +496,24 @@ public class Ponysay
 			ptr = 0;
 		    }
 		}
-		else if (d == '[')
+		else if (c == '[')
 		{   csi = true;
 		    ptr = 0;
 		}
-		else if (d == ']')
+		else if (c == ']')
 		    osi = true;
 		else
 		{   escape = false;
 		    items.add(new Pony.Cell('\033', foreground, background, format));
-		    items.add(new Pony.Cell(d, foreground, background, format));
+		    items.add(new Pony.Cell(c, foreground, background, format));
+		    System.err.println("\033[01;31mutil-say: warning: bad escape sequence: ESC 0x" + Integer.toString(c, 16) + "\033[00m");
 		    curwidth += 2;
 		}
-	    else if (d == '\033')
+	    else if (c == '\033')
 		escape = true;
-	    else if (d == '$')
+	    else if (c == '$')
 		dollar = true;
-	    else if (d == '\n')
+	    else if (c == '\n')
 	    {   if (width < curwidth)
 		    width = curwidth;
 		curwidth = 0;
