@@ -402,17 +402,17 @@ public class Ponysay
 	    else if (escape)
 		if (osi)
 		    if (ptr > 0)
-		    {   buf[ptr++ -1] = c;
+		    {   buf[ptr++ - 1] = c;
 			if (ptr == 8)
 			{   ptr = 0;
 			    osi = escape = false;
-			    int index =             (buf[0] < 'A') ? (buf[0] & 15) : ((buf[0] ^ '@') + 9);
-			    int red =               (buf[1] < 'A') ? (buf[1] & 15) : ((buf[1] ^ '@') + 9);
-			    red = (red << 4) |     ((buf[2] < 'A') ? (buf[2] & 15) : ((buf[2] ^ '@') + 9));
-			    int green =             (buf[3] < 'A') ? (buf[3] & 15) : ((buf[3] ^ '@') + 9);
-			    green = (green << 4) | ((buf[4] < 'A') ? (buf[4] & 15) : ((buf[4] ^ '@') + 9));
-			    int blue =              (buf[5] < 'A') ? (buf[5] & 15) : ((buf[5] ^ '@') + 9);
-			    blue = (blue << 4) |   ((buf[6] < 'A') ? (buf[6] & 15) : ((buf[6] ^ '@') + 9));
+			    int index =             (buf[0] < 'A') ? (buf[0] & 15) : ((buf[0] & 15) + 9);
+			    int red =               (buf[1] < 'A') ? (buf[1] & 15) : ((buf[1] & 15) + 9);
+			    red = (red << 4) |     ((buf[2] < 'A') ? (buf[2] & 15) : ((buf[2] & 15) + 9));
+			    int green =             (buf[3] < 'A') ? (buf[3] & 15) : ((buf[3] & 15) + 9);
+			    green = (green << 4) | ((buf[4] < 'A') ? (buf[4] & 15) : ((buf[4] & 15) + 9));
+			    int blue =              (buf[5] < 'A') ? (buf[5] & 15) : ((buf[5] & 15) + 9);
+			    blue = (blue << 4) |   ((buf[6] < 'A') ? (buf[6] & 15) : ((buf[6] & 15) + 9));
 			    colours[index] = new Color(red, green, blue);
 			}
 		    }
@@ -1143,6 +1143,8 @@ public class Ponysay
 				}   }
 				else if (balloon.minWidth != null)
 				    databuf.append("$balloon" + balloon.minWidth.toString());
+				else
+				    databuf.append("$balloon");
 				// KEYWORD: not supported in ponysay: balloon.top != null
 				if (balloon.minHeight != null)
 				    databuf.append("," + balloon.minHeight.toString());
