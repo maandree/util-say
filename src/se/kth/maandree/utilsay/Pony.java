@@ -82,6 +82,40 @@ public class Pony
     
     
     /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Pony clone()
+    {
+	String[][] _tags = this.tags == null ? null : new String[this.tags.length][2];
+	if (this.tags != null)
+	    for (int i = 0, n = this.tags.length; i < n; i ++)
+	    {	_tags[i][0] = this.tags[i][0];
+		_tags[i][1] = this.tags[i][1];
+	    }
+	Pony rc = new Pony(this.height, this.width, this.comment, _tags);
+	for (int y = 0; y < this.height; y++)
+	{
+	    Cell[] trow = this.matrix[y];
+	    Cell[] rrow = rc.matrix[y];
+	    Meta[][] tmetarow = this.metamatrix[y];
+	    Meta[][] rmetarow = rc.metamatrix[y];
+	    for (int x = 0; x <= this.width; x++)
+	    {   if (x != this.width)
+		    rrow[x] = trow[x] == null ? null : trow[x].clone();
+		if (tmetarow[x] != null)
+		{   Meta[] tmetacell = tmetarow[x];
+		    Meta[] rmetacell = rmetarow[x] = new Meta[tmetacell.length];
+		    for (int z = 0, m = tmetacell.length; z < m; z++)
+			rmetacell[z] = tmetacell[z] == null ? null : tmetacell[z].clone();
+	    }   }
+	}
+	return rc;
+    }
+    
+    
+    
+    /**
      * A charcter cell in the pony
      */
     public static class Cell
@@ -144,6 +178,20 @@ public class Pony
 	 */
 	public boolean[] format;
 	
+	
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public Cell clone()
+	{
+	    boolean[] _format = this.format == null ? null : new boolean[this.format.length];
+	    if (this.format != null)
+		System.arraycopy(this.format, 0, _format, 0, this.format.length);
+	    return new Cell(this.character, this.upperColour, this.lowerColour, _format);
+	}
+	
     }
     
     
@@ -153,7 +201,12 @@ public class Pony
      */
     public interface Meta
     {
-	// Marker interface
+	// Marker interface with clone support
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	public Meta clone();
     }
     
     
@@ -204,6 +257,20 @@ public class Pony
 	 */
 	public boolean[] format;
 	
+	
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public Combining clone()
+	{
+	    boolean[] _format = this.format == null ? null : new boolean[this.format.length];
+	    if (this.format != null)
+		System.arraycopy(this.format, 0, _format, 0, this.format.length);
+	    return new Combining(this.character, this.foregroundColour, this.backgroundColour, _format);
+	}
+	
     }
     
     
@@ -253,6 +320,20 @@ public class Pony
 	 */
 	public boolean[] format;
 	
+	
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public Recall clone()
+	{
+	    boolean[] _format = this.format == null ? null : new boolean[this.format.length];
+	    if (this.format != null)
+		System.arraycopy(this.format, 0, _format, 0, this.format.length);
+	    return new Recall(this.name, this.foregroundColour, this.backgroundColour, _format);
+	}
+	
     }
     
     
@@ -284,6 +365,17 @@ public class Pony
 	 * The value of the variable
 	 */
 	public String value;
+	
+	
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public Store clone()
+	{
+	    return new Store(this.name, this.value);
+	}
 	
     }
     
@@ -388,6 +480,17 @@ public class Pony
 	 * Balloon placement justification
 	 */
 	public int justification;
+	
+	
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public Balloon clone()
+	{
+	    return new Balloon(this.left, this.top, this.minWidth, this.minHeight, this.maxWidth, this.maxHeight, this.justification);
+	}
 	
     }
     

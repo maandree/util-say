@@ -74,6 +74,7 @@ public class Ponysay
 	this.utf8 = this.version > VERSION_COWSAY ? true : (flags.containsKey("utf8") && flags.get("utf8").toLowerCase().startsWith("y"));
 	this.fullcolour = flags.containsKey("fullcolour") && flags.get("fullcolour").toLowerCase().startsWith("y");
 	this.chroma = (flags.containsKey("chroma") == false) ? 1 : parseDouble(flags.get("chroma"));
+	this.balloon = (flags.containsKey("balloon") == false) ? -1 : parseInteger(flags.get("balloon"));
 	this.left = (flags.containsKey("left") == false) ? 2 : parseInteger(flags.get("left"));
 	this.right = (flags.containsKey("right") == false) ? 0 : parseInteger(flags.get("right"));
 	this.top = (flags.containsKey("top") == false) ? 0 : parseInteger(flags.get("top"));
@@ -85,7 +86,6 @@ public class Ponysay
 	this.escesc = this.version > VERSION_COWSAY ? false : (flags.containsKey("escesc") && flags.get("escesc").toLowerCase().startsWith("y"));
     }
     // TODO padding should not move the balloon
-    // TODO add option to add balloon and link (in which case: default top to 3)
     
     
     
@@ -180,6 +180,11 @@ public class Ponysay
      * Output option: top margin, negative for unmodified
      */
     protected int top;
+    
+    /**
+     * Input/output option: insert balloon into the image, negative for false, otherwise the additional space between the pony and balloon
+     */
+    protected int balloon;
     
     /**
      * Output option: bottom margin, negative for unmodified
@@ -594,6 +599,9 @@ public class Ponysay
 	    metaptr = 0;
 	}
 	
+	if (this.balloon >= 0)
+	    Common.insertBalloon(pony, this.balloon);
+	
 	return pony;
     }
     
@@ -702,6 +710,11 @@ public class Ponysay
      */
     public void exportPony(Pony pony) throws IOException
     {
+	if (this.balloon >= 0)
+	{   pony = (Pony)(pony.clone());
+	    Common.insertBalloon(pony, this.balloon);
+	}
+	
 	Color[] colours = new Color[256];
 	boolean[] format = new boolean[9];
 	Color background = null, foreground = null;
