@@ -824,16 +824,16 @@ public class Ponysay
 			    if ((cell.character != ' ') || (cell.lowerColour != null))
 				if ((cell.character != Pony.Cell.PIXELS) || (cell.lowerColour != null) || (cell.upperColour != null))
 				    cellpass = false;
-			if (cellpass == false)
-			{   Pony.Meta[] meta = metamatrix[j][cur];
-			    if ((meta != null) && (meta.length != 0))
-			    {	for (int k = 0, l = meta.length; k < l; k++)
-				    if ((meta[k] != null) && ((meta[k] instanceof Pony.Store) == false))
+			Pony.Meta[] meta = metamatrix[j][cur];
+			if ((meta != null) && (meta.length != 0))
+			{   for (int k = 0, l = meta.length; k < l; k++)
+				if ((meta[k] != null) && ((meta[k] instanceof Pony.Store) == false))
+				    if ((cellpass == false) || (meta[k] instanceof Pony.Balloon))
 					break outer;
-			    }
-			    else
-				break outer;
 			}
+			else
+			    if (cellpass == false)
+				break outer;
 		    }
 	    this.left -= cur;
 	    // if (this.left < 0)
@@ -861,16 +861,16 @@ public class Ponysay
 			    if ((cell.character != ' ') || (cell.lowerColour != null))
 				if ((cell.character != Pony.Cell.PIXELS) || (cell.lowerColour != null) || (cell.upperColour != null))
 				    cellpass = false;
-			if (cellpass == false)
-			{   Pony.Meta[] meta = metamatrix[j][n - cur];
-			    if ((meta != null) && (meta.length != 0))
-			    {	for (int k = 0, l = meta.length; k < l; k++)
-				    if ((meta[k] != null) && ((meta[k] instanceof Pony.Store) == false))
+			Pony.Meta[] meta = metamatrix[j][n - cur];
+			if ((meta != null) && (meta.length != 0))
+			{   for (int k = 0, l = meta.length; k < l; k++)
+				if ((meta[k] != null) && ((meta[k] instanceof Pony.Store) == false))
+				    if ((cellpass == false) || (meta[k] instanceof Pony.Balloon))
 					break outer;
-			    }
-			    else
-				break outer;
 			}
+			else
+			    if (cellpass == false)
+				break outer;
 		    }
 	    this.right -= cur;
 	    // if (this.right < 0)
@@ -887,12 +887,12 @@ public class Ponysay
 	    this.right = 0;
 	if (this.top >= 0)
 	{
-	    int cur = 0, m = Math.min(matrix[0].length - this.right, matrix[0].length);
+	    int cur = 0, m = Math.min(matrix[0].length + this.right, matrix[0].length);
 	    outer:
 	        for (int n = matrix.length; cur < n; cur++)
 		{   Pony.Cell[] row = matrix[cur];
 		    Pony.Meta[][] metarow = metamatrix[cur];
-		    for (int j = Math.max(this.left, 0); j < m; j++)
+		    for (int j = Math.max(-this.left, 0); j < m; j++)
 		    {
 			boolean cellpass = true;
 			Pony.Cell cell = row[j];
@@ -900,16 +900,16 @@ public class Ponysay
 			    if ((cell.character != ' ') || (cell.lowerColour != null))
 				if ((cell.character != Pony.Cell.PIXELS) || (cell.lowerColour != null) || (cell.upperColour != null))
 				    cellpass = false;
-			if (cellpass == false)
-			{   Pony.Meta[] meta = metarow[j];
-			    if ((meta != null) && (meta.length != 0))
-			    {	for (int k = 0, l = meta.length; k < l; k++)
-				    if ((meta[k] != null) && ((meta[k] instanceof Pony.Store) == false))
+			Pony.Meta[] meta = metarow[j];
+			if ((meta != null) && (meta.length != 0))
+			{   for (int k = 0, l = meta.length; k < l; k++)
+				if ((meta[k] != null) && ((meta[k] instanceof Pony.Store) == false))
+				    if ((cellpass == false) || (meta[k] instanceof Pony.Balloon))
 					break outer;
-			    }
-			    else
-				break outer;
 			}
+			else
+			    if (cellpass == false)
+				break outer;
 		}   }
 	    this.top -= cur;
 	    //if (this.top < 0)
@@ -926,13 +926,13 @@ public class Ponysay
 	    this.top = 0;
 	if (this.bottom >= 0)
 	{
-	    int cur = 0, m = Math.min(matrix[0].length - this.right, matrix[0].length);
+	    int cur = 0, m = Math.min(matrix[0].length + this.right, matrix[0].length);
 	    outer:
-	    for (int n = matrix.length - 1 - this.top; cur <= n; cur++)
+	    for (int n = matrix.length - 1 + this.top; cur <= n; cur++)
 		if (n - cur < matrix.length)
 		{   Pony.Cell[] row = matrix[n - cur];
 		    Pony.Meta[][] metarow = metamatrix[n - cur];
-		    for (int j = Math.max(this.left, 0); j < m; j++)
+		    for (int j = Math.max(-this.left, 0); j < m; j++)
 		    {
 			boolean cellpass = true;
 			Pony.Cell cell = row[j];
@@ -940,16 +940,16 @@ public class Ponysay
 			    if ((cell.character != ' ') || (cell.lowerColour != null))
 				if ((cell.character != Pony.Cell.PIXELS) || (cell.lowerColour != null) || (cell.upperColour != null))
 				    cellpass = false;
-			if (cellpass == false)
-			{   Pony.Meta[] meta = metarow[j];
-			    if ((meta != null) && (meta.length != 0))
-			    {	for (int k = 0, l = meta.length; k < l; k++)
-				    if ((meta[k] != null) && ((meta[k] instanceof Pony.Store) == false))
+			Pony.Meta[] meta = metarow[j];
+			if ((meta != null) && (meta.length != 0))
+			{   for (int k = 0, l = meta.length; k < l; k++)
+				if ((meta[k] != null) && ((meta[k] instanceof Pony.Store) == false))
+				    if ((cellpass == false) || (meta[k] instanceof Pony.Balloon))
 					break outer;
-			    }
-			    else
-				break outer;
 			}
+			else
+			    if (cellpass == false)
+				break outer;
 		}   }
 	    this.bottom -= cur;
 	    // if (this.bottom < 0)
