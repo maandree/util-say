@@ -1,7 +1,7 @@
 all: utilsay
 
 utilsay:
-	javac -cp . -s src -d . src/se/kth/maandree/utilsay/*.java
+	javac -O -cp . -s src -d . src/se/kth/maandree/utilsay/*.java
 	jar -cfm util-say.jar META-INF/MANIFEST.MF se/kth/maandree/utilsay/*.class
 	rm -r se
 	./build.sh --build-scripts
