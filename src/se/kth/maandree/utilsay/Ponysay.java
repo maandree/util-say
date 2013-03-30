@@ -1164,7 +1164,7 @@ public class Ponysay
 			    balloonend++;
 			else
 			{   if (balloonend >= 0)
-			    {   databuf.append(applyColour(colours, background, foreground, format, background = null, foreground = this.spacesave ? foreground : cell.upperColour, format = PLAIN));
+			    {   databuf.append(applyColour(colours, background, foreground, format, background = null, foreground = this.spacesave ? foreground : null, format = PLAIN));
 				for (int i = 0; i < balloonend; i++)
 				    databuf.append(' ');
 				balloonend = -1;
@@ -1203,7 +1203,7 @@ public class Ponysay
 			    }
 			    else
 			    {   if (balloonend >= 0)
-				{   databuf.append(applyColour(colours, background, foreground, format, background = null, foreground = this.spacesave ? foreground : cell.lowerColour, format = PLAIN));
+				{   databuf.append(applyColour(colours, background, foreground, format, background = null, foreground = this.spacesave ? foreground : null, format = PLAIN));
 				    for (int i = 0; i < balloonend; i++)
 					databuf.append(' ');
 				    balloonend = -1;
@@ -1214,7 +1214,7 @@ public class Ponysay
 			else
 			    if (cell.upperColour == null)
 			    {   if (balloonend >= 0)
-				{   databuf.append(applyColour(colours, background, foreground, format, background = null, foreground = this.spacesave ? foreground : cell.lowerColour, format = PLAIN));
+				{   databuf.append(applyColour(colours, background, foreground, format, background = null, foreground = this.spacesave ? foreground : null, format = PLAIN));
 				    for (int i = 0; i < balloonend; i++)
 					databuf.append(' ');
 				    balloonend = -1;
@@ -1225,7 +1225,7 @@ public class Ponysay
 			    else if (cell.upperColour.equals(cell.lowerColour))
 				if (this.zebra)
 				{   if (balloonend >= 0)
-				    {   databuf.append(applyColour(colours, background, foreground, format, background = null, foreground = this.spacesave ? foreground : cell.lowerColour, format = PLAIN));
+				    {   databuf.append(applyColour(colours, background, foreground, format, background = null, foreground = this.spacesave ? foreground : null, format = PLAIN));
 					for (int i = 0; i < balloonend; i++)
 					    databuf.append(' ');
 					balloonend = -1;
@@ -1235,7 +1235,7 @@ public class Ponysay
 				}
 				else if (this.fullblocks /*TODO || (this.colourful && ¿can get better colour?)*/)
 				{   if (balloonend >= 0)
-				    {   databuf.append(applyColour(colours, background, foreground, format, background = null, foreground = this.spacesave ? foreground : cell.lowerColour, format = PLAIN));
+				    {   databuf.append(applyColour(colours, background, foreground, format, background = null, foreground = this.spacesave ? foreground : null, format = PLAIN));
 					for (int i = 0; i < balloonend; i++)
 					    databuf.append(' ');
 					balloonend = -1;
@@ -1255,7 +1255,7 @@ public class Ponysay
 				}
 			    else  //TODO (this.colourful && ¿can get better colour?) → flip
 			    {	if (balloonend >= 0)
-				{   databuf.append(applyColour(colours, background, foreground, format, background = null, foreground = this.spacesave ? foreground : cell.lowerColour, format = PLAIN));
+				{   databuf.append(applyColour(colours, background, foreground, format, background = null, foreground = this.spacesave ? foreground : null, format = PLAIN));
 				    for (int i = 0; i < balloonend; i++)
 					databuf.append(' ');
 				    balloonend = -1;
@@ -1419,8 +1419,9 @@ public class Ponysay
 		    colourindex2fore = (this.colourful ? matchColour(this.fullcolour ? newForeground : palette[colourindex1fore], palette, 0, 16, this.chroma) : 15);
 		else
 		    colourindex2fore = colourindex1fore;
-		if (colourindex2fore == colourindex2back)
-		    colourindex2fore |= 8;
+		if (this.tty)
+		    if (colourindex2fore == colourindex2back)
+			colourindex2fore |= 8;
 	    }
 	
 	if (colourindex2back != -1)
