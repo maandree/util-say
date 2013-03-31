@@ -63,7 +63,21 @@ public class PonysayXterm extends PonysaySubmodule
      * Input/output option: colour palette
      */
     protected Color[] palette;
+        
+    // KEYWORD when colourlabs supports convertion from sRGB, enabled preceptional distance
     
+    
+    
+    /**
+     * {@inheritDoc}
+     */
+    public void initImport(Color[] colours)
+    {
+	if (this.palette != null)
+	    System.arraycopy(this.palette, 0, colours, 0, 16);
+	else
+	    this.palette = PonysayXterm.parsePalette("");
+    }
     
     
     /**

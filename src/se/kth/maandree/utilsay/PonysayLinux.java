@@ -69,6 +69,18 @@ public class PonysayLinux extends PonysaySubmodule
     /**
      * {@inheritDoc}
      */
+    public void initImport(Color[] colours)
+    {
+	if (this.palette != null)
+	    System.arraycopy(this.palette, 0, colours, 0, 16);
+	else
+	    this.palette = PonysayXterm.parsePalette("");
+    }
+    
+    
+    /**
+     * {@inheritDoc}
+     */
     public String initExport(Color[] colours)
     {
 	if (this.palette != null)

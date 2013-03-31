@@ -30,6 +30,13 @@ import java.util.*;
 public abstract class PonysaySubmodule
 {
     /**
+     * Initialise the import
+     * 
+     * @param  colours  The supermodule's colour palette
+     */
+    public abstract void initImport(Color[] colours);
+    
+    /**
      * Initialise the export and return a string used to reset the colour palette
      * 
      * @param   colours  The supermodule's colour palette

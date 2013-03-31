@@ -76,11 +76,25 @@ public class Ponysay
 	this.right = (flags.containsKey("right") == false) ? 0 : Common.parseInteger(flags.get("right"));
 	this.top = (flags.containsKey("top") == false) ? 0 : Common.parseInteger(flags.get("top"));
 	this.bottom = (flags.containsKey("bottom") == false) ? 1 : Common.parseInteger(flags.get("bottom"));
-	this.palette = (flags.containsKey("palette") == false) ? null : PonysayXterm.parsePalette(flags.get("palette").toUpperCase().replace("\033", "").replace("]", "").replace("P", ""));
 	this.ignoreballoon = flags.containsKey("ignoreballoon") && flags.get("ignoreballoon").toLowerCase().startsWith("y");
 	this.ignorelink = flags.containsKey("ignorelink") ? flags.get("ignorelink").toLowerCase().startsWith("y") : this.ignoreballoon;
 	this.escesc = this.version > VERSION_COWSAY ? false : (flags.containsKey("escesc") && flags.get("escesc").toLowerCase().startsWith("y"));
-	this.outputModule = new PonysayXterm(flags);
+	
+	String platform = flags.get("platform");
+	if (platform != null)
+	{   platform = platform.replace("-", "").replace("_", "");
+	    platform = platform.replace("colour", "color");
+	    platform = platform.replace("colors", "color");
+	    platform = platform.intern();
+	}
+	if ((platform == "xterm") || (platform == "xterm256color"))
+	    this.submodule = new PonysayXterm(flags);
+	else if ((platform == "linux") || (platform == "tty"))
+	    this.submodule = new PonysayLinux(flags);
+	else
+	{   this.submodule = new PonysayXterm(flags);
+	    System.err.println("\033[01;31mutil-say: warning: ponysay submodule does not exist: " + platform + "\033[00m");
+	}
     }
     
     
@@ -119,13 +133,6 @@ public class Ponysay
      * Output option: zebra effect
      */
     protected boolean zebra;
-    
-    /**
-     * Input/output option: colour palette
-     */
-    protected Color[] palette;
-    
-    // KEYWORD when colourlabs supports convertion from sRGB, enabled preceptional distance
     
     /**
      * Input/output option: ponysay version
@@ -168,9 +175,9 @@ public class Ponysay
     protected int bottom;
     
     /**
-     * Output option: colouring submodule
+     * Input/output option: colouring submodule
      */
-    protected PonysaySubmodule outputModule;
+    protected PonysaySubmodule submodule;
     
     
     
@@ -197,10 +204,7 @@ public class Ponysay
 	{   Colour colour = new Colour(i);
 	    colours[i] = new Color(colour.red, colour.green, colour.blue);
 	}
-	if (this.palette != null)
-	    System.arraycopy(this.palette, 0, colours, 0, 16);
-	else
-	    this.palette = PonysayXterm.parsePalette("");
+	submodule.initImport(colours);
 	
 	InputStream in = System.in;
 	if (this.file != null)
@@ -694,7 +698,7 @@ public class Ponysay
 	    colours[i] = new Color(colour.red, colour.green, colour.blue);
 	}
 	
-	String resetPalette = this.outputModule.initExport(colours);
+	String resetPalette = this.submodule.initExport(colours);
 	
 	
 	StringBuilder databuf = new StringBuilder();
@@ -852,16 +856,16 @@ public class Ponysay
 			    {   Pony.Recall recall = (Pony.Recall)meta;
 				Color back = ((recall.backgroundColour == null) || (recall.backgroundColour.getAlpha() < 112)) ? null : recall.backgroundColour;
 				Color fore = ((recall.foregroundColour == null) || (recall.foregroundColour.getAlpha() < 112)) ? null : recall.foregroundColour;
-				databuf.append(this.outputModule.applyColour(colours, background, foreground, format, background = back, foreground = fore, recall.format));
+				databuf.append(this.submodule.applyColour(colours, background, foreground, format, background = back, foreground = fore, recall.format));
 				databuf.append("$" + recall.name.replace("$", "\033$") + "$");
 			    }
 			    else if (metaclass == Pony.Combining.class)
 			    {   Pony.Combining combining = (Pony.Combining)meta;
-				databuf.append(this.outputModule.applyColour(colours, background, foreground, format, background = combining.backgroundColour, foreground = combining.foregroundColour, format = combining.format));
+				databuf.append(this.submodule.applyColour(colours, background, foreground, format, background = combining.backgroundColour, foreground = combining.foregroundColour, format = combining.format));
 				databuf.append(combining.character);
 			    }
 			    else if (metaclass == Pony.Balloon.class)
-			    {   databuf.append(this.outputModule.applyColour(colours, background, foreground, format, background = null, foreground = null, format = PLAIN));
+			    {   databuf.append(this.submodule.applyColour(colours, background, foreground, format, background = null, foreground = null, format = PLAIN));
 				Pony.Balloon balloon = (Pony.Balloon)meta;
 				if (balloon.left != null)
 				{   int justification = balloon.minWidth != null ? balloon.justification & (Pony.Balloon.LEFT | Pony.Balloon.RIGHT) : Pony.Balloon.NONE;
@@ -903,45 +907,45 @@ public class Ponysay
 			cell = defaultcell;
 		    if (cell.character >= 0)
 		        if (balloonend < 0)
-			{   databuf.append(this.outputModule.applyColour(colours, background, foreground, format, background = cell.lowerColour, foreground = cell.upperColour, format = cell.format));
+			{   databuf.append(this.submodule.applyColour(colours, background, foreground, format, background = cell.lowerColour, foreground = cell.upperColour, format = cell.format));
 			    databuf.append(Common.utf32to16(cell.character));
 			}
 			else if (((cell.character == ' ') || (cell.character == ' ')) && (cell.lowerColour == null))
 			    balloonend++;
 			else
 			{   if (balloonend >= 0)
-			    {   databuf.append(this.outputModule.applyColour(colours, background, foreground, format, background = null, foreground = this.spacesave ? foreground : null, format = PLAIN));
+			    {   databuf.append(this.submodule.applyColour(colours, background, foreground, format, background = null, foreground = this.spacesave ? foreground : null, format = PLAIN));
 				for (int i = 0; i < balloonend; i++)
 				    databuf.append(' ');
 				balloonend = -1;
 			    }
-			    databuf.append(this.outputModule.applyColour(colours, background, foreground, format, background = cell.lowerColour, foreground = cell.upperColour, format = cell.format));
+			    databuf.append(this.submodule.applyColour(colours, background, foreground, format, background = cell.lowerColour, foreground = cell.upperColour, format = cell.format));
 			    databuf.append(Common.utf32to16(cell.character));
 			}
 		    else if (cell.character == Pony.Cell.NNW_SSE)
 		    {   if (balloonend >= 0)
-			{   databuf.append(this.outputModule.applyColour(colours, background, foreground, format, background = null, foreground = null, format = PLAIN));
+			{   databuf.append(this.submodule.applyColour(colours, background, foreground, format, background = null, foreground = null, format = PLAIN));
 			    for (int i = 0; i < balloonend; i++)
 				databuf.append(' ');
 			    balloonend = -1;
 			}
-			databuf.append(this.outputModule.applyColour(colours, background, foreground, format, background = null, foreground = null, format = PLAIN));
+			databuf.append(this.submodule.applyColour(colours, background, foreground, format, background = null, foreground = null, format = PLAIN));
 			databuf.append("$\\$");
 		    }
 		    else if (cell.character == Pony.Cell.NNE_SSW)
 		    {   if (balloonend >= 0)
-			{   databuf.append(this.outputModule.applyColour(colours, background, foreground, format, background = null, foreground = null, format = PLAIN));
+			{   databuf.append(this.submodule.applyColour(colours, background, foreground, format, background = null, foreground = null, format = PLAIN));
 			    for (int i = 0; i < balloonend; i++)
 				databuf.append(' ');
 			    balloonend = -1;
 			}
-			databuf.append(this.outputModule.applyColour(colours, background, foreground, format, background = null, foreground = null, format = PLAIN));
+			databuf.append(this.submodule.applyColour(colours, background, foreground, format, background = null, foreground = null, format = PLAIN));
 			databuf.append("$/$");
 		    }
 		    else if (cell.character == Pony.Cell.PIXELS)
 			if (cell.lowerColour == null)
 			    if (cell.upperColour == null)
-			    {   databuf.append(this.outputModule.applyColour(colours, background, foreground, format, background = null, foreground = this.spacesave ? foreground : null, format = PLAIN));
+			    {   databuf.append(this.submodule.applyColour(colours, background, foreground, format, background = null, foreground = this.spacesave ? foreground : null, format = PLAIN));
 				if (balloonend >= 0)
 				    balloonend++;
 				else
@@ -949,64 +953,64 @@ public class Ponysay
 			    }
 			    else
 			    {   if (balloonend >= 0)
-				{   databuf.append(this.outputModule.applyColour(colours, background, foreground, format, background = null, foreground = this.spacesave ? foreground : null, format = PLAIN));
+				{   databuf.append(this.submodule.applyColour(colours, background, foreground, format, background = null, foreground = this.spacesave ? foreground : null, format = PLAIN));
 				    for (int i = 0; i < balloonend; i++)
 					databuf.append(' ');
 				    balloonend = -1;
 				}
-				databuf.append(this.outputModule.applyColour(colours, background, foreground, format, background = null, foreground = cell.upperColour, format = PLAIN));
+				databuf.append(this.submodule.applyColour(colours, background, foreground, format, background = null, foreground = cell.upperColour, format = PLAIN));
 				databuf.append('▀');
 			    }
 			else
 			    if (cell.upperColour == null)
 			    {   if (balloonend >= 0)
-				{   databuf.append(this.outputModule.applyColour(colours, background, foreground, format, background = null, foreground = this.spacesave ? foreground : null, format = PLAIN));
+				{   databuf.append(this.submodule.applyColour(colours, background, foreground, format, background = null, foreground = this.spacesave ? foreground : null, format = PLAIN));
 				    for (int i = 0; i < balloonend; i++)
 					databuf.append(' ');
 				    balloonend = -1;
 				}
-				databuf.append(this.outputModule.applyColour(colours, background, foreground, format, background = null, foreground = cell.lowerColour, format = PLAIN));
+				databuf.append(this.submodule.applyColour(colours, background, foreground, format, background = null, foreground = cell.lowerColour, format = PLAIN));
 				databuf.append('▄');
 			    }
 			    else if (cell.upperColour.equals(cell.lowerColour))
 				if (this.zebra)
 				{   if (balloonend >= 0)
-				    {   databuf.append(this.outputModule.applyColour(colours, background, foreground, format, background = null, foreground = this.spacesave ? foreground : null, format = PLAIN));
+				    {   databuf.append(this.submodule.applyColour(colours, background, foreground, format, background = null, foreground = this.spacesave ? foreground : null, format = PLAIN));
 					for (int i = 0; i < balloonend; i++)
 					    databuf.append(' ');
 					balloonend = -1;
 				    }
-				    databuf.append(this.outputModule.applyColour(colours, background, foreground, format, background = cell.lowerColour, foreground = cell.lowerColour, format = PLAIN));
+				    databuf.append(this.submodule.applyColour(colours, background, foreground, format, background = cell.lowerColour, foreground = cell.lowerColour, format = PLAIN));
 				    databuf.append('▄');
 				}
 				else if (this.fullblocks /*TODO || (this.colourful && ¿can get better colour?)*/)
 				{   if (balloonend >= 0)
-				    {   databuf.append(this.outputModule.applyColour(colours, background, foreground, format, background = null, foreground = this.spacesave ? foreground : null, format = PLAIN));
+				    {   databuf.append(this.submodule.applyColour(colours, background, foreground, format, background = null, foreground = this.spacesave ? foreground : null, format = PLAIN));
 					for (int i = 0; i < balloonend; i++)
 					    databuf.append(' ');
 					balloonend = -1;
 				    }
-				    databuf.append(this.outputModule.applyColour(colours, background, foreground, format, background = this.spacesave ? background : cell.lowerColour, foreground = cell.lowerColour, format = PLAIN));
+				    databuf.append(this.submodule.applyColour(colours, background, foreground, format, background = this.spacesave ? background : cell.lowerColour, foreground = cell.lowerColour, format = PLAIN));
 				    databuf.append('█');
 				}
 				else
 				{   if (balloonend >= 0)
-				    {   databuf.append(this.outputModule.applyColour(colours, background, foreground, format, background = null, foreground = this.spacesave ? foreground : null, format = PLAIN));
+				    {   databuf.append(this.submodule.applyColour(colours, background, foreground, format, background = null, foreground = this.spacesave ? foreground : null, format = PLAIN));
 					for (int i = 0; i < balloonend; i++)
 					    databuf.append(' ');
 					balloonend = -1;
 				    }
-				    databuf.append(this.outputModule.applyColour(colours, background, foreground, format, background = cell.lowerColour, foreground = this.spacesave ? foreground : cell.lowerColour, format = PLAIN));
+				    databuf.append(this.submodule.applyColour(colours, background, foreground, format, background = cell.lowerColour, foreground = this.spacesave ? foreground : cell.lowerColour, format = PLAIN));
 				    databuf.append(' ');
 				}
 			    else  //TODO (this.colourful && ¿can get better colour?) → flip
 			    {	if (balloonend >= 0)
-				{   databuf.append(this.outputModule.applyColour(colours, background, foreground, format, background = null, foreground = this.spacesave ? foreground : null, format = PLAIN));
+				{   databuf.append(this.submodule.applyColour(colours, background, foreground, format, background = null, foreground = this.spacesave ? foreground : null, format = PLAIN));
 				    for (int i = 0; i < balloonend; i++)
 					databuf.append(' ');
 				    balloonend = -1;
 				}
-				databuf.append(this.outputModule.applyColour(colours, background, foreground, format, background = cell.upperColour, foreground = cell.lowerColour, format = PLAIN));
+				databuf.append(this.submodule.applyColour(colours, background, foreground, format, background = cell.upperColour, foreground = cell.lowerColour, format = PLAIN));
 				databuf.append('▄');
 			    }
 		}
