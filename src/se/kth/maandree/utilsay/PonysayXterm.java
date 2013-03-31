@@ -101,7 +101,7 @@ public class PonysayXterm extends PonysaySubmodule
 	boolean bold = this.fullcolour;
 	return new boolean[][] {
 	    {false, false, false, false, false, false, false, false, false},
-	    {bold, false, false, false, false, false, false, false, false, bold},
+	    {bold, false, false, false, false, false, false, false, false, false},
 	    {bold, false, false, false, false, false, false, false, false}};
     }
     
@@ -200,6 +200,8 @@ public class PonysayXterm extends PonysaySubmodule
 		{   int s = ((newFormat.length > 9) && newFormat[9]) ? 0 : (newFormat[0] ? 8 : 0);
 		    int e = ((newFormat.length > 9) && newFormat[9]) ? 16 : (s + 8);
 		    colourindex2fore = this.colourful ? matchColour(this.fullcolour ? newForeground : palette[colourindex1fore], this.palette, s, e, this.chroma) : 15;
+		    if (((colourindex2fore == 0) && (newBackground == null)) || (colourindex2fore == colourindex2back))
+			colourindex2fore ^= 8;
 		}
 		else
 		    colourindex2fore = colourindex1fore;
@@ -260,7 +262,7 @@ public class PonysayXterm extends PonysaySubmodule
 	    }
 	
 	boolean _ = newFormat[0];
-	newFormat[0] = (8 <= colourindex2fore) && (colourindex2fore < 16);
+	newFormat[0] = (colourindex2fore == -1) ? oldFormat[0] : ((8 <= colourindex2fore) && (colourindex2fore < 16));
 	for (int i = 0; i < 9; i++)
 	    if (newFormat[i] ^ oldFormat[i])
 		if ((oldFormat[i] = newFormat[i]))
