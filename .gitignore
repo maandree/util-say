@@ -11,6 +11,14 @@ _/
 /doc/javadoc/
 *.class
 /*.jar
+/*.info
+/*.info.*
+/*.dvi
+/*.dvi.*
+/*.ps
+/*.ps.*
+/*.pdf
+/*.pdf.*
 
 
 ##  backup files  ##
@@ -30,9 +38,19 @@ _/
 !/dist/*/*/PKGBUILD
 
 
-##  non-included files  ##
-##########################
+##  auxiliary files  ##
+#######################
 
-/dev/ecj.jar
-/ecj.jar
+/*.aux
+/*.cp
+/*.cps
+/*.fn
+/*.ky
+/*.log
+/*.op
+/*.ops
+/*.pg
+/*.toc
+/*.tp
+/*.vr
 

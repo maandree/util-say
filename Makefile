@@ -32,4 +32,6 @@ uninstall:
 clean:
 	yes | rm -r se || true
 	rm util-say.jar || true
+	rm *.{info,pdf,ps,dvi}{,.*} || true
+	rm *.{aux,cp,cps,fn,ky,log,op,ops,pg,toc,tp,vr} || true
 
