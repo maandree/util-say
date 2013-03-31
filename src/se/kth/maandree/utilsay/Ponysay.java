@@ -412,13 +412,13 @@ public class Ponysay
 			if (ptr == 8)
 			{   ptr = 0;
 			    osi = escape = false;
-			    int index =             (buf[0] < 'A') ? (buf[0] & 15) : ((buf[0] & 15) + 9);
-			    int red =               (buf[1] < 'A') ? (buf[1] & 15) : ((buf[1] & 15) + 9);
-			    red = (red << 4) |     ((buf[2] < 'A') ? (buf[2] & 15) : ((buf[2] & 15) + 9));
-			    int green =             (buf[3] < 'A') ? (buf[3] & 15) : ((buf[3] & 15) + 9);
-			    green = (green << 4) | ((buf[4] < 'A') ? (buf[4] & 15) : ((buf[4] & 15) + 9));
-			    int blue =              (buf[5] < 'A') ? (buf[5] & 15) : ((buf[5] & 15) + 9);
-			    blue = (blue << 4) |   ((buf[6] < 'A') ? (buf[6] & 15) : ((buf[6] & 15) + 9));
+			    int index =             (buf[0] <= '9') ? (buf[0] & 15) : ((buf[0] & 15) + 9);
+			    int red =               (buf[1] <= '9') ? (buf[1] & 15) : ((buf[1] & 15) + 9);
+			    red = (red << 4) |     ((buf[2] <= '9') ? (buf[2] & 15) : ((buf[2] & 15) + 9));
+			    int green =             (buf[3] <= '9') ? (buf[3] & 15) : ((buf[3] & 15) + 9);
+			    green = (green << 4) | ((buf[4] <= '9') ? (buf[4] & 15) : ((buf[4] & 15) + 9));
+			    int blue =              (buf[5] <= '9') ? (buf[5] & 15) : ((buf[5] & 15) + 9);
+			    blue = (blue << 4) |   ((buf[6] <= '9') ? (buf[6] & 15) : ((buf[6] & 15) + 9));
 			    colours[index] = new Color(red, green, blue);
 			}
 		    }
@@ -494,7 +494,7 @@ public class Ponysay
 				else if (value == 49)   background = null;
 				else if (value == 38)   xterm256 = 1;
 				else if (value == 48)   xterm256 = 1;
-				else if (value < 38)    foreground = colours[value - 30];
+				else if (value < 38)    foreground = colours[(format[0] ? 8 : 0) + value - 30];
 				else if (value < 48)    background = colours[value - 40];
 				if (xterm256 == 1)
 				    back = value == 48;
