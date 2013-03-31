@@ -352,17 +352,19 @@ public class PonysayHaiku extends PonysaySubmodule
 		    String[] code = Common.utf32to16(_code).split(";");
 		    int xterm256 = 0;
 		    boolean back = false;
+		    int forei = -2;
 		    for (String seg : code)
 		    {   int value = Integer.parseInt(seg);
 			if (xterm256 == 2)
 			{   xterm256 = 0;
 			    if (back)  background = colours[value];
-			    else       foreground = colours[value];
+			    else       forei = value;
 			}
 			else if (value == 0)
 			{   for (int i = 0; i < 9; i++)
 				format[i] = false;
-			    background = foreground = null;
+			    background = null;
+			    forei = -1;
 			}
 			else if (xterm256 == 1)
 			    xterm256 = value == 5 ? 2 : 0;
@@ -370,15 +372,22 @@ public class PonysayHaiku extends PonysaySubmodule
 			    format[value - 1] = true;
 			else if ((20 < value) && (value < 30))
 			    format[value - 21] = false;
-			else if (value == 37)   foreground = null; /* Haiku uses 37 instead instead of 39 */
+			else if (value == 37)   forei = -1; /* Haiku uses 37 instead instead of 39 */
 			else if (value == 40)   background = null; /* Haiku uses 40 instead instead of 49 */
 			else if (value == 38)   xterm256 = 1;
 			else if (value == 48)   xterm256 = 1;
 			else if (value < 38)    foreground = colours[(format[0] ? 8 : 0) + value - 30];
-			else if (value < 48)    background = colours[value - 40];
+			else if (value < 48)    forei = value - 40;
 			if (xterm256 == 1)
 			    back = value == 48;
 		    }
+		    if (forei == -1)
+			foreground = null;
+		    else if (forei >= 0)
+			if ((forei < 8) && format[0])
+			    foreground = colours[forei | 8];
+			else
+			    foreground = colours[forei];
 		}
 		this.ptr = 0;
 	    }
