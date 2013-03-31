@@ -605,7 +605,10 @@ public class Ponysay
 	int curleft = 0, curright = 0, curtop = 0, curbottom = 0;
 	Pony.Cell[][] matrix = pony.matrix;
 	Pony.Meta[][][] metamatrix = pony.metamatrix;
-	boolean[] PLAIN = new boolean[9];
+	boolean[][] plains = this.submodule.getPlains();
+	boolean[] PLAIN = plains[0];
+	boolean[] P1PLAIN = plains[1];
+	boolean[] P2PLAIN = plains[2];
 	
 	
 	if ((pony.tags != null) || (pony.comment != null))
@@ -858,7 +861,7 @@ public class Ponysay
 					databuf.append(' ');
 				    balloonend = -1;
 				}
-				databuf.append(this.submodule.applyColour(colours, background, foreground, format, background = null, foreground = cell.upperColour, PLAIN));
+				databuf.append(this.submodule.applyColour(colours, background, foreground, format, background = null, foreground = cell.upperColour, P1PLAIN));
 				databuf.append('▀');
 			    }
 			else
@@ -869,7 +872,7 @@ public class Ponysay
 					databuf.append(' ');
 				    balloonend = -1;
 				}
-				databuf.append(this.submodule.applyColour(colours, background, foreground, format, background = null, foreground = cell.lowerColour, PLAIN));
+				databuf.append(this.submodule.applyColour(colours, background, foreground, format, background = null, foreground = cell.lowerColour, P1PLAIN));
 				databuf.append('▄');
 			    }
 			    else if (cell.upperColour.equals(cell.lowerColour))
@@ -880,17 +883,17 @@ public class Ponysay
 					    databuf.append(' ');
 					balloonend = -1;
 				    }
-				    databuf.append(this.submodule.applyColour(colours, background, foreground, format, background = cell.lowerColour, foreground = cell.lowerColour, PLAIN));
+				    databuf.append(this.submodule.applyColour(colours, background, foreground, format, background = cell.lowerColour, foreground = cell.lowerColour, P2PLAIN));
 				    databuf.append('▄');
 				}
-				else if (this.fullblocks /*TODO && this.colourful && ¿can get better colour?*/)
+				else if (this.fullblocks)
 				{   if (balloonend >= 0)
 				    {   databuf.append(this.submodule.applyColour(colours, background, foreground, format, background = null, foreground = this.spacesave ? foreground : null, PLAIN));
 					for (int i = 0; i < balloonend; i++)
 					    databuf.append(' ');
 					balloonend = -1;
 				    }
-				    databuf.append(this.submodule.applyColour(colours, background, foreground, format, background = this.spacesave ? background : cell.lowerColour, foreground = cell.lowerColour, PLAIN));
+				    databuf.append(this.submodule.applyColour(colours, background, foreground, format, background = this.spacesave ? background : cell.lowerColour, foreground = cell.lowerColour, P1PLAIN));
 				    databuf.append('█');
 				}
 				else
@@ -903,15 +906,15 @@ public class Ponysay
 				    databuf.append(this.submodule.applyColour(colours, background, foreground, format, background = cell.lowerColour, foreground = this.spacesave ? foreground : cell.lowerColour, PLAIN));
 				    databuf.append(' ');
 				}
-			    else  //TODO (this.colourful && ¿can get better colour?) → flip
+			    else
 			    {	if (balloonend >= 0)
-				{   databuf.append(this.submodule.applyColour(colours, background, foreground, format, background = null, foreground = this.spacesave ? foreground : null, PLAIN));
+				{   databuf.append(this.submodule.applyColour(colours, background, foreground, format, background = null, foreground = this.spacesave ? foreground : null, P2PLAIN));
 				    for (int i = 0; i < balloonend; i++)
 					databuf.append(' ');
 				    balloonend = -1;
 				}
 				databuf.append(this.submodule.applyColour(colours, background, foreground, format, background = cell.upperColour, foreground = cell.lowerColour, PLAIN));
-				databuf.append('▄');
+				databuf.append('▄');  //TODO (this.colourful && ¿can get better colour?) → flip
 			    }
 		}
 	    }

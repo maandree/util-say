@@ -94,6 +94,19 @@ public class PonysayHaiku extends PonysaySubmodule
     /**
      * {@inheritDoc}
      */
+    public boolean[][] getPlains()
+    {
+	boolean bold = this.fullcolour;
+	return new boolean[][] {
+	    {false, false, false, false, false, false, false, false, false},
+	    {bold, false, false, false, false, false, false, false, false, bold},
+	    {bold, false, false, false, false, false, false, false, false}};
+    }
+    
+    
+    /**
+     * {@inheritDoc}
+     */
     public void initImport(Color[] colours)
     {
 	if (this.palette != null)
@@ -165,8 +178,9 @@ public class PonysayHaiku extends PonysaySubmodule
 	    {
 		colourindex1fore = matchColour(newForeground, palette, 16, 256, this.chroma);
 		if (this.fullcolour)
-		{   int b = newFormat[0] ? 8 : 0;
-		    colourindex2fore = (this.colourful ? matchColour(this.fullcolour ? newForeground : palette[colourindex1fore], this.palette, b + 1, b + 6, this.chroma) : 15);
+		{   int s = ((newFormat.length > 9) && newFormat[9]) ? 0 : (newFormat[0] ? 9 : 1);
+		    int e = ((newFormat.length > 9) && newFormat[9]) ? 16 : (s + 5);
+		    colourindex2fore = (this.colourful ? matchColour(this.fullcolour ? newForeground : palette[colourindex1fore], this.palette, s, e, this.chroma) : 15);
 		}
 		else
 		    colourindex2fore = colourindex1fore;
@@ -226,6 +240,8 @@ public class PonysayHaiku extends PonysaySubmodule
 		rc.append(colourindex2fore);
 	    }
 	
+	boolean _ = newFormat[0];
+	newFormat[0] = (8 <= colourindex2fore) && (colourindex2fore < 16);
 	for (int i = 0; i < 9; i++)
 	    if (newFormat[i] ^ oldFormat[i])
 		if ((oldFormat[i] = newFormat[i]))
@@ -236,6 +252,7 @@ public class PonysayHaiku extends PonysaySubmodule
 		{   rc.append(";2");
 		    rc.append(i + 1);
 		}
+	newFormat[0] = _;
 	
 	String _rc = rc.toString();
 	if (_rc.isEmpty())

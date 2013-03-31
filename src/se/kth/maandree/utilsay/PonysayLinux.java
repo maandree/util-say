@@ -94,6 +94,19 @@ public class PonysayLinux extends PonysaySubmodule
     /**
      * {@inheritDoc}
      */
+    public boolean[][] getPlains()
+    {
+	boolean bold = true;
+	return new boolean[][] {
+	    {false, false, false, false, false, false, false, false, false},
+	    {bold, false, false, false, false, false, false, false, false, bold},
+	    {bold, false, false, false, false, false, false, false, false}};
+    }
+    
+    
+    /**
+     * {@inheritDoc}
+     */
     public void initImport(Color[] colours)
     {
 	if (this.palette != null)
@@ -186,8 +199,9 @@ public class PonysayLinux extends PonysaySubmodule
 	    if (newForeground != null)
 	    {	if (this.fullcolour == false)
 		    colourindex1fore = matchColour(newForeground, palette, 16, 256, this.chroma);
-		int b = newFormat[0] ? 8 : 0;
-		colourindex2fore = (this.colourful ? matchColour(this.fullcolour ? newForeground : palette[colourindex1fore], this.palette, b, b + 8, this.chroma) : 15);
+		int s = ((newFormat.length > 9) && newFormat[9]) ? 0 : (newFormat[0] ? 8 : 0);
+		int e = ((newFormat.length > 9) && newFormat[9]) ? 16 : (s + 8);
+		colourindex2fore = (this.colourful ? matchColour(this.fullcolour ? newForeground : palette[colourindex1fore], this.palette, s, e, this.chroma) : 15);
 	    }
 	
 	if (colourindex2back != -1)
@@ -218,6 +232,8 @@ public class PonysayLinux extends PonysaySubmodule
 	    rc.append(colourindex2fore & 7);
 	}
 	
+	boolean _ = newFormat[0];
+	newFormat[0] = (8 <= colourindex2fore) && (colourindex2fore < 16);
 	for (int i = 0; i < 9; i++)
 	    if (newFormat[i] ^ oldFormat[i])
 		if ((oldFormat[i] = newFormat[i]))
@@ -228,6 +244,7 @@ public class PonysayLinux extends PonysaySubmodule
 		{   rc.append(";2");
 		    rc.append(i + 1);
 		}
+	newFormat[0] = _;
 	
 	String _rc = rc.toString();
 	if (_rc.isEmpty())

@@ -30,6 +30,13 @@ import java.util.*;
 public abstract class PonysaySubmodule
 {
     /**
+     * Get the plain format styles to use
+     * 
+     * @return  {plain for text, plain for one pixel, plain for two pixels}
+     */
+    public abstract boolean[][] getPlains();
+    
+    /**
      * Initialise the import
      * 
      * @param  colours  The supermodule's colour palette
