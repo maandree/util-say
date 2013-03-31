@@ -378,7 +378,7 @@ public class PonysayXterm extends PonysaySubmodule
 			else if (value == 49)   background = null;
 			else if (value == 38)   xterm256 = 1;
 			else if (value == 48)   xterm256 = 1;
-			else if (value < 38)    forei = (format[0] ? 8 : 0) + value - 30;
+			else if (value < 38)    forei = value - 30;
 			else if (value < 48)    background = colours[value - 40];
 			if (xterm256 == 1)
 			    back = value == 48;
