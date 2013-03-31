@@ -17,14 +17,14 @@ util-say.jar: META-INF/MANIFEST.MF $(OBJ)
 install:
 	install -d -m 755 "$(DESTDIR)/usr/bin"
 	install -m 755 util-say.jar "$(DESTDIR)/usr/bin"
-	install -m 755 util-say "$(DESTDIR)/usr/bin"
+	install -m 755 ponytool "$(DESTDIR)/usr/bin"
 	install -d -m 755 "$(DESTDIR)/usr/share/licenses/util-say"
 	install -m 644 LICENSE COPYING "$(DESTDIR)/usr/share/licenses/util-say"
 
 
 uninstall:
 	unlink "$(DESTDIR)/usr/bin/util-say.jar"
-	unlink "$(DESTDIR)/usr/bin/util-say"
+	unlink "$(DESTDIR)/usr/bin/ponytool"
 	yes | rm -r "$(DESTDIR)/usr/share/licenses/util-say"
 
 
