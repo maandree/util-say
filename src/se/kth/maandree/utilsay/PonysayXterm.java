@@ -131,21 +131,38 @@ public class PonysayXterm extends PonysaySubmodule
 	StringBuilder resetPalette = null;
 	if (this.fullcolour)
 	{   resetPalette = new StringBuilder();
-	    for (int i = 0; i < 16; i++)
-	    {   Colour colour = new Colour(i);
-		resetPalette.append("\033]4;");
-		resetPalette.append(i);
-		resetPalette.append(";rgb:");
-		resetPalette.append("0123456789ABCDEF".charAt(colour.red >>> 4));
-		resetPalette.append("0123456789ABCDEF".charAt(colour.red & 15));
-		resetPalette.append('/');
-		resetPalette.append("0123456789ABCDEF".charAt(colour.green >>> 4));
-		resetPalette.append("0123456789ABCDEF".charAt(colour.green & 15));
-		resetPalette.append('/');
-		resetPalette.append("0123456789ABCDEF".charAt(colour.blue >>> 4));
-		resetPalette.append("0123456789ABCDEF".charAt(colour.blue & 15));
-		resetPalette.append("\033\\");
-	}   }
+	    if (this.colourful)
+		for (int i = 0; i < 16; i++)
+		{   Colour colour = new Colour(i);
+		    resetPalette.append("\033]4;");
+		    resetPalette.append(i);
+		    resetPalette.append(";rgb:");
+		    resetPalette.append("0123456789ABCDEF".charAt(colour.red >>> 4));
+		    resetPalette.append("0123456789ABCDEF".charAt(colour.red & 15));
+		    resetPalette.append('/');
+		    resetPalette.append("0123456789ABCDEF".charAt(colour.green >>> 4));
+		    resetPalette.append("0123456789ABCDEF".charAt(colour.green & 15));
+		    resetPalette.append('/');
+		    resetPalette.append("0123456789ABCDEF".charAt(colour.blue >>> 4));
+		    resetPalette.append("0123456789ABCDEF".charAt(colour.blue & 15));
+		    resetPalette.append("\033\\");
+		}
+	    else
+		for (int i : new int[] { 7, 15 })
+		{   Colour colour = new Colour(i);
+		    resetPalette.append("\033]4;");
+		    resetPalette.append(i);
+		    resetPalette.append(";rgb:");
+		    resetPalette.append("0123456789ABCDEF".charAt(colour.red >>> 4));
+		    resetPalette.append("0123456789ABCDEF".charAt(colour.red & 15));
+		    resetPalette.append('/');
+		    resetPalette.append("0123456789ABCDEF".charAt(colour.green >>> 4));
+		    resetPalette.append("0123456789ABCDEF".charAt(colour.green & 15));
+		    resetPalette.append('/');
+		    resetPalette.append("0123456789ABCDEF".charAt(colour.blue >>> 4));
+		    resetPalette.append("0123456789ABCDEF".charAt(colour.blue & 15));
+		    resetPalette.append("\033\\");
+	}	}
 	
 	return resetPalette == null ? null : resetPalette.toString();
     }
