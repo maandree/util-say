@@ -422,6 +422,10 @@ public class Ponysay
 	    }   }
 	}
 	
+	if ((items.size() > 0) && (items.get(items.size() - 1) == null))
+	{   items.remove(items.size() - 1);
+	    height--;
+	}
 	
 	if (in != System.in)
 	    in.close();
