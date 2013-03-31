@@ -879,7 +879,7 @@ public class Ponysay
 				    databuf.append(this.submodule.applyColour(colours, background, foreground, format, background = cell.lowerColour, foreground = cell.lowerColour, format = PLAIN));
 				    databuf.append('▄');
 				}
-				else if (this.fullblocks /*TODO || (this.colourful && ¿can get better colour?)*/)
+				else if (this.fullblocks /*TODO && this.colourful && ¿can get better colour?*/)
 				{   if (balloonend >= 0)
 				    {   databuf.append(this.submodule.applyColour(colours, background, foreground, format, background = null, foreground = this.spacesave ? foreground : null, format = PLAIN));
 					for (int i = 0; i < balloonend; i++)
