@@ -336,8 +336,8 @@ public class PonysayHaiku extends PonysaySubmodule
 			    format[value - 1] = true;
 			else if ((20 < value) && (value < 30))
 			    format[value - 21] = false;
-			else if (value == 39)   foreground = null;
-			else if (value == 49)   background = null;
+			else if (value == 37)   foreground = null; /* Haiku uses 37 instead instead of 39 */
+			else if (value == 40)   background = null; /* Haiku uses 40 instead instead of 49 */
 			else if (value == 38)   xterm256 = 1;
 			else if (value == 48)   xterm256 = 1;
 			else if (value < 38)    foreground = colours[(format[0] ? 8 : 0) + value - 30];
