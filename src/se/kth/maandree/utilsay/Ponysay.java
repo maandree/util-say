@@ -1220,7 +1220,20 @@ public class Ponysay
 	int colourindex1fore = -1, colourindex2fore = -1;
 	
 	if ((oldBackground != null) && (newBackground == null))
-	    rc.append(";49");
+	{   if (this.tty)
+	    {   Color colour = palette[0] = ttypalette[0];
+		rc.append("m\033]P0");
+		rc.append("0123456789ABCDEF".charAt(colour.getRed() >>> 4));
+		rc.append("0123456789ABCDEF".charAt(colour.getRed() & 15));
+		rc.append("0123456789ABCDEF".charAt(colour.getGreen() >>> 4));
+		rc.append("0123456789ABCDEF".charAt(colour.getGreen() & 15));
+		rc.append("0123456789ABCDEF".charAt(colour.getBlue() >>> 4));
+		rc.append("0123456789ABCDEF".charAt(colour.getBlue() & 15));
+		rc.append("\033[49");
+	    }
+	    else
+		rc.append(";49");
+	}
 	else if ((oldBackground == null) || (oldBackground.equals(newBackground) == false))
 	    if (newBackground != null)
 	    {
@@ -1233,14 +1246,29 @@ public class Ponysay
 	    }
 	
 	if ((oldForeground != null) && (newForeground == null))
-	    rc.append(";39");
+        {   if (this.tty)
+	    {   Color colour = palette[7] = ttypalette[7];
+		rc.append("m\033]P7");
+		rc.append("0123456789ABCDEF".charAt(colour.getRed() >>> 4));
+		rc.append("0123456789ABCDEF".charAt(colour.getRed() & 15));
+		rc.append("0123456789ABCDEF".charAt(colour.getGreen() >>> 4));
+		rc.append("0123456789ABCDEF".charAt(colour.getGreen() & 15));
+		rc.append("0123456789ABCDEF".charAt(colour.getBlue() >>> 4));
+		rc.append("0123456789ABCDEF".charAt(colour.getBlue() & 15));
+		rc.append("\033[39");
+	    }
+	    else
+		rc.append(";39");
+	}
 	else if ((oldForeground == null) || (oldForeground.equals(newForeground) == false))
 	    if (newForeground != null)
 	    {
 		if ((this.fullcolour && this.tty) == false)
 		    colourindex1fore = matchColour(newForeground, palette, 16, 256, this.chroma);
 		if (this.tty || this.fullcolour)
-		    colourindex2fore = (this.colourful ? matchColour(this.fullcolour ? newForeground : palette[colourindex1fore], this.tty ? ttypalette : palette, 8, 16, this.chroma) : 15);
+		{   int b = newFormat[0] ? 8 : 0;
+		    colourindex2fore = (this.colourful ? matchColour(this.fullcolour ? newForeground : palette[colourindex1fore], this.tty ? ttypalette : palette, b, b + 8, this.chroma) : 15);
+		}
 		else
 		    colourindex2fore = colourindex1fore;
 	    }
@@ -1296,8 +1324,8 @@ public class Ponysay
 		rc.append("0123456789ABCDEF".charAt(colour.getGreen() & 15));
 		rc.append("0123456789ABCDEF".charAt(colour.getBlue() >>> 4));
 		rc.append("0123456789ABCDEF".charAt(colour.getBlue() & 15));
-		rc.append("\033[4");
-		rc.append(colourindex2fore);
+		rc.append("\033[3");
+		rc.append(colourindex2fore & 7);
 	    }
 	    else if (this.fullcolour)
 	    {   Color colour = newForeground;
@@ -1313,7 +1341,7 @@ public class Ponysay
 		rc.append("0123456789ABCDEF".charAt(colour.getBlue() >>> 4));
 		rc.append("0123456789ABCDEF".charAt(colour.getBlue() & 15));
 		rc.append("\033\\\033[3");
-		rc.append(colourindex2fore);
+		rc.append(colourindex2fore & 7);
 		palette[colourindex2fore] = colour;
 	    }
 	    else if (colourindex2fore < 16)
