@@ -52,8 +52,7 @@ public class Program
 	{
             System.out.println("Copyright (C) 2012, 2013  Mattias Andrée <maandree@member.fsf.org>");
             System.out.println();
-            System.out.println("You can use --list to get a list of all programs");
-            System.out.println("USAGE:  util-say [--help | PROGRAM ARGUMENTS...]");
+            System.out.println("USAGE:  ponytool --import module [param*] {--export module [param*]}");
 	    System.out.println();
             System.out.println();
             System.out.println("This program is free software: you can redistribute it and/or modify");
