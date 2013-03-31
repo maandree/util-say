@@ -1109,7 +1109,7 @@ public class Ponysay
 	}
 	
 	if (resetPalette != null)
-	    data = resetPalette;
+	    data += resetPalette;
 	if (this.escesc)
 	    data = data.replace("\033", "\\e");
 	
