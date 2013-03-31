@@ -95,7 +95,8 @@ public class Ponysay
 	    this.submodule = new PonysayHaiku(flags);
 	else
 	{   this.submodule = new PonysayXterm(flags);
-	    System.err.println("\033[01;31mutil-say: warning: ponysay submodule does not exist: " + platform + "\033[00m");
+	    if (platform != null)
+		System.err.println("\033[01;31mutil-say: warning: ponysay submodule does not exist: " + platform + "\033[00m");
 	}
     }
     
@@ -214,8 +215,6 @@ public class Ponysay
 	
 	boolean dollar = false;
 	boolean escape = false;
-	boolean csi = false;
-	boolean osi = false;
 	
 	int[] buf = new int[256];
 	int ptr = 0;
@@ -383,116 +382,11 @@ public class Ponysay
 		    buf[ptr++] = c;
 		}
 	    else if (escape)
-		if (osi)
-		    if (ptr > 0)
-		    {   buf[ptr++ - 1] = c;
-			if (ptr == 8)
-			{   ptr = 0;
-			    osi = escape = false;
-			    int index =             (buf[0] <= '9') ? (buf[0] & 15) : ((buf[0] & 15) + 9);
-			    int red =               (buf[1] <= '9') ? (buf[1] & 15) : ((buf[1] & 15) + 9);
-			    red = (red << 4) |     ((buf[2] <= '9') ? (buf[2] & 15) : ((buf[2] & 15) + 9));
-			    int green =             (buf[3] <= '9') ? (buf[3] & 15) : ((buf[3] & 15) + 9);
-			    green = (green << 4) | ((buf[4] <= '9') ? (buf[4] & 15) : ((buf[4] & 15) + 9));
-			    int blue =              (buf[5] <= '9') ? (buf[5] & 15) : ((buf[5] & 15) + 9);
-			    blue = (blue << 4) |   ((buf[6] <= '9') ? (buf[6] & 15) : ((buf[6] & 15) + 9));
-			    colours[index] = new Color(red, green, blue);
-			}
-		    }
-		    else if (ptr < 0)
-		    {   if (~ptr == buf.length)
-			    System.arraycopy(buf, 0, buf = new int[~ptr << 1], 0, ~ptr);
-			if (c == '\\')
-			{   ptr = ~ptr;
-			    ptr--;
-			    if ((ptr > 8) && (buf[ptr] == '\033') && (buf[0] == ';'))
-			    {   int[] _code = new int[ptr - 1];
-				System.arraycopy(buf, 1, _code, 0, ptr - 1);
-				String[] code = Common.utf32to16(_code).split(";");
-				if (code.length == 2)
-				{   int index = Integer.parseInt(code[0]);
-				    code = code[1].split("/");
-				    if ((code.length == 3) && (code[0].startsWith("rgb:")))
-				    {   code[0] = code[0].substring(4);
-					int red   = Integer.parseInt(code[0], 16);
-					int green = Integer.parseInt(code[1], 16);
-					int blue  = Integer.parseInt(code[2], 16);
-					colours[index] = new Color(red, green, blue);
-			    }   }   }
-			    ptr = 0;
-			    osi = escape = false;
-			}
-			else
-			{   buf[~ptr] = c;
-			    ptr--;
-			}
-		    }
-		    else if (c == 'P')  ptr = 1;
-		    else if (c == '4')  ptr = ~0;
-		    else
-		    {   osi = escape = false;
-			items.add(new Pony.Cell('\033', foreground, background, format));
-			items.add(new Pony.Cell(']', foreground, background, format));
-			items.add(new Pony.Cell(c, foreground, background, format));
-			System.err.println("\033[01;31mutil-say: warning: bad escape sequence: OSI 0x" + Integer.toString(c) + "\033[00m");
-		    }
-		else if (csi)
-		{   if (ptr == buf.length)
-			System.arraycopy(buf, 0, buf = new int[ptr << 1], 0, ptr);
-		    buf[ptr++] = c;
-		    if ((('a' <= c) && (c <= 'z')) || (('A' <= c) && (c <= 'Z')) || (c == '~'))
-		    {   csi = escape = false;
-			ptr--;
-			if (c == 'm')
-			{   int[] _code = new int[ptr];
-			    System.arraycopy(buf, 0, _code, 0, ptr);
-			    String[] code = Common.utf32to16(_code).split(";");
-			    int xterm256 = 0;
-			    boolean back = false;
-			    for (String seg : code)
-			    {   int value = Integer.parseInt(seg);
-				if (xterm256 == 2)
-				{   xterm256 = 0;
-				    if (back)  background = colours[value];
-				    else       foreground = colours[value];
-				}
-				else if (value == 0)
-				{   for (int i = 0; i < 9; i++)
-					format[i] = false;
-				    background = foreground = null;
-				}
-				else if (xterm256 == 1)
-				    xterm256 = value == 5 ? 2 : 0;
-				else if (value < 10)
-				    format[value - 1] = true;
-				else if ((20 < value) && (value < 30))
-				    format[value - 21] = false;
-				else if (value == 39)   foreground = null;
-				else if (value == 49)   background = null;
-				else if (value == 38)   xterm256 = 1;
-				else if (value == 48)   xterm256 = 1;
-				else if (value < 38)    foreground = colours[(format[0] ? 8 : 0) + value - 30];
-				else if (value < 48)    background = colours[value - 40];
-				if (xterm256 == 1)
-				    back = value == 48;
-			    }
-			}
-			ptr = 0;
-		    }
-		}
-		else if (c == '[')
-		{   csi = true;
-		    ptr = 0;
-		}
-		else if (c == ']')
-		    osi = true;
-		else
-		{   escape = false;
-		    items.add(new Pony.Cell('\033', foreground, background, format));
-		    items.add(new Pony.Cell(c, foreground, background, format));
-		    System.err.println("\033[01;31mutil-say: warning: bad escape sequence: ESC 0x" + Integer.toString(c, 16) + "\033[00m");
-		    curwidth += 2;
-		}
+	    {   Object[] back_fore_state = this.submodule.parseEscape(c, background, foreground, format, colours);
+		background = (Color)(back_fore_state[0]);
+		foreground = (Color)(back_fore_state[1]);
+		escape = back_fore_state[2] == Boolean.TRUE;
+	    }
 	    else if (c == '\033')
 		escape = true;
 	    else if (c == '$')

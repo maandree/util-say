@@ -64,6 +64,31 @@ public class PonysayLinux extends PonysaySubmodule
      */
     protected Color[] palette;
     
+    /**
+     * Auxiliary: whether the parsing is currectly in a CSI sequence
+     */
+    private boolean csi = false;
+    
+    /**
+     * Auxiliary: whether the parsing is currectly in a OSI sequence
+     */
+    private boolean osi = false;
+    
+    /**
+     * Auxiliary: parsing buffer
+     */
+    private int[] buf = new int[256];
+    
+    /**
+     * Auxiliary: parsing buffer pointer
+     */
+    private int ptr = 0;
+    
+    /**
+     * Auxiliary: parsing return array
+     */
+    private Object[] rcbuf = new Object[3];
+    
     
     
     /**
@@ -213,6 +238,130 @@ public class PonysayLinux extends PonysaySubmodule
 	    return "";
 	return ("\033[" + _rc.substring(1)).replace("\033[\033]", "\033]") + "m";
     }
+    
+    
+    /**
+     * {@inheritDoc}
+     */
+    public Object[] parseEscape(int c, Color background, Color foreground, boolean[] format, Color[] colours)
+    {
+	boolean escape = true;
+	if (osi)
+	    if (this.ptr > 0)
+	    {   this.buf[this.ptr++ - 1] = c;
+		if (this.ptr == 8)
+		{   this.ptr = 0;
+		    osi = escape = false;
+		    int index =             (this.buf[0] <= '9') ? (this.buf[0] & 15) : ((this.buf[0] & 15) + 9);
+		    int red =               (this.buf[1] <= '9') ? (this.buf[1] & 15) : ((this.buf[1] & 15) + 9);
+		    red = (red << 4) |     ((this.buf[2] <= '9') ? (this.buf[2] & 15) : ((this.buf[2] & 15) + 9));
+		    int green =             (this.buf[3] <= '9') ? (this.buf[3] & 15) : ((this.buf[3] & 15) + 9);
+		    green = (green << 4) | ((this.buf[4] <= '9') ? (this.buf[4] & 15) : ((this.buf[4] & 15) + 9));
+		    int blue =              (this.buf[5] <= '9') ? (this.buf[5] & 15) : ((this.buf[5] & 15) + 9);
+		    blue = (blue << 4) |   ((this.buf[6] <= '9') ? (this.buf[6] & 15) : ((this.buf[6] & 15) + 9));
+		    colours[index] = new Color(red, green, blue);
+		}
+	    }
+	    else if (this.ptr < 0)
+	    {   if (~this.ptr == this.buf.length)
+		    System.arraycopy(this.buf, 0, this.buf = new int[~this.ptr << 1], 0, ~this.ptr);
+		if (c == '\\')
+		{   this.ptr = ~this.ptr;
+		    this.ptr--;
+		    if ((this.ptr > 8) && (this.buf[this.ptr] == '\033') && (this.buf[0] == ';'))
+		    {   int[] _code = new int[this.ptr - 1];
+			System.arraycopy(this.buf, 1, _code, 0, this.ptr - 1);
+			String[] code = Common.utf32to16(_code).split(";");
+			if (code.length == 2)
+			{   int index = Integer.parseInt(code[0]);
+			    code = code[1].split("/");
+			    if ((code.length == 3) && (code[0].startsWith("rgb:")))
+			    {   code[0] = code[0].substring(4);
+				int red   = Integer.parseInt(code[0], 16);
+				int green = Integer.parseInt(code[1], 16);
+				int blue  = Integer.parseInt(code[2], 16);
+				colours[index] = new Color(red, green, blue);
+		    }   }   }
+		    this.ptr = 0;
+		    osi = escape = false;
+		}
+		else
+		{   this.buf[~this.ptr] = c;
+		    this.ptr--;
+		}
+	    }
+	    else if (c == 'P')  this.ptr = 1;
+	    else if (c == '4')  this.ptr = ~0;
+	    else
+	    {   osi = escape = false;
+		/*items.add(new Pony.Cell('\033', foreground, background, format));
+		items.add(new Pony.Cell(']', foreground, background, format));
+		items.add(new Pony.Cell(c, foreground, background, format));*/
+		System.err.println("\033[01;31mutil-say: warning: bad escape sequence: OSI 0x" + Integer.toString(c) + "\033[00m");
+	    }
+	else if (csi)
+	{   if (this.ptr == this.buf.length)
+		System.arraycopy(this.buf, 0, this.buf = new int[this.ptr << 1], 0, this.ptr);
+	    this.buf[this.ptr++] = c;
+	    if ((('a' <= c) && (c <= 'z')) || (('A' <= c) && (c <= 'Z')) || (c == '~'))
+	    {   csi = escape = false;
+		this.ptr--;
+		if (c == 'm')
+		{   int[] _code = new int[this.ptr];
+		    System.arraycopy(this.buf, 0, _code, 0, this.ptr);
+		    String[] code = Common.utf32to16(_code).split(";");
+		    int xterm256 = 0;
+		    boolean back = false;
+		    for (String seg : code)
+		    {   int value = Integer.parseInt(seg);
+			if (xterm256 == 2)
+			{   xterm256 = 0;
+			    if (back)  background = colours[value];
+			    else       foreground = colours[value];
+			}
+			else if (value == 0)
+			{   for (int i = 0; i < 9; i++)
+				format[i] = false;
+			    background = foreground = null;
+			}
+			else if (xterm256 == 1)
+			    xterm256 = value == 5 ? 2 : 0;
+			else if (value < 10)
+			    format[value - 1] = true;
+			else if ((20 < value) && (value < 30))
+			    format[value - 21] = false;
+			else if (value == 37)   foreground = null; /* Haiku uses 37 instead instead of 39 */
+			else if (value == 40)   background = null; /* Haiku uses 40 instead instead of 49 */
+			else if (value == 38)   xterm256 = 1;
+			else if (value == 48)   xterm256 = 1;
+			else if (value < 38)    foreground = colours[(format[0] ? 8 : 0) + value - 30];
+			else if (value < 48)    background = colours[value - 40];
+			if (xterm256 == 1)
+			    back = value == 48;
+		    }
+		}
+		this.ptr = 0;
+	    }
+	}
+	else if (c == '[')
+	{   csi = true;
+	    this.ptr = 0;
+	}
+	else if (c == ']')
+	    osi = true;
+	else
+	{   escape = false;
+	    /*items.add(new Pony.Cell('\033', foreground, background, format));
+	      items.add(new Pony.Cell(c, foreground, background, format));*/
+	    System.err.println("\033[01;31mutil-say: warning: bad escape sequence: ESC 0x" + Integer.toString(c, 16) + "\033[00m");
+	}
+	
+	this.rcbuf[0] = background;
+	this.rcbuf[1] = foreground;
+	this.rcbuf[2] = escape ? Boolean.TRUE : Boolean.FALSE;
+	return this.rcbuf;
+    }
+    
     
     
     /**

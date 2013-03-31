@@ -57,6 +57,19 @@ public abstract class PonysaySubmodule
      */
     public abstract String applyColour(Color[] palette, Color oldBackground, Color oldForeground, boolean[] oldFormat, Color newBackground, Color newForeground, boolean[] newFormat);
     
+    /**
+     * Parse escape sequences
+     * 
+     * @param   c           The current character in the parsing
+     * @param   background  The current background colour
+     * @param   foreground  The current foreground colour
+     * @param   format      The current format, may be updated in-place
+     * @param   colours     The current palette, may be updated in-place
+     * @return              The background colour, the foreground colour and state: {@code {background, foreground, Boolean.TRUE|Boolean.FALSE}},
+     *                      wheere the state is true as along as the escape parsing has not completed
+     */
+    public abstract Object[] parseEscape(int c, Color background, Color foreground, boolean[] format, Color[] colours);
+    
     
     
     /**
