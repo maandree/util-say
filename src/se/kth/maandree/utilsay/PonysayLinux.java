@@ -39,7 +39,7 @@ public class PonysayLinux extends PonysaySubmodule
 	this.chroma = (flags.containsKey("chroma") == false) ? 1 : Common.parseDouble(flags.get("chroma"));
 	this.colourful = (flags.containsKey("colourful") == false) || flags.get("colourful").toLowerCase().startsWith("y");
 	this.fullcolour = flags.containsKey("fullcolour") && flags.get("fullcolour").toLowerCase().startsWith("y");
-	this.palette = (flags.containsKey("palette") == false) ? null : PonysayXterm.parsePalette(flags.get("palette").toUpperCase().replace("\033", "").replace("]", "").replace("P", ""));
+	this.palette = (flags.containsKey("palette") == false) ? null : PonysayXterm.parsePalette(flags.get("palette"));
     }
     
     
@@ -223,6 +223,16 @@ public class PonysayLinux extends PonysaySubmodule
      */
     public static Color[] parsePalette(String value)
     {
+	String val = null;
+	{   int ptr = 0;
+	    char[] buf = new char[value.length()];
+	    for (int i = 0, n = buf.length; i < n; i++)
+	    {   char c = value.charAt(i);
+		if ((c != '\033') && (c != ']') && (c != 'P'))
+		    buf[ptr++] = c;
+	    }
+	    val = (new String(buf, 0, ptr)).toUpperCase();
+	}
 	String defvalue = "00000001AA0000200AA003AA550040000AA5AA00AA600AAAA7AAAAAA"
 	                + "85555559FF5555A55FF55BFFFF55C5555FFDFF55FFE55FFFFFFFFFFF";
 	Color[] palette = new Color[16];
@@ -234,12 +244,12 @@ public class PonysayLinux extends PonysaySubmodule
 	    int blue  = Integer.parseInt(defvalue.substring(ptr + 5, ptr + 7), 16);
 	    palette[index] = new Color(red, green, blue);
 	}
-	for (int ptr = 0, n = value.length(); ptr < n; ptr += 7)
+	for (int ptr = 0, n = val.length(); ptr < n; ptr += 7)
 	{
-	    int index = Integer.parseInt(value.substring(ptr + 0, ptr + 1), 16);
-	    int red   = Integer.parseInt(value.substring(ptr + 1, ptr + 3), 16);
-	    int green = Integer.parseInt(value.substring(ptr + 3, ptr + 5), 16);
-	    int blue  = Integer.parseInt(value.substring(ptr + 5, ptr + 7), 16);
+	    int index = Integer.parseInt(val.substring(ptr + 0, ptr + 1), 16);
+	    int red   = Integer.parseInt(val.substring(ptr + 1, ptr + 3), 16);
+	    int green = Integer.parseInt(val.substring(ptr + 3, ptr + 5), 16);
+	    int blue  = Integer.parseInt(val.substring(ptr + 5, ptr + 7), 16);
 	    palette[index] = new Color(red, green, blue);
 	}
 	return palette;
