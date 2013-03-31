@@ -23,18 +23,18 @@ import java.util.*;
 
 
 /**
- * <tt>linux</tt> (Linux VT) submodule for {@link Ponysay}
+ * Haiku <tt>xterm</tt> submodule for {@link Ponysay}
  * 
  * @author  Mattias Andrée, <a href="mailto:maandree@member.fsf.org">maandree@member.fsf.org</a>
  */
-public class PonysayLinux extends PonysaySubmodule
+public class PonysayHaiku extends PonysaySubmodule
 {
     /**
      * Constructor
      * 
      * @param  flags  Flags passed to the module
      */
-    public PonysayLinux(HashMap<String, String> flags)
+    public PonysayHaiku(HashMap<String, String> flags)
     {
 	this.chroma = (flags.containsKey("chroma") == false) ? 1 : Common.parseDouble(flags.get("chroma"));
 	this.colourful = (flags.containsKey("colourful") == false) || flags.get("colourful").toLowerCase().startsWith("y");
@@ -88,31 +88,24 @@ public class PonysayLinux extends PonysaySubmodule
 	else
 	    this.palette = parsePalette("");
 	
-	StringBuilder resetPalette = new StringBuilder();
-	if (this.colourful)
+	StringBuilder resetPalette = null;
+	if (this.fullcolour)
+	{   resetPalette = new StringBuilder();
 	    for (int i = 0; i < 16; i++)
 	    {   Colour colour = new Colour(i);
-		resetPalette.append("\033]P");
-		resetPalette.append("0123456789ABCDEF".charAt(i));
+		resetPalette.append("\033]4;");
+		resetPalette.append(i);
+		resetPalette.append(";rgb:");
 		resetPalette.append("0123456789ABCDEF".charAt(colour.red >>> 4));
 		resetPalette.append("0123456789ABCDEF".charAt(colour.red & 15));
+		resetPalette.append('/');
 		resetPalette.append("0123456789ABCDEF".charAt(colour.green >>> 4));
 		resetPalette.append("0123456789ABCDEF".charAt(colour.green & 15));
+		resetPalette.append('/');
 		resetPalette.append("0123456789ABCDEF".charAt(colour.blue >>> 4));
 		resetPalette.append("0123456789ABCDEF".charAt(colour.blue & 15));
-	    }
-	else
-	    for (int i : new int[] { 7, 15 })
-	    {   Colour colour = new Colour(i);
-		resetPalette.append("\033]P");
-		resetPalette.append("0123456789ABCDEF".charAt(i));
-		resetPalette.append("0123456789ABCDEF".charAt(colour.red >>> 4));
-		resetPalette.append("0123456789ABCDEF".charAt(colour.red & 15));
-		resetPalette.append("0123456789ABCDEF".charAt(colour.green >>> 4));
-		resetPalette.append("0123456789ABCDEF".charAt(colour.green & 15));
-		resetPalette.append("0123456789ABCDEF".charAt(colour.blue >>> 4));
-		resetPalette.append("0123456789ABCDEF".charAt(colour.blue & 15));
-	    }
+		resetPalette.append("\033\\");
+	}   }
 	
 	return resetPalette == null ? null : resetPalette.toString();
     }
@@ -129,72 +122,85 @@ public class PonysayLinux extends PonysaySubmodule
 	int colourindex1fore = -1, colourindex2fore = -1;
 	
 	if ((oldBackground != null) && (newBackground == null))
-	{   Color colour = palette[0] = this.palette[0];
-	    rc.append("m\033]P0");
-	    rc.append("0123456789ABCDEF".charAt(colour.getRed() >>> 4));
-	    rc.append("0123456789ABCDEF".charAt(colour.getRed() & 15));
-	    rc.append("0123456789ABCDEF".charAt(colour.getGreen() >>> 4));
-	    rc.append("0123456789ABCDEF".charAt(colour.getGreen() & 15));
-	    rc.append("0123456789ABCDEF".charAt(colour.getBlue() >>> 4));
-	    rc.append("0123456789ABCDEF".charAt(colour.getBlue() & 15));
-	    rc.append("\033[49");
-	}
+	    rc.append(";40");
 	else if ((oldBackground == null) || (oldBackground.equals(newBackground) == false))
 	    if (newBackground != null)
 	    {
-		if (this.fullcolour == false)
-		    colourindex1back = matchColour(newBackground, palette, 16, 256, this.chroma);
-		colourindex2back = (this.colourful ? matchColour(this.fullcolour ? newBackground : palette[colourindex1back], this.palette, 0, 8, this.chroma) : 7);
+		colourindex1back = matchColour(newBackground, palette, 16, 256, this.chroma);
+		if (this.fullcolour)
+		    colourindex2back = (this.colourful ? matchColour(this.fullcolour ? newBackground : palette[colourindex1back], this.palette, 1, 6, this.chroma) : 7);
+		else
+		    colourindex2back = colourindex1back;
 	    }
 	
 	if ((oldForeground != null) && (newForeground == null))
-        {   Color colour = palette[7] = this.palette[7];
-	    rc.append("m\033]P7");
-	    rc.append("0123456789ABCDEF".charAt(colour.getRed() >>> 4));
-	    rc.append("0123456789ABCDEF".charAt(colour.getRed() & 15));
-	    rc.append("0123456789ABCDEF".charAt(colour.getGreen() >>> 4));
-	    rc.append("0123456789ABCDEF".charAt(colour.getGreen() & 15));
-	    rc.append("0123456789ABCDEF".charAt(colour.getBlue() >>> 4));
-	    rc.append("0123456789ABCDEF".charAt(colour.getBlue() & 15));
-	    rc.append("\033[39");
-	}
+	    rc.append(";37");
 	else if ((oldForeground == null) || (oldForeground.equals(newForeground) == false))
 	    if (newForeground != null)
 	    {
-		if (this.fullcolour == false)
-		    colourindex1fore = matchColour(newForeground, palette, 16, 256, this.chroma);
-		int b = newFormat[0] ? 8 : 0;
-		    colourindex2fore = (this.colourful ? matchColour(this.fullcolour ? newForeground : palette[colourindex1fore], this.palette, b, b + 8, this.chroma) : 15);
+		colourindex1fore = matchColour(newForeground, palette, 16, 256, this.chroma);
+		if (this.fullcolour)
+		{   int b = newFormat[0] ? 8 : 0;
+		    colourindex2fore = (this.colourful ? matchColour(this.fullcolour ? newForeground : palette[colourindex1fore], this.palette, b + 1, b + 6, this.chroma) : 15);
+		}
+		else
+		    colourindex2fore = colourindex1fore;
 	    }
 	
 	if (colourindex2back != -1)
-	{   Color colour = palette[colourindex1back];
-	    rc.append("m\033]P");
-	    rc.append("0123456789ABCDEF".charAt(colourindex2back));
-	    rc.append("0123456789ABCDEF".charAt(colour.getRed() >>> 4));
-	    rc.append("0123456789ABCDEF".charAt(colour.getRed() & 15));
-	    rc.append("0123456789ABCDEF".charAt(colour.getGreen() >>> 4));
-	    rc.append("0123456789ABCDEF".charAt(colour.getGreen() & 15));
-	    rc.append("0123456789ABCDEF".charAt(colour.getBlue() >>> 4));
-	    rc.append("0123456789ABCDEF".charAt(colour.getBlue() & 15));
-	    rc.append("\033[4");
-	    rc.append(colourindex2back);
-	}
+	    if (this.fullcolour)
+	    {   Color colour = newBackground;
+		rc.append("m\033]4;");
+		rc.append(colourindex2back);
+		rc.append(";rgb:");
+		rc.append("0123456789ABCDEF".charAt(colour.getRed() >>> 4));
+		rc.append("0123456789ABCDEF".charAt(colour.getRed() & 15));
+		rc.append('/');
+		rc.append("0123456789ABCDEF".charAt(colour.getGreen() >>> 4));
+		rc.append("0123456789ABCDEF".charAt(colour.getGreen() & 15));
+		rc.append('/');
+		rc.append("0123456789ABCDEF".charAt(colour.getBlue() >>> 4));
+		rc.append("0123456789ABCDEF".charAt(colour.getBlue() & 15));
+		rc.append("\033\\\033[4");
+		rc.append(colourindex2back);
+		palette[colourindex2back] = colour;
+	    }
+	    else if (colourindex2back < 16)
+	    {   rc.append(";4");
+		rc.append(colourindex2back);
+	    }
+	    else
+	    {   rc.append(";48;5;");
+		rc.append(colourindex2back);
+	    }
 	
 	if (colourindex2fore != -1)
-	{   Color colour = palette[colourindex1fore];
-	    rc.append("m\033]P");
-	    rc.append("0123456789ABCDEF".charAt(colourindex2fore));
-	    rc.append("0123456789ABCDEF".charAt(colour.getRed() >>> 4));
-	    rc.append("0123456789ABCDEF".charAt(colour.getRed() & 15));
-	    rc.append("0123456789ABCDEF".charAt(colour.getGreen() >>> 4));
-	    rc.append("0123456789ABCDEF".charAt(colour.getGreen() & 15));
-	    rc.append("0123456789ABCDEF".charAt(colour.getBlue() >>> 4));
-	    rc.append("0123456789ABCDEF".charAt(colour.getBlue() & 15));
-	    rc.append("\033[3");
-	    rc.append(colourindex2fore & 7);
-	}
-	if (colourindex2fore >= 0)
+	    if (this.fullcolour)
+	    {   Color colour = newForeground;
+		rc.append("m\033]4;");
+		rc.append(colourindex2fore);
+		rc.append(";rgb:");
+		rc.append("0123456789ABCDEF".charAt(colour.getRed() >>> 4));
+		rc.append("0123456789ABCDEF".charAt(colour.getRed() & 15));
+		rc.append('/');
+		rc.append("0123456789ABCDEF".charAt(colour.getGreen() >>> 4));
+		rc.append("0123456789ABCDEF".charAt(colour.getGreen() & 15));
+		rc.append('/');
+		rc.append("0123456789ABCDEF".charAt(colour.getBlue() >>> 4));
+		rc.append("0123456789ABCDEF".charAt(colour.getBlue() & 15));
+		rc.append("\033\\\033[3");
+		rc.append(colourindex2fore & 7);
+		palette[colourindex2fore] = colour;
+	    }
+	    else if (colourindex2fore < 16)
+	    {   rc.append(";3");
+		rc.append(colourindex2fore);
+	    }
+	    else
+	    {   rc.append(";38;5;");
+		rc.append(colourindex2fore);
+	    }
+	if (this.fullcolour && (colourindex2fore >= 0))
 	    newFormat[0] = (colourindex2fore & 8) == 8;
 	
 	for (int i = 0; i < 9; i++)
@@ -228,13 +234,21 @@ public class PonysayLinux extends PonysaySubmodule
 	    char[] buf = new char[value.length()];
 	    for (int i = 0, n = buf.length; i < n; i++)
 	    {   char c = value.charAt(i);
-		if ((c != '\033') && (c != ']') && (c != 'P'))
-		    buf[ptr++] = c;
+		if ((c != '\033') && (c != ']'))
+		    if (c == ';')
+			if ((i > 0) && (buf[ptr - 1] == '4'))
+			    buf[ptr - 1] = '/';
+			else
+			    buf[ptr++] = '/';
+		    else if (c == ':')
+			ptr -= 3;
+		    else
+			buf[ptr++] = c;
 	    }
 	    val = (new String(buf, 0, ptr)).toUpperCase();
 	}
-	String defvalue = "00000001AA0000200AA003AA550040000AA5AA00AA600AAAA7AAAAAA"
-	                + "85555559FF5555A55FF55BFFFF55C5555FFDFF55FFE55FFFFFFFFFFF";
+	String defvalue = "00000001CD0000200CD003CDCD0041E90FF5CD00CD600CDCD7E5E5E5"
+	                + "84C4C4C9FF0000A00FF00BFFFF00C4682B4DFF00FFE00FFFFFFFFFFF";
 	Color[] palette = new Color[16];
         for (int ptr = 0, n = defvalue.length(); ptr < n; ptr += 7)
 	{
@@ -244,12 +258,14 @@ public class PonysayLinux extends PonysaySubmodule
 	    int blue  = Integer.parseInt(defvalue.substring(ptr + 5, ptr + 7), 16);
 	    palette[index] = new Color(red, green, blue);
 	}
-	for (int ptr = 0, n = val.length(); ptr < n; ptr += 7)
-	{
-	    int index = Integer.parseInt(val.substring(ptr + 0, ptr + 1), 16);
-	    int red   = Integer.parseInt(val.substring(ptr + 1, ptr + 3), 16);
-	    int green = Integer.parseInt(val.substring(ptr + 3, ptr + 5), 16);
-	    int blue  = Integer.parseInt(val.substring(ptr + 5, ptr + 7), 16);
+	for (int ptr = 0, n = val.length(); ptr < n;)
+	{   String v = val.substring(ptr + 1, val.indexOf('\\', ptr));
+	    ptr = v.length() + 2;
+	    String[] vs = v.split("/");
+	    int index = Integer.parseInt(vs[0], 10);
+	    int red   = Integer.parseInt(vs[1], 16);
+	    int green = Integer.parseInt(vs[2], 16);
+	    int blue  = Integer.parseInt(vs[3], 16);
 	    palette[index] = new Color(red, green, blue);
 	}
 	return palette;

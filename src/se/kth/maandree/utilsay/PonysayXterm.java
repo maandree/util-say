@@ -76,7 +76,7 @@ public class PonysayXterm extends PonysaySubmodule
 	if (this.palette != null)
 	    System.arraycopy(this.palette, 0, colours, 0, 16);
 	else
-	    this.palette = PonysayXterm.parsePalette("");
+	    this.palette = PonysayXterm.("");
     }
     
     
