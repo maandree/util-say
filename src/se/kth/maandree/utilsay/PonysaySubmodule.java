@@ -30,10 +30,17 @@ import java.util.*;
 public abstract class PonysaySubmodule
 {
     /**
+     * Initialise the export and return a string used to reset the colour palette
+     * 
+     * @param   colours  The supermodule's colour palette
+     * @return           String to print to reset the colour palette
+     */
+    public abstract String initExport(Color[] colours);
+    
+    /**
      * Get ANSI colour sequence to append to the output
      * 
      * @param  palette        The current colour palette
-     * @param  userPalette    The user's default colour palette
      * @param  oldBackground  The current background colour
      * @param  oldForeground  The current foreground colour
      * @param  oldFormat      The current text format
@@ -41,7 +48,7 @@ public abstract class PonysaySubmodule
      * @param  newForeground  The new foreground colour
      * @param  newFormat      The new text format
      */
-    public abstract String applyColour(Color[] palette, Color[] userPalette, Color oldBackground, Color oldForeground, boolean[] oldFormat, Color newBackground, Color newForeground, boolean[] newFormat);
+    public abstract String applyColour(Color[] palette, Color oldBackground, Color oldForeground, boolean[] oldFormat, Color newBackground, Color newForeground, boolean[] newFormat);
     
     
     

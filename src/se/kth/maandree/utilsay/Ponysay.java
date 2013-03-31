@@ -66,24 +66,21 @@ public class Ponysay
     {
 	this.file = (flags.containsKey("file") ? (this.file = flags.get("file")).equals("-") : true) ? null : this.file;
 	this.even = (flags.containsKey("even") == false) || flags.get("even").toLowerCase().startsWith("y");
-	this.tty = flags.containsKey("tty") && flags.get("tty").toLowerCase().startsWith("y");
-	this.fullblocks = flags.containsKey("fullblocks") ? flags.get("fullblocks").toLowerCase().startsWith("y") : this.tty;
+	this.fullblocks = (flags.containsKey("fullblocks") == false) || flags.get("fullblocks").toLowerCase().startsWith("y");
 	this.spacesave = flags.containsKey("spacesave") && flags.get("spacesave").toLowerCase().startsWith("y");
 	this.zebra = flags.containsKey("zebra") && flags.get("zebra").toLowerCase().startsWith("y");
 	this.version = flags.containsKey("version") ? parseVersion(flags.get("version")) : VERSION_HORIZONTAL_JUSTIFICATION;
 	this.utf8 = this.version > VERSION_COWSAY ? true : (flags.containsKey("utf8") && flags.get("utf8").toLowerCase().startsWith("y"));
-	this.fullcolour = flags.containsKey("fullcolour") && flags.get("fullcolour").toLowerCase().startsWith("y");
-	this.chroma = (flags.containsKey("chroma") == false) ? 1 : Common.parseDouble(flags.get("chroma"));
 	this.balloon = (flags.containsKey("balloon") == false) ? -1 : Common.parseInteger(flags.get("balloon"));
 	this.left = (flags.containsKey("left") == false) ? 2 : Common.parseInteger(flags.get("left"));
 	this.right = (flags.containsKey("right") == false) ? 0 : Common.parseInteger(flags.get("right"));
 	this.top = (flags.containsKey("top") == false) ? 0 : Common.parseInteger(flags.get("top"));
 	this.bottom = (flags.containsKey("bottom") == false) ? 1 : Common.parseInteger(flags.get("bottom"));
-	this.palette = (flags.containsKey("palette") == false) ? null : parsePalette(flags.get("palette").toUpperCase().replace("\033", "").replace("]", "").replace("P", ""));
+	this.palette = (flags.containsKey("palette") == false) ? null : PonysayXterm.parsePalette(flags.get("palette").toUpperCase().replace("\033", "").replace("]", "").replace("P", ""));
 	this.ignoreballoon = flags.containsKey("ignoreballoon") && flags.get("ignoreballoon").toLowerCase().startsWith("y");
 	this.ignorelink = flags.containsKey("ignorelink") ? flags.get("ignorelink").toLowerCase().startsWith("y") : this.ignoreballoon;
-	this.colourful = this.tty && ((flags.containsKey("colourful") == false) || flags.get("colourful").toLowerCase().startsWith("y"));
 	this.escesc = this.version > VERSION_COWSAY ? false : (flags.containsKey("escesc") && flags.get("escesc").toLowerCase().startsWith("y"));
+	this.outputModule = new PonysayXterm(flags);
     }
     
     
@@ -109,16 +106,6 @@ public class Ponysay
     protected boolean even;
     
     /**
-     * Output option: linux vt
-     */
-    protected boolean tty;
-    
-    /**
-     * Output option: colourful tty
-     */
-    protected boolean colourful;
-    
-    /**
      * Output option: allow solid block elements
      */
     protected boolean fullblocks;
@@ -138,11 +125,6 @@ public class Ponysay
      */
     protected Color[] palette;
     
-    /**
-     * Output option: chroma weight, negative for sRGB distance
-     */
-    protected double chroma;
-    
     // KEYWORD when colourlabs supports convertion from sRGB, enabled preceptional distance
     
     /**
@@ -159,11 +141,6 @@ public class Ponysay
      * Output option: escape escape charactes
      */
     protected boolean escesc;
-    
-    /**
-     * Output option: do not limit to xterm 256 standard colours
-     */
-    protected boolean fullcolour;
     
     /**
      * Output option: left margin, negative for unmodified
@@ -189,6 +166,11 @@ public class Ponysay
      * Output option: bottom margin, negative for unmodified
      */
     protected int bottom;
+    
+    /**
+     * Output option: colouring submodule
+     */
+    protected PonysaySubmodule outputModule;
     
     
     
@@ -218,7 +200,7 @@ public class Ponysay
 	if (this.palette != null)
 	    System.arraycopy(this.palette, 0, colours, 0, 16);
 	else
-	    this.palette = parsePalette("");
+	    this.palette = PonysayXterm.parsePalette("");
 	
 	InputStream in = System.in;
 	if (this.file != null)
@@ -711,56 +693,8 @@ public class Ponysay
 	{   Colour colour = new Colour(i);
 	    colours[i] = new Color(colour.red, colour.green, colour.blue);
 	}
-	if (this.palette != null)
-	    System.arraycopy(this.palette, 0, colours, 0, 16);
-	else
-	    this.palette = parsePalette("");
 	
-	StringBuilder resetpalette = null;
-	if (this.tty)
-	    if (this.colourful)
-	    {   resetpalette = new StringBuilder();
-		for (int i = 0; i < 16; i++)
-		{   Colour colour = new Colour(i);
-		    resetpalette.append("\033]P");
-		    resetpalette.append("0123456789ABCDEF".charAt(i));
-		    resetpalette.append("0123456789ABCDEF".charAt(colour.red >>> 4));
-		    resetpalette.append("0123456789ABCDEF".charAt(colour.red & 15));
-		    resetpalette.append("0123456789ABCDEF".charAt(colour.green >>> 4));
-		    resetpalette.append("0123456789ABCDEF".charAt(colour.green & 15));
-		    resetpalette.append("0123456789ABCDEF".charAt(colour.blue >>> 4));
-		    resetpalette.append("0123456789ABCDEF".charAt(colour.blue & 15));
-	    }   }
-	    else
-	    {   resetpalette = new StringBuilder();
-		for (int i : new int[] { 7, 15 })
-		{   Colour colour = new Colour(i);
-		    resetpalette.append("\033]P");
-		    resetpalette.append("0123456789ABCDEF".charAt(i));
-		    resetpalette.append("0123456789ABCDEF".charAt(colour.red >>> 4));
-		    resetpalette.append("0123456789ABCDEF".charAt(colour.red & 15));
-		    resetpalette.append("0123456789ABCDEF".charAt(colour.green >>> 4));
-		    resetpalette.append("0123456789ABCDEF".charAt(colour.green & 15));
-		    resetpalette.append("0123456789ABCDEF".charAt(colour.blue >>> 4));
-		    resetpalette.append("0123456789ABCDEF".charAt(colour.blue & 15));
-	    }   }
-	else if (this.fullcolour)
-	{   resetpalette = new StringBuilder();
-	    for (int i = 0; i < 16; i++)
-	    {   Colour colour = new Colour(i);
-		resetpalette.append("\033]4;");
-		resetpalette.append(i);
-		resetpalette.append(";rgb:");
-		resetpalette.append("0123456789ABCDEF".charAt(colour.red >>> 4));
-		resetpalette.append("0123456789ABCDEF".charAt(colour.red & 15));
-		resetpalette.append('/');
-		resetpalette.append("0123456789ABCDEF".charAt(colour.green >>> 4));
-		resetpalette.append("0123456789ABCDEF".charAt(colour.green & 15));
-		resetpalette.append('/');
-		resetpalette.append("0123456789ABCDEF".charAt(colour.blue >>> 4));
-		resetpalette.append("0123456789ABCDEF".charAt(colour.blue & 15));
-		resetpalette.append("\033\\");
-	}   }
+	String resetPalette = this.outputModule.initExport(colours);
 	
 	
 	StringBuilder databuf = new StringBuilder();
@@ -918,16 +852,16 @@ public class Ponysay
 			    {   Pony.Recall recall = (Pony.Recall)meta;
 				Color back = ((recall.backgroundColour == null) || (recall.backgroundColour.getAlpha() < 112)) ? null : recall.backgroundColour;
 				Color fore = ((recall.foregroundColour == null) || (recall.foregroundColour.getAlpha() < 112)) ? null : recall.foregroundColour;
-				databuf.append(applyColour(colours, this.palette, background, foreground, format, background = back, foreground = fore, recall.format));
+				databuf.append(this.outputModule.applyColour(colours, background, foreground, format, background = back, foreground = fore, recall.format));
 				databuf.append("$" + recall.name.replace("$", "\033$") + "$");
 			    }
 			    else if (metaclass == Pony.Combining.class)
 			    {   Pony.Combining combining = (Pony.Combining)meta;
-				databuf.append(applyColour(colours, this.palette, background, foreground, format, background = combining.backgroundColour, foreground = combining.foregroundColour, format = combining.format));
+				databuf.append(this.outputModule.applyColour(colours, background, foreground, format, background = combining.backgroundColour, foreground = combining.foregroundColour, format = combining.format));
 				databuf.append(combining.character);
 			    }
 			    else if (metaclass == Pony.Balloon.class)
-			    {   databuf.append(applyColour(colours, this.palette, background, foreground, format, background = null, foreground = null, format = PLAIN));
+			    {   databuf.append(this.outputModule.applyColour(colours, background, foreground, format, background = null, foreground = null, format = PLAIN));
 				Pony.Balloon balloon = (Pony.Balloon)meta;
 				if (balloon.left != null)
 				{   int justification = balloon.minWidth != null ? balloon.justification & (Pony.Balloon.LEFT | Pony.Balloon.RIGHT) : Pony.Balloon.NONE;
@@ -969,45 +903,45 @@ public class Ponysay
 			cell = defaultcell;
 		    if (cell.character >= 0)
 		        if (balloonend < 0)
-			{   databuf.append(applyColour(colours, this.palette, background, foreground, format, background = cell.lowerColour, foreground = cell.upperColour, format = cell.format));
+			{   databuf.append(this.outputModule.applyColour(colours, background, foreground, format, background = cell.lowerColour, foreground = cell.upperColour, format = cell.format));
 			    databuf.append(Common.utf32to16(cell.character));
 			}
 			else if (((cell.character == ' ') || (cell.character == ' ')) && (cell.lowerColour == null))
 			    balloonend++;
 			else
 			{   if (balloonend >= 0)
-			    {   databuf.append(applyColour(colours, this.palette, background, foreground, format, background = null, foreground = this.spacesave ? foreground : null, format = PLAIN));
+			    {   databuf.append(this.outputModule.applyColour(colours, background, foreground, format, background = null, foreground = this.spacesave ? foreground : null, format = PLAIN));
 				for (int i = 0; i < balloonend; i++)
 				    databuf.append(' ');
 				balloonend = -1;
 			    }
-			    databuf.append(applyColour(colours, this.palette, background, foreground, format, background = cell.lowerColour, foreground = cell.upperColour, format = cell.format));
+			    databuf.append(this.outputModule.applyColour(colours, background, foreground, format, background = cell.lowerColour, foreground = cell.upperColour, format = cell.format));
 			    databuf.append(Common.utf32to16(cell.character));
 			}
 		    else if (cell.character == Pony.Cell.NNW_SSE)
 		    {   if (balloonend >= 0)
-			{   databuf.append(applyColour(colours, this.palette, background, foreground, format, background = null, foreground = null, format = PLAIN));
+			{   databuf.append(this.outputModule.applyColour(colours, background, foreground, format, background = null, foreground = null, format = PLAIN));
 			    for (int i = 0; i < balloonend; i++)
 				databuf.append(' ');
 			    balloonend = -1;
 			}
-			databuf.append(applyColour(colours, this.palette, background, foreground, format, background = null, foreground = null, format = PLAIN));
+			databuf.append(this.outputModule.applyColour(colours, background, foreground, format, background = null, foreground = null, format = PLAIN));
 			databuf.append("$\\$");
 		    }
 		    else if (cell.character == Pony.Cell.NNE_SSW)
 		    {   if (balloonend >= 0)
-			{   databuf.append(applyColour(colours, this.palette, background, foreground, format, background = null, foreground = null, format = PLAIN));
+			{   databuf.append(this.outputModule.applyColour(colours, background, foreground, format, background = null, foreground = null, format = PLAIN));
 			    for (int i = 0; i < balloonend; i++)
 				databuf.append(' ');
 			    balloonend = -1;
 			}
-			databuf.append(applyColour(colours, this.palette, background, foreground, format, background = null, foreground = null, format = PLAIN));
+			databuf.append(this.outputModule.applyColour(colours, background, foreground, format, background = null, foreground = null, format = PLAIN));
 			databuf.append("$/$");
 		    }
 		    else if (cell.character == Pony.Cell.PIXELS)
 			if (cell.lowerColour == null)
 			    if (cell.upperColour == null)
-			    {   databuf.append(applyColour(colours, this.palette, background, foreground, format, background = null, foreground = this.spacesave ? foreground : null, format = PLAIN));
+			    {   databuf.append(this.outputModule.applyColour(colours, background, foreground, format, background = null, foreground = this.spacesave ? foreground : null, format = PLAIN));
 				if (balloonend >= 0)
 				    balloonend++;
 				else
@@ -1015,64 +949,64 @@ public class Ponysay
 			    }
 			    else
 			    {   if (balloonend >= 0)
-				{   databuf.append(applyColour(colours, this.palette, background, foreground, format, background = null, foreground = this.spacesave ? foreground : null, format = PLAIN));
+				{   databuf.append(this.outputModule.applyColour(colours, background, foreground, format, background = null, foreground = this.spacesave ? foreground : null, format = PLAIN));
 				    for (int i = 0; i < balloonend; i++)
 					databuf.append(' ');
 				    balloonend = -1;
 				}
-				databuf.append(applyColour(colours, this.palette, background, foreground, format, background = null, foreground = cell.upperColour, format = PLAIN));
+				databuf.append(this.outputModule.applyColour(colours, background, foreground, format, background = null, foreground = cell.upperColour, format = PLAIN));
 				databuf.append('▀');
 			    }
 			else
 			    if (cell.upperColour == null)
 			    {   if (balloonend >= 0)
-				{   databuf.append(applyColour(colours, this.palette, background, foreground, format, background = null, foreground = this.spacesave ? foreground : null, format = PLAIN));
+				{   databuf.append(this.outputModule.applyColour(colours, background, foreground, format, background = null, foreground = this.spacesave ? foreground : null, format = PLAIN));
 				    for (int i = 0; i < balloonend; i++)
 					databuf.append(' ');
 				    balloonend = -1;
 				}
-				databuf.append(applyColour(colours, this.palette, background, foreground, format, background = null, foreground = cell.lowerColour, format = PLAIN));
+				databuf.append(this.outputModule.applyColour(colours, background, foreground, format, background = null, foreground = cell.lowerColour, format = PLAIN));
 				databuf.append('▄');
 			    }
 			    else if (cell.upperColour.equals(cell.lowerColour))
 				if (this.zebra)
 				{   if (balloonend >= 0)
-				    {   databuf.append(applyColour(colours, this.palette, background, foreground, format, background = null, foreground = this.spacesave ? foreground : null, format = PLAIN));
+				    {   databuf.append(this.outputModule.applyColour(colours, background, foreground, format, background = null, foreground = this.spacesave ? foreground : null, format = PLAIN));
 					for (int i = 0; i < balloonend; i++)
 					    databuf.append(' ');
 					balloonend = -1;
 				    }
-				    databuf.append(applyColour(colours, this.palette, background, foreground, format, background = cell.lowerColour, foreground = cell.lowerColour, format = PLAIN));
+				    databuf.append(this.outputModule.applyColour(colours, background, foreground, format, background = cell.lowerColour, foreground = cell.lowerColour, format = PLAIN));
 				    databuf.append('▄');
 				}
 				else if (this.fullblocks /*TODO || (this.colourful && ¿can get better colour?)*/)
 				{   if (balloonend >= 0)
-				    {   databuf.append(applyColour(colours, this.palette, background, foreground, format, background = null, foreground = this.spacesave ? foreground : null, format = PLAIN));
+				    {   databuf.append(this.outputModule.applyColour(colours, background, foreground, format, background = null, foreground = this.spacesave ? foreground : null, format = PLAIN));
 					for (int i = 0; i < balloonend; i++)
 					    databuf.append(' ');
 					balloonend = -1;
 				    }
-				    databuf.append(applyColour(colours, this.palette, background, foreground, format, background = this.spacesave ? background : cell.lowerColour, foreground = cell.lowerColour, format = PLAIN));
+				    databuf.append(this.outputModule.applyColour(colours, background, foreground, format, background = this.spacesave ? background : cell.lowerColour, foreground = cell.lowerColour, format = PLAIN));
 				    databuf.append('█');
 				}
 				else
 				{   if (balloonend >= 0)
-				    {   databuf.append(applyColour(colours, this.palette, background, foreground, format, background = null, foreground = this.spacesave ? foreground : null, format = PLAIN));
+				    {   databuf.append(this.outputModule.applyColour(colours, background, foreground, format, background = null, foreground = this.spacesave ? foreground : null, format = PLAIN));
 					for (int i = 0; i < balloonend; i++)
 					    databuf.append(' ');
 					balloonend = -1;
 				    }
-				    databuf.append(applyColour(colours, this.palette, background, foreground, format, background = cell.lowerColour, foreground = this.spacesave ? foreground : cell.lowerColour, format = PLAIN));
+				    databuf.append(this.outputModule.applyColour(colours, background, foreground, format, background = cell.lowerColour, foreground = this.spacesave ? foreground : cell.lowerColour, format = PLAIN));
 				    databuf.append(' ');
 				}
 			    else  //TODO (this.colourful && ¿can get better colour?) → flip
 			    {	if (balloonend >= 0)
-				{   databuf.append(applyColour(colours, this.palette, background, foreground, format, background = null, foreground = this.spacesave ? foreground : null, format = PLAIN));
+				{   databuf.append(this.outputModule.applyColour(colours, background, foreground, format, background = null, foreground = this.spacesave ? foreground : null, format = PLAIN));
 				    for (int i = 0; i < balloonend; i++)
 					databuf.append(' ');
 				    balloonend = -1;
 				}
-				databuf.append(applyColour(colours, this.palette, background, foreground, format, background = cell.upperColour, foreground = cell.lowerColour, format = PLAIN));
+				databuf.append(this.outputModule.applyColour(colours, background, foreground, format, background = cell.upperColour, foreground = cell.lowerColour, format = PLAIN));
 				databuf.append('▄');
 			    }
 		}
@@ -1174,8 +1108,8 @@ public class Ponysay
 	    }
 	}
 	
-	if (resetpalette != null)
-	    data += resetpalette.toString();
+	if (resetPalette != null)
+	    data = resetPalette;
 	if (this.escesc)
 	    data = data.replace("\033", "\\e");
 	
@@ -1186,179 +1120,6 @@ public class Ponysay
 	out.flush();
 	if (out != System.out)
 	    out.close();
-    }
-    
-    
-    /**
-     * Get ANSI colour sequence to append to the output
-     * 
-     * @param  palette        The current colour palette
-     * @param  userPalette    The user's default colour palette
-     * @param  oldBackground  The current background colour
-     * @param  oldForeground  The current foreground colour
-     * @param  oldFormat      The current text format
-     * @param  newBackground  The new background colour
-     * @param  newForeground  The new foreground colour
-     * @param  newFormat      The new text format
-     */ // TODO cache colour matching
-    protected String applyColour(Color[] palette, Color[] userPalette, Color oldBackground, Color oldForeground, boolean[] oldFormat, Color newBackground, Color newForeground, boolean[] newFormat)
-    {
-	StringBuilder rc = new StringBuilder();
-	
-	int colourindex1back = -1, colourindex2back = -1;
-	int colourindex1fore = -1, colourindex2fore = -1;
-	
-	if ((oldBackground != null) && (newBackground == null))
-	{   if (this.tty)
-	    {   Color colour = palette[0] = userPalette[0];
-		rc.append("m\033]P0");
-		rc.append("0123456789ABCDEF".charAt(colour.getRed() >>> 4));
-		rc.append("0123456789ABCDEF".charAt(colour.getRed() & 15));
-		rc.append("0123456789ABCDEF".charAt(colour.getGreen() >>> 4));
-		rc.append("0123456789ABCDEF".charAt(colour.getGreen() & 15));
-		rc.append("0123456789ABCDEF".charAt(colour.getBlue() >>> 4));
-		rc.append("0123456789ABCDEF".charAt(colour.getBlue() & 15));
-		rc.append("\033[49");
-	    }
-	    else
-		rc.append(";49");
-	}
-	else if ((oldBackground == null) || (oldBackground.equals(newBackground) == false))
-	    if (newBackground != null)
-	    {
-		if ((this.fullcolour && this.tty) == false)
-		    colourindex1back = matchColour(newBackground, palette, 16, 256, this.chroma);
-		if (this.tty || this.fullcolour)
-		    colourindex2back = (this.colourful ? matchColour(this.fullcolour ? newBackground : palette[colourindex1back], this.tty ? userPalette : palette, 0, 8, this.chroma) : 7);
-		else
-		    colourindex2back = colourindex1back;
-	    }
-	
-	if ((oldForeground != null) && (newForeground == null))
-        {   if (this.tty)
-	    {   Color colour = palette[7] = userPalette[7];
-		rc.append("m\033]P7");
-		rc.append("0123456789ABCDEF".charAt(colour.getRed() >>> 4));
-		rc.append("0123456789ABCDEF".charAt(colour.getRed() & 15));
-		rc.append("0123456789ABCDEF".charAt(colour.getGreen() >>> 4));
-		rc.append("0123456789ABCDEF".charAt(colour.getGreen() & 15));
-		rc.append("0123456789ABCDEF".charAt(colour.getBlue() >>> 4));
-		rc.append("0123456789ABCDEF".charAt(colour.getBlue() & 15));
-		rc.append("\033[39");
-	    }
-	    else
-		rc.append(";39");
-	}
-	else if ((oldForeground == null) || (oldForeground.equals(newForeground) == false))
-	    if (newForeground != null)
-	    {
-		if ((this.fullcolour && this.tty) == false)
-		    colourindex1fore = matchColour(newForeground, palette, 16, 256, this.chroma);
-		if (this.tty || this.fullcolour)
-		{   int b = newFormat[0] ? 8 : 0;
-		    colourindex2fore = (this.colourful ? matchColour(this.fullcolour ? newForeground : palette[colourindex1fore], this.tty ? userPalette : palette, b, b + 8, this.chroma) : 15);
-		}
-		else
-		    colourindex2fore = colourindex1fore;
-	    }
-	
-	if (colourindex2back != -1)
-	    if (this.tty)
-	    {   Color colour = palette[colourindex1back];
-		rc.append("m\033]P");
-		rc.append("0123456789ABCDEF".charAt(colourindex2back));
-		rc.append("0123456789ABCDEF".charAt(colour.getRed() >>> 4));
-		rc.append("0123456789ABCDEF".charAt(colour.getRed() & 15));
-		rc.append("0123456789ABCDEF".charAt(colour.getGreen() >>> 4));
-		rc.append("0123456789ABCDEF".charAt(colour.getGreen() & 15));
-		rc.append("0123456789ABCDEF".charAt(colour.getBlue() >>> 4));
-		rc.append("0123456789ABCDEF".charAt(colour.getBlue() & 15));
-		rc.append("\033[4");
-		rc.append(colourindex2back);
-	    }
-	    else if (this.fullcolour)
-	    {   Color colour = newBackground;
-		rc.append("m\033]4;");
-		rc.append(colourindex2back);
-		rc.append(";rgb:");
-		rc.append("0123456789ABCDEF".charAt(colour.getRed() >>> 4));
-		rc.append("0123456789ABCDEF".charAt(colour.getRed() & 15));
-		rc.append('/');
-		rc.append("0123456789ABCDEF".charAt(colour.getGreen() >>> 4));
-		rc.append("0123456789ABCDEF".charAt(colour.getGreen() & 15));
-		rc.append('/');
-		rc.append("0123456789ABCDEF".charAt(colour.getBlue() >>> 4));
-		rc.append("0123456789ABCDEF".charAt(colour.getBlue() & 15));
-		rc.append("\033\\\033[4");
-		rc.append(colourindex2back);
-		palette[colourindex2back] = colour;
-	    }
-	    else if (colourindex2back < 16)
-	    {   rc.append(";4");
-		rc.append(colourindex2back);
-	    }
-	    else
-	    {   rc.append(";48;5;");
-		rc.append(colourindex2back);
-	    }
-	
-	if (colourindex2fore != -1)
-	    if (this.tty)
-	    {   Color colour = palette[colourindex1fore];
-		rc.append("m\033]P");
-		rc.append("0123456789ABCDEF".charAt(colourindex2fore));
-		rc.append("0123456789ABCDEF".charAt(colour.getRed() >>> 4));
-		rc.append("0123456789ABCDEF".charAt(colour.getRed() & 15));
-		rc.append("0123456789ABCDEF".charAt(colour.getGreen() >>> 4));
-		rc.append("0123456789ABCDEF".charAt(colour.getGreen() & 15));
-		rc.append("0123456789ABCDEF".charAt(colour.getBlue() >>> 4));
-		rc.append("0123456789ABCDEF".charAt(colour.getBlue() & 15));
-		rc.append("\033[3");
-		rc.append(colourindex2fore & 7);
-	    }
-	    else if (this.fullcolour)
-	    {   Color colour = newForeground;
-		rc.append("m\033]4;");
-		rc.append(colourindex2fore);
-		rc.append(";rgb:");
-		rc.append("0123456789ABCDEF".charAt(colour.getRed() >>> 4));
-		rc.append("0123456789ABCDEF".charAt(colour.getRed() & 15));
-		rc.append('/');
-		rc.append("0123456789ABCDEF".charAt(colour.getGreen() >>> 4));
-		rc.append("0123456789ABCDEF".charAt(colour.getGreen() & 15));
-		rc.append('/');
-		rc.append("0123456789ABCDEF".charAt(colour.getBlue() >>> 4));
-		rc.append("0123456789ABCDEF".charAt(colour.getBlue() & 15));
-		rc.append("\033\\\033[3");
-		rc.append(colourindex2fore & 7);
-		palette[colourindex2fore] = colour;
-	    }
-	    else if (colourindex2fore < 16)
-	    {   rc.append(";3");
-		rc.append(colourindex2fore);
-	    }
-	    else
-	    {   rc.append(";38;5;");
-		rc.append(colourindex2fore);
-	    }
-	if (this.tty && (colourindex2fore >= 0))
-	    newFormat[0] = (colourindex2fore & 8) == 8;
-	
-	for (int i = 0; i < 9; i++)
-	    if (newFormat[i] ^ oldFormat[i])
-		if (newFormat[i])
-		{   rc.append(";");
-		    rc.append(i);
-		}
-		else
-		{   rc.append(";2");
-		    rc.append(i);
-		}
-	
-	String _rc = rc.toString();
-	if (_rc.isEmpty())
-	    return "";
-	return ("\033[" + _rc.substring(1)).replace("\033[\033]", "\033]") + "m";
     }
     
     
@@ -1382,36 +1143,6 @@ public class Ponysay
 	                       return VERSION_METADATA;
 	}
 	/* version 3.0 */      return VERSION_HORIZONTAL_JUSTIFICATION;
-    }
-    
-    /**
-     * Parse palette
-     * 
-     * @param   value  String representation, without ESC, ] or P
-     * @return         Raw representation
-     */
-    protected static Color[] parsePalette(String value)
-    {
-	String defvalue = "00000001AA0000200AA003AA550040000AA5AA00AA600AAAA7AAAAAA"
-	                + "85555559FF5555A55FF55BFFFF55C5555FFDFF55FFE55FFFFFFFFFFF";
-	Color[] palette = new Color[16];
-        for (int ptr = 0, n = defvalue.length(); ptr < n; ptr += 7)
-	{
-	    int index = Integer.parseInt(defvalue.substring(ptr + 0, ptr + 1), 16);
-	    int red   = Integer.parseInt(defvalue.substring(ptr + 1, ptr + 3), 16);
-	    int green = Integer.parseInt(defvalue.substring(ptr + 3, ptr + 5), 16);
-	    int blue  = Integer.parseInt(defvalue.substring(ptr + 5, ptr + 7), 16);
-	    palette[index] = new Color(red, green, blue);
-	}
-	for (int ptr = 0, n = value.length(); ptr < n; ptr += 7)
-	{
-	    int index = Integer.parseInt(value.substring(ptr + 0, ptr + 1), 16);
-	    int red   = Integer.parseInt(value.substring(ptr + 1, ptr + 3), 16);
-	    int green = Integer.parseInt(value.substring(ptr + 3, ptr + 5), 16);
-	    int blue  = Integer.parseInt(value.substring(ptr + 5, ptr + 7), 16);
-	    palette[index] = new Color(red, green, blue);
-	}
-	return palette;
     }
     
 }
