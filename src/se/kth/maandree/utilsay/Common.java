@@ -327,5 +327,73 @@ public class Common
     }
     
     
+    /**
+     * Converts an integer array to a string with only 16-bit charaters
+     * 
+     * @param   ints  The int array
+     * @return        The string
+     */
+    public static String utf32to16(final int... ints)
+    {
+	int len = ints.length;
+	for (final int i : ints)
+	    if (i > 0xFFFF)
+		len++;
+	    else if (i > 0x10FFFF)
+		throw new RuntimeException("Be serious, there is no character above plane 16.");
+	
+	final char[] chars = new char[len];
+	int ptr = 0;
+	
+	for (final int i : ints)
+	    if (i <= 0xFFFF)
+		chars[ptr++] = (char)i;
+	    else
+	    {
+		/* 10000₁₆ + (H − D800₁₆) ⋅ 400₁₆ + (L − DC00₁₆) */
+		
+		int c = i - 0x10000;
+		int L = (c & 0x3FF) + 0xDC00;
+		int H = (c >>> 10) + 0xD800;
+		
+		chars[ptr++] = (char)H;
+		chars[ptr++] = (char)L;
+	    }
+	
+	return new String(chars);
+    }
+    
+    /**
+     * Parse double value
+     * 
+     * @param   value  String representation
+     * @return         Raw representation, -1 if not a number
+     */
+    public static double parseDouble(String value)
+    {
+	try
+	{   return Double.parseDouble(value);
+	}
+	catch (Throwable err)
+	{   return -1.0;
+	}
+    }
+    
+    /**
+     * Parse integer value
+     * 
+     * @param   value  String representation
+     * @return         Raw representation, -1 if not an integer
+     */
+    public static int parseInteger(String value)
+    {
+	try
+	{   return Integer.parseInt(value);
+	}
+	catch (Throwable err)
+	{   return -1;
+	}
+    }
+    
 }
 

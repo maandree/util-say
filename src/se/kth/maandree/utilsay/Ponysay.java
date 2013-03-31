@@ -73,12 +73,12 @@ public class Ponysay
 	this.version = flags.containsKey("version") ? parseVersion(flags.get("version")) : VERSION_HORIZONTAL_JUSTIFICATION;
 	this.utf8 = this.version > VERSION_COWSAY ? true : (flags.containsKey("utf8") && flags.get("utf8").toLowerCase().startsWith("y"));
 	this.fullcolour = flags.containsKey("fullcolour") && flags.get("fullcolour").toLowerCase().startsWith("y");
-	this.chroma = (flags.containsKey("chroma") == false) ? 1 : parseDouble(flags.get("chroma"));
-	this.balloon = (flags.containsKey("balloon") == false) ? -1 : parseInteger(flags.get("balloon"));
-	this.left = (flags.containsKey("left") == false) ? 2 : parseInteger(flags.get("left"));
-	this.right = (flags.containsKey("right") == false) ? 0 : parseInteger(flags.get("right"));
-	this.top = (flags.containsKey("top") == false) ? 0 : parseInteger(flags.get("top"));
-	this.bottom = (flags.containsKey("bottom") == false) ? 1 : parseInteger(flags.get("bottom"));
+	this.chroma = (flags.containsKey("chroma") == false) ? 1 : Common.parseDouble(flags.get("chroma"));
+	this.balloon = (flags.containsKey("balloon") == false) ? -1 : Common.parseInteger(flags.get("balloon"));
+	this.left = (flags.containsKey("left") == false) ? 2 : Common.parseInteger(flags.get("left"));
+	this.right = (flags.containsKey("right") == false) ? 0 : Common.parseInteger(flags.get("right"));
+	this.top = (flags.containsKey("top") == false) ? 0 : Common.parseInteger(flags.get("top"));
+	this.bottom = (flags.containsKey("bottom") == false) ? 1 : Common.parseInteger(flags.get("bottom"));
 	this.palette = (flags.containsKey("palette") == false) ? null : parsePalette(flags.get("palette").toUpperCase().replace("\033", "").replace("]", "").replace("P", ""));
 	this.ignoreballoon = flags.containsKey("ignoreballoon") && flags.get("ignoreballoon").toLowerCase().startsWith("y");
 	this.ignorelink = flags.containsKey("ignorelink") ? flags.get("ignorelink").toLowerCase().startsWith("y") : this.ignoreballoon;
@@ -189,17 +189,6 @@ public class Ponysay
      * Output option: bottom margin, negative for unmodified
      */
     protected int bottom;
-    
-    
-    /**
-     * Colour CIELAB value cache
-     */
-    private static ThreadLocal<HashMap<Color, double[]>> labMap = new ThreadLocal<HashMap<Color, double[]>>();
-    
-    /**
-     * Chroma weight using in {@link #labMap}
-     */
-    private static ThreadLocal<Double> labMapWeight = new ThreadLocal<Double>();
     
     
     
@@ -360,7 +349,7 @@ public class Ponysay
 		    {
 			int[] _name = new int[ptr];
 			System.arraycopy(buf, 0, _name, 0, _name.length);
-			String name = utf32to16(_name);
+			String name = Common.utf32to16(_name);
 			if (name.equals("\\"))
 		        {   curwidth++;
 			    items.add(new Pony.Cell(this.ignorelink ? ' ' : Pony.Cell.NNW_SSE, null, null, PLAIN));
@@ -392,7 +381,7 @@ public class Ponysay
 			System.arraycopy(buf, 0, name, 0, name.length);
 			int[] value = new int[ptr - dollareql - 1];
 			System.arraycopy(buf, dollareql + 1, value, 0, value.length);
-			items.add(new Pony.Store(utf32to16(name), utf32to16(value)));
+			items.add(new Pony.Store(Common.utf32to16(name), Common.utf32to16(value)));
 		    }
 		    ptr = 0;
 		    dollareql = -1;
@@ -431,7 +420,7 @@ public class Ponysay
 			    if ((ptr > 8) && (buf[ptr] == '\033') && (buf[0] == ';'))
 			    {   int[] _code = new int[ptr - 1];
 				System.arraycopy(buf, 1, _code, 0, ptr - 1);
-				String[] code = utf32to16(_code).split(";");
+				String[] code = Common.utf32to16(_code).split(";");
 				if (code.length == 2)
 				{   int index = Integer.parseInt(code[0]);
 				    code = code[1].split("/");
@@ -469,7 +458,7 @@ public class Ponysay
 			if (c == 'm')
 			{   int[] _code = new int[ptr];
 			    System.arraycopy(buf, 0, _code, 0, ptr);
-			    String[] code = utf32to16(_code).split(";");
+			    String[] code = Common.utf32to16(_code).split(";");
 			    int xterm256 = 0;
 			    boolean back = false;
 			    for (String seg : code)
@@ -981,7 +970,7 @@ public class Ponysay
 		    if (cell.character >= 0)
 		        if (balloonend < 0)
 			{   databuf.append(applyColour(colours, this.palette, background, foreground, format, background = cell.lowerColour, foreground = cell.upperColour, format = cell.format));
-			    databuf.append(utf32to16(cell.character));
+			    databuf.append(Common.utf32to16(cell.character));
 			}
 			else if (((cell.character == ' ') || (cell.character == ' ')) && (cell.lowerColour == null))
 			    balloonend++;
@@ -993,7 +982,7 @@ public class Ponysay
 				balloonend = -1;
 			    }
 			    databuf.append(applyColour(colours, this.palette, background, foreground, format, background = cell.lowerColour, foreground = cell.upperColour, format = cell.format));
-			    databuf.append(utf32to16(cell.character));
+			    databuf.append(Common.utf32to16(cell.character));
 			}
 		    else if (cell.character == Pony.Cell.NNW_SSE)
 		    {   if (balloonend >= 0)
@@ -1204,15 +1193,15 @@ public class Ponysay
      * Get ANSI colour sequence to append to the output
      * 
      * @param  palette        The current colour palette
-     * @param  ttypalette     The user's TTY colour palette
+     * @param  userPalette    The user's default colour palette
      * @param  oldBackground  The current background colour
      * @param  oldForeground  The current foreground colour
-     * @parma  oldFormat      The current text format
+     * @param  oldFormat      The current text format
      * @param  newBackground  The new background colour
      * @param  newForeground  The new foreground colour
-     * @parma  newFormat      The new text format
+     * @param  newFormat      The new text format
      */ // TODO cache colour matching
-    protected String applyColour(Color[] palette, Color[] ttypalette, Color oldBackground, Color oldForeground, boolean[] oldFormat, Color newBackground, Color newForeground, boolean[] newFormat)
+    protected String applyColour(Color[] palette, Color[] userPalette, Color oldBackground, Color oldForeground, boolean[] oldFormat, Color newBackground, Color newForeground, boolean[] newFormat)
     {
 	StringBuilder rc = new StringBuilder();
 	
@@ -1221,7 +1210,7 @@ public class Ponysay
 	
 	if ((oldBackground != null) && (newBackground == null))
 	{   if (this.tty)
-	    {   Color colour = palette[0] = ttypalette[0];
+	    {   Color colour = palette[0] = userPalette[0];
 		rc.append("m\033]P0");
 		rc.append("0123456789ABCDEF".charAt(colour.getRed() >>> 4));
 		rc.append("0123456789ABCDEF".charAt(colour.getRed() & 15));
@@ -1240,14 +1229,14 @@ public class Ponysay
 		if ((this.fullcolour && this.tty) == false)
 		    colourindex1back = matchColour(newBackground, palette, 16, 256, this.chroma);
 		if (this.tty || this.fullcolour)
-		    colourindex2back = (this.colourful ? matchColour(this.fullcolour ? newBackground : palette[colourindex1back], this.tty ? ttypalette : palette, 0, 8, this.chroma) : 7);
+		    colourindex2back = (this.colourful ? matchColour(this.fullcolour ? newBackground : palette[colourindex1back], this.tty ? userPalette : palette, 0, 8, this.chroma) : 7);
 		else
 		    colourindex2back = colourindex1back;
 	    }
 	
 	if ((oldForeground != null) && (newForeground == null))
         {   if (this.tty)
-	    {   Color colour = palette[7] = ttypalette[7];
+	    {   Color colour = palette[7] = userPalette[7];
 		rc.append("m\033]P7");
 		rc.append("0123456789ABCDEF".charAt(colour.getRed() >>> 4));
 		rc.append("0123456789ABCDEF".charAt(colour.getRed() & 15));
@@ -1267,7 +1256,7 @@ public class Ponysay
 		    colourindex1fore = matchColour(newForeground, palette, 16, 256, this.chroma);
 		if (this.tty || this.fullcolour)
 		{   int b = newFormat[0] ? 8 : 0;
-		    colourindex2fore = (this.colourful ? matchColour(this.fullcolour ? newForeground : palette[colourindex1fore], this.tty ? ttypalette : palette, b, b + 8, this.chroma) : 15);
+		    colourindex2fore = (this.colourful ? matchColour(this.fullcolour ? newForeground : palette[colourindex1fore], this.tty ? userPalette : palette, b, b + 8, this.chroma) : 15);
 		}
 		else
 		    colourindex2fore = colourindex1fore;
@@ -1374,72 +1363,6 @@ public class Ponysay
     
     
     /**
-     * Get the closest matching colour
-     * 
-     * @param   colour        The colour to match
-     * @param   palette       The palette for which to match
-     * @param   paletteStart  The beginning of the usable part of the palette
-     * @param   paletteEnd    The exclusive end of the usable part of the palette
-     * @param   chromaWeight  The chroma weight, negative for sRGB distance
-     * @return                The index of the closest colour in the palette
-     */
-    protected static int matchColour(Color colour, Color[] palette, int paletteStart, int paletteEnd, double chromaWeight)
-    {
-	if (chromaWeight < 0.0)
-	{
-	    int bestI = paletteStart;
-	    int bestD = 4 * 256 * 256;
-	    for (int i = paletteStart; i < paletteEnd; i++)
-	    {
-		int ðr = colour.getRed()   - palette[i].getRed();
-		int ðg = colour.getGreen() - palette[i].getGreen();
-		int ðb = colour.getBlue()  - palette[i].getBlue();
-		
-		int ð = ðr*ðr + ðg*ðg + ðb*ðb;
-		if (bestD > ð)
-		{   bestD = ð;
-		    bestI = i;
-		}
-	    }
-	    return bestI;
-	}
-	
-	Double _chroma = labMapWeight.get();
-	HashMap<Color, double[]> _labMap = ((_chroma == null) || (_chroma.doubleValue() != chromaWeight)) ? null : labMap.get();
-	if (_labMap == null)
-	{   labMap.set(_labMap = new HashMap<Color, double[]>());
-	    labMapWeight.set(new Double(chromaWeight));
-	}
-	
-	double[] lab = _labMap.get(colour);
-	/* if (lab == null) */ // FIXME Why does this not work!?
-	    _labMap.put(colour, lab = Colour.toLab(colour.getRed(), colour.getGreen(), colour.getBlue(), chromaWeight));
-	double L = lab[0], a = lab[1], b = lab[2];
-	
-	int bestI = -1;
-	double bestD = 0.0;
-	Color p;
-	for (int i = paletteStart; i < paletteEnd; i++)
-	{
-	    double[] tLab = _labMap.get(p = palette[i]);
-	    /* if (tLab == null) */ // FIXME Why does this not work!?
-		_labMap.put(colour, tLab = Colour.toLab(p.getRed(), p.getGreen(), p.getBlue(), chromaWeight));
-	    double ðL = L - tLab[0];
-	    double ða = a - tLab[1];
-	    double ðb = b - tLab[2];
-	    
-	    double ð = ðL*ðL + ða*ða + ðb*ðb;
-	    if ((bestD > ð) || (bestI < 0))
-	    {   bestD = ð;
-		bestI = i;
-	    }
-	}
-	
-	return bestI;
-    }
-    
-    
-    /**
      * Determine pony file format version for ponysay version string
      * 
      * @param   value  The ponysay version
@@ -1459,38 +1382,6 @@ public class Ponysay
 	                       return VERSION_METADATA;
 	}
 	/* version 3.0 */      return VERSION_HORIZONTAL_JUSTIFICATION;
-    }
-    
-    /**
-     * Parse double value
-     * 
-     * @param   value  String representation
-     * @return         Raw representation, -1 if not a number
-     */
-    protected static double parseDouble(String value)
-    {
-	try
-	{   return Double.parseDouble(value);
-	}
-	catch (Throwable err)
-	{   return -1.0;
-	}
-    }
-    
-    /**
-     * Parse integer value
-     * 
-     * @param   value  String representation
-     * @return         Raw representation, -1 if not an integer
-     */
-    protected static int parseInteger(String value)
-    {
-	try
-	{   return Integer.parseInt(value);
-	}
-	catch (Throwable err)
-	{   return -1;
-	}
     }
     
     /**
@@ -1521,43 +1412,6 @@ public class Ponysay
 	    palette[index] = new Color(red, green, blue);
 	}
 	return palette;
-    }
-    
-    
-    /**
-     * Converts an integer array to a string with only 16-bit charaters
-     * 
-     * @param   ints  The int array
-     * @return        The string
-     */
-    public static String utf32to16(final int... ints)
-    {
-	int len = ints.length;
-	for (final int i : ints)
-	    if (i > 0xFFFF)
-		len++;
-	    else if (i > 0x10FFFF)
-		throw new RuntimeException("Be serious, there is no character above plane 16.");
-	
-	final char[] chars = new char[len];
-	int ptr = 0;
-	
-	for (final int i : ints)
-	    if (i <= 0xFFFF)
-		chars[ptr++] = (char)i;
-	    else
-	    {
-		/* 10000₁₆ + (H − D800₁₆) ⋅ 400₁₆ + (L − DC00₁₆) */
-		
-		int c = i - 0x10000;
-		int L = (c & 0x3FF) + 0xDC00;
-		int H = (c >>> 10) + 0xD800;
-		
-		chars[ptr++] = (char)H;
-		chars[ptr++] = (char)L;
-	    }
-	
-	return new String(chars);
     }
     
 }
