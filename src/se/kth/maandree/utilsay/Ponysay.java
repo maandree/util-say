@@ -200,7 +200,7 @@ public class Ponysay
 	boolean[] PLAIN = new boolean[9];
 	
 	Color[] colours = new Color[256];
-	boolean[] format = PLAIN;
+	boolean[] format = new boolean[9];
 	Color background = null, foreground = null;
 	
 	for (int i = 0; i < 256; i++)
@@ -761,11 +761,11 @@ public class Ponysay
 			    }
 			    else if (metaclass == Pony.Combining.class)
 			    {   Pony.Combining combining = (Pony.Combining)meta;
-				databuf.append(this.submodule.applyColour(colours, background, foreground, format, background = combining.backgroundColour, foreground = combining.foregroundColour, format = combining.format));
+				databuf.append(this.submodule.applyColour(colours, background, foreground, format, background = combining.backgroundColour, foreground = combining.foregroundColour, combining.format));
 				databuf.append(combining.character);
 			    }
 			    else if (metaclass == Pony.Balloon.class)
-			    {   databuf.append(this.submodule.applyColour(colours, background, foreground, format, background = null, foreground = null, format = PLAIN));
+			    {   databuf.append(this.submodule.applyColour(colours, background, foreground, format, background = null, foreground = null, PLAIN));
 				Pony.Balloon balloon = (Pony.Balloon)meta;
 				if (balloon.left != null)
 				{   int justification = balloon.minWidth != null ? balloon.justification & (Pony.Balloon.LEFT | Pony.Balloon.RIGHT) : Pony.Balloon.NONE;
@@ -807,45 +807,45 @@ public class Ponysay
 			cell = defaultcell;
 		    if (cell.character >= 0)
 		        if (balloonend < 0)
-			{   databuf.append(this.submodule.applyColour(colours, background, foreground, format, background = cell.lowerColour, foreground = cell.upperColour, format = cell.format));
+			{   databuf.append(this.submodule.applyColour(colours, background, foreground, format, background = cell.lowerColour, foreground = cell.upperColour, cell.format));
 			    databuf.append(Common.utf32to16(cell.character));
 			}
 			else if (((cell.character == ' ') || (cell.character == ' ')) && (cell.lowerColour == null))
 			    balloonend++;
 			else
 			{   if (balloonend >= 0)
-			    {   databuf.append(this.submodule.applyColour(colours, background, foreground, format, background = null, foreground = this.spacesave ? foreground : null, format = PLAIN));
+			    {   databuf.append(this.submodule.applyColour(colours, background, foreground, format, background = null, foreground = this.spacesave ? foreground : null, PLAIN));
 				for (int i = 0; i < balloonend; i++)
 				    databuf.append(' ');
 				balloonend = -1;
 			    }
-			    databuf.append(this.submodule.applyColour(colours, background, foreground, format, background = cell.lowerColour, foreground = cell.upperColour, format = cell.format));
+			    databuf.append(this.submodule.applyColour(colours, background, foreground, format, background = cell.lowerColour, foreground = cell.upperColour, cell.format));
 			    databuf.append(Common.utf32to16(cell.character));
 			}
 		    else if (cell.character == Pony.Cell.NNW_SSE)
 		    {   if (balloonend >= 0)
-			{   databuf.append(this.submodule.applyColour(colours, background, foreground, format, background = null, foreground = null, format = PLAIN));
+			{   databuf.append(this.submodule.applyColour(colours, background, foreground, format, background = null, foreground = null, PLAIN));
 			    for (int i = 0; i < balloonend; i++)
 				databuf.append(' ');
 			    balloonend = -1;
 			}
-			databuf.append(this.submodule.applyColour(colours, background, foreground, format, background = null, foreground = null, format = PLAIN));
+			databuf.append(this.submodule.applyColour(colours, background, foreground, format, background = null, foreground = null, PLAIN));
 			databuf.append("$\\$");
 		    }
 		    else if (cell.character == Pony.Cell.NNE_SSW)
 		    {   if (balloonend >= 0)
-			{   databuf.append(this.submodule.applyColour(colours, background, foreground, format, background = null, foreground = null, format = PLAIN));
+			{   databuf.append(this.submodule.applyColour(colours, background, foreground, format, background = null, foreground = null, PLAIN));
 			    for (int i = 0; i < balloonend; i++)
 				databuf.append(' ');
 			    balloonend = -1;
 			}
-			databuf.append(this.submodule.applyColour(colours, background, foreground, format, background = null, foreground = null, format = PLAIN));
+			databuf.append(this.submodule.applyColour(colours, background, foreground, format, background = null, foreground = null, PLAIN));
 			databuf.append("$/$");
 		    }
 		    else if (cell.character == Pony.Cell.PIXELS)
 			if (cell.lowerColour == null)
 			    if (cell.upperColour == null)
-			    {   databuf.append(this.submodule.applyColour(colours, background, foreground, format, background = null, foreground = this.spacesave ? foreground : null, format = PLAIN));
+			    {   databuf.append(this.submodule.applyColour(colours, background, foreground, format, background = null, foreground = this.spacesave ? foreground : null, PLAIN));
 				if (balloonend >= 0)
 				    balloonend++;
 				else
@@ -853,70 +853,70 @@ public class Ponysay
 			    }
 			    else
 			    {   if (balloonend >= 0)
-				{   databuf.append(this.submodule.applyColour(colours, background, foreground, format, background = null, foreground = this.spacesave ? foreground : null, format = PLAIN));
+				{   databuf.append(this.submodule.applyColour(colours, background, foreground, format, background = null, foreground = this.spacesave ? foreground : null, PLAIN));
 				    for (int i = 0; i < balloonend; i++)
 					databuf.append(' ');
 				    balloonend = -1;
 				}
-				databuf.append(this.submodule.applyColour(colours, background, foreground, format, background = null, foreground = cell.upperColour, format = PLAIN));
+				databuf.append(this.submodule.applyColour(colours, background, foreground, format, background = null, foreground = cell.upperColour, PLAIN));
 				databuf.append('▀');
 			    }
 			else
 			    if (cell.upperColour == null)
 			    {   if (balloonend >= 0)
-				{   databuf.append(this.submodule.applyColour(colours, background, foreground, format, background = null, foreground = this.spacesave ? foreground : null, format = PLAIN));
+				{   databuf.append(this.submodule.applyColour(colours, background, foreground, format, background = null, foreground = this.spacesave ? foreground : null, PLAIN));
 				    for (int i = 0; i < balloonend; i++)
 					databuf.append(' ');
 				    balloonend = -1;
 				}
-				databuf.append(this.submodule.applyColour(colours, background, foreground, format, background = null, foreground = cell.lowerColour, format = PLAIN));
+				databuf.append(this.submodule.applyColour(colours, background, foreground, format, background = null, foreground = cell.lowerColour, PLAIN));
 				databuf.append('▄');
 			    }
 			    else if (cell.upperColour.equals(cell.lowerColour))
 				if (this.zebra)
 				{   if (balloonend >= 0)
-				    {   databuf.append(this.submodule.applyColour(colours, background, foreground, format, background = null, foreground = this.spacesave ? foreground : null, format = PLAIN));
+				    {   databuf.append(this.submodule.applyColour(colours, background, foreground, format, background = null, foreground = this.spacesave ? foreground : null, PLAIN));
 					for (int i = 0; i < balloonend; i++)
 					    databuf.append(' ');
 					balloonend = -1;
 				    }
-				    databuf.append(this.submodule.applyColour(colours, background, foreground, format, background = cell.lowerColour, foreground = cell.lowerColour, format = PLAIN));
+				    databuf.append(this.submodule.applyColour(colours, background, foreground, format, background = cell.lowerColour, foreground = cell.lowerColour, PLAIN));
 				    databuf.append('▄');
 				}
 				else if (this.fullblocks /*TODO && this.colourful && ¿can get better colour?*/)
 				{   if (balloonend >= 0)
-				    {   databuf.append(this.submodule.applyColour(colours, background, foreground, format, background = null, foreground = this.spacesave ? foreground : null, format = PLAIN));
+				    {   databuf.append(this.submodule.applyColour(colours, background, foreground, format, background = null, foreground = this.spacesave ? foreground : null, PLAIN));
 					for (int i = 0; i < balloonend; i++)
 					    databuf.append(' ');
 					balloonend = -1;
 				    }
-				    databuf.append(this.submodule.applyColour(colours, background, foreground, format, background = this.spacesave ? background : cell.lowerColour, foreground = cell.lowerColour, format = PLAIN));
+				    databuf.append(this.submodule.applyColour(colours, background, foreground, format, background = this.spacesave ? background : cell.lowerColour, foreground = cell.lowerColour, PLAIN));
 				    databuf.append('█');
 				}
 				else
 				{   if (balloonend >= 0)
-				    {   databuf.append(this.submodule.applyColour(colours, background, foreground, format, background = null, foreground = this.spacesave ? foreground : null, format = PLAIN));
+				    {   databuf.append(this.submodule.applyColour(colours, background, foreground, format, background = null, foreground = this.spacesave ? foreground : null, PLAIN));
 					for (int i = 0; i < balloonend; i++)
 					    databuf.append(' ');
 					balloonend = -1;
 				    }
-				    databuf.append(this.submodule.applyColour(colours, background, foreground, format, background = cell.lowerColour, foreground = this.spacesave ? foreground : cell.lowerColour, format = PLAIN));
+				    databuf.append(this.submodule.applyColour(colours, background, foreground, format, background = cell.lowerColour, foreground = this.spacesave ? foreground : cell.lowerColour, PLAIN));
 				    databuf.append(' ');
 				}
 			    else  //TODO (this.colourful && ¿can get better colour?) → flip
 			    {	if (balloonend >= 0)
-				{   databuf.append(this.submodule.applyColour(colours, background, foreground, format, background = null, foreground = this.spacesave ? foreground : null, format = PLAIN));
+				{   databuf.append(this.submodule.applyColour(colours, background, foreground, format, background = null, foreground = this.spacesave ? foreground : null, PLAIN));
 				    for (int i = 0; i < balloonend; i++)
 					databuf.append(' ');
 				    balloonend = -1;
 				}
-				databuf.append(this.submodule.applyColour(colours, background, foreground, format, background = cell.upperColour, foreground = cell.lowerColour, format = PLAIN));
+				databuf.append(this.submodule.applyColour(colours, background, foreground, format, background = cell.upperColour, foreground = cell.lowerColour, PLAIN));
 				databuf.append('▄');
 			    }
 		}
 	    }
 	    background = foreground = null;
-	    format = PLAIN;
+	    format = new boolean[9];
 	    databuf.append("\033[0m\n");
 	}
 	

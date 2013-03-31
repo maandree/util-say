@@ -154,6 +154,8 @@ public class Pony
 		this.format = new boolean[9];
 	    else
 		System.arraycopy(format, 0, this.format = new boolean[9], 0, 9);
+	    if ((character == PIXELS) || (character == ' ') || (character == ' '))
+		this.format[0] = false;
 	}
 	
 	

@@ -166,8 +166,7 @@ public class PonysayLinux extends PonysaySubmodule
 	}
 	else if ((oldBackground == null) || (oldBackground.equals(newBackground) == false))
 	    if (newBackground != null)
-	    {
-		if (this.fullcolour == false)
+	    {	if (this.fullcolour == false)
 		    colourindex1back = matchColour(newBackground, palette, 16, 256, this.chroma);
 		colourindex2back = (this.colourful ? matchColour(this.fullcolour ? newBackground : palette[colourindex1back], this.palette, 0, 8, this.chroma) : 7);
 	    }
@@ -185,8 +184,7 @@ public class PonysayLinux extends PonysaySubmodule
 	}
 	else if ((oldForeground == null) || (oldForeground.equals(newForeground) == false))
 	    if (newForeground != null)
-	    {
-		if (this.fullcolour == false)
+	    {	if (this.fullcolour == false)
 		    colourindex1fore = matchColour(newForeground, palette, 16, 256, this.chroma);
 		int b = newFormat[0] ? 8 : 0;
 		colourindex2fore = (this.colourful ? matchColour(this.fullcolour ? newForeground : palette[colourindex1fore], this.palette, b, b + 8, this.chroma) : 15);
@@ -219,18 +217,16 @@ public class PonysayLinux extends PonysaySubmodule
 	    rc.append("\033[3");
 	    rc.append(colourindex2fore & 7);
 	}
-	if (colourindex2fore >= 0)
-	    newFormat[0] = (colourindex2fore & 8) == 8;
 	
 	for (int i = 0; i < 9; i++)
 	    if (newFormat[i] ^ oldFormat[i])
-		if (newFormat[i])
+		if ((oldFormat[i] = newFormat[i]))
 		{   rc.append(";");
-		    rc.append(i);
+		    rc.append(i + 1);
 		}
 		else
 		{   rc.append(";2");
-		    rc.append(i);
+		    rc.append(i + 1);
 		}
 	
 	String _rc = rc.toString();

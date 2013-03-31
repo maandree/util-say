@@ -225,18 +225,16 @@ public class PonysayHaiku extends PonysaySubmodule
 	    {   rc.append(";38;5;");
 		rc.append(colourindex2fore);
 	    }
-	if (this.fullcolour && (colourindex2fore >= 0))
-	    newFormat[0] = (colourindex2fore & 8) == 8;
 	
 	for (int i = 0; i < 9; i++)
 	    if (newFormat[i] ^ oldFormat[i])
-		if (newFormat[i])
+		if ((oldFormat[i] = newFormat[i]))
 		{   rc.append(";");
-		    rc.append(i);
+		    rc.append(i + 1);
 		}
 		else
 		{   rc.append(";2");
-		    rc.append(i);
+		    rc.append(i + 1);
 		}
 	
 	String _rc = rc.toString();
