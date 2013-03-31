@@ -381,7 +381,7 @@ public class PonysayXterm extends PonysaySubmodule
 			else if (value < 38)    forei = value - 30;
 			else if (value < 48)    background = colours[value - 40];
 			else if ((90 <= value) && (value < 98))
-			    forei = values - 90 + 8;
+			    background = colours[values - 90 + 8];
 			else if ((100 <= value) && (value < 108))
 			    forei = values - 100 + 8;
 			if (xterm256 == 1)
