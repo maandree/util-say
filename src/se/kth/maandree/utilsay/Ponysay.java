@@ -908,19 +908,19 @@ public class Ponysay
 				}
 			    else
 			    {	if (balloonend >= 0)
-				{   databuf.append(this.submodule.applyColour(colours, background, foreground, format, background = null, foreground = this.spacesave ? foreground : null, P2PLAIN));
+				{   databuf.append(this.submodule.applyColour(colours, background, foreground, format, background = null, foreground = this.spacesave ? foreground : null, PLAIN));
 				    for (int i = 0; i < balloonend; i++)
 					databuf.append(' ');
 				    balloonend = -1;
 				}
-				databuf.append(this.submodule.applyColour(colours, background, foreground, format, background = cell.upperColour, foreground = cell.lowerColour, PLAIN));
+				databuf.append(this.submodule.applyColour(colours, background, foreground, format, background = cell.upperColour, foreground = cell.lowerColour, P2PLAIN));
 				databuf.append('▄');  //TODO (this.colourful && ¿can get better colour?) → flip
 			    }
 		}
 	    }
 	    background = foreground = null;
 	    format = new boolean[9];
-	    databuf.append("\033[0m\n");
+	    databuf.append("\033[00m\n");
 	}
 	
 	

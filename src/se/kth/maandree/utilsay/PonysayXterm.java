@@ -185,7 +185,7 @@ public class PonysayXterm extends PonysaySubmodule
 	    {
 		colourindex1back = matchColour(newBackground, palette, 16, 256, this.chroma);
 		if (this.fullcolour)
-		    colourindex2back = (this.colourful ? matchColour(this.fullcolour ? newBackground : palette[colourindex1back], this.palette, 0, 8, this.chroma) : 7);
+		    colourindex2back = this.colourful ? matchColour(this.fullcolour ? newBackground : palette[colourindex1back], this.palette, 0, 8, this.chroma) : 7;
 		else
 		    colourindex2back = colourindex1back;
 	    }
@@ -199,7 +199,7 @@ public class PonysayXterm extends PonysaySubmodule
 		if (this.fullcolour)
 		{   int s = ((newFormat.length > 9) && newFormat[9]) ? 0 : (newFormat[0] ? 8 : 0);
 		    int e = ((newFormat.length > 9) && newFormat[9]) ? 16 : (s + 8);
-		    colourindex2fore = (this.colourful ? matchColour(this.fullcolour ? newForeground : palette[colourindex1fore], this.palette, s, e, this.chroma) : 15);
+		    colourindex2fore = this.colourful ? matchColour(this.fullcolour ? newForeground : palette[colourindex1fore], this.palette, s, e, this.chroma) : 15;
 		}
 		else
 		    colourindex2fore = colourindex1fore;
@@ -264,7 +264,7 @@ public class PonysayXterm extends PonysaySubmodule
 	for (int i = 0; i < 9; i++)
 	    if (newFormat[i] ^ oldFormat[i])
 		if ((oldFormat[i] = newFormat[i]))
-		{   rc.append(";");
+		{   rc.append(";0");
 		    rc.append(i + 1);
 		}
 		else

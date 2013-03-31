@@ -96,11 +96,10 @@ public class PonysayLinux extends PonysaySubmodule
      */
     public boolean[][] getPlains()
     {
-	boolean bold = true;
 	return new boolean[][] {
 	    {false, false, false, false, false, false, false, false, false},
-	    {bold, false, false, false, false, false, false, false, false, bold},
-	    {bold, false, false, false, false, false, false, false, false}};
+	    {true, false, false, false, false, false, false, false, false, false},
+	    {true, false, false, false, false, false, false, false, false}};
     }
     
     
@@ -181,7 +180,7 @@ public class PonysayLinux extends PonysaySubmodule
 	    if (newBackground != null)
 	    {	if (this.fullcolour == false)
 		    colourindex1back = matchColour(newBackground, palette, 16, 256, this.chroma);
-		colourindex2back = (this.colourful ? matchColour(this.fullcolour ? newBackground : palette[colourindex1back], this.palette, 0, 8, this.chroma) : 7);
+		colourindex2back = this.colourful ? matchColour(this.fullcolour ? newBackground : palette[colourindex1back], this.palette, 0, 8, this.chroma) : 7;
 	    }
 	
 	if ((oldForeground != null) && (newForeground == null))
@@ -201,7 +200,9 @@ public class PonysayLinux extends PonysaySubmodule
 		    colourindex1fore = matchColour(newForeground, palette, 16, 256, this.chroma);
 		int s = ((newFormat.length > 9) && newFormat[9]) ? 0 : (newFormat[0] ? 8 : 0);
 		int e = ((newFormat.length > 9) && newFormat[9]) ? 16 : (s + 8);
-		colourindex2fore = (this.colourful ? matchColour(this.fullcolour ? newForeground : palette[colourindex1fore], this.palette, s, e, this.chroma) : 15);
+		colourindex2fore = this.colourful ? matchColour(this.fullcolour ? newForeground : palette[colourindex1fore], this.palette, s, e, this.chroma) : 15;
+		if (((colourindex2fore == 0) && (newBackground == null)) || (colourindex2fore == colourindex2back))
+		    colourindex2fore ^= 8;
 	    }
 	
 	if (colourindex2back != -1)
@@ -233,11 +234,11 @@ public class PonysayLinux extends PonysaySubmodule
 	}
 	
 	boolean _ = newFormat[0];
-	newFormat[0] = (8 <= colourindex2fore) && (colourindex2fore < 16);
+	newFormat[0] = (colourindex2fore == -1) ? oldFormat[0] : ((8 <= colourindex2fore) && (colourindex2fore < 16));
 	for (int i = 0; i < 9; i++)
 	    if (newFormat[i] ^ oldFormat[i])
 		if ((oldFormat[i] = newFormat[i]))
-		{   rc.append(";");
+		{   rc.append(";0");
 		    rc.append(i + 1);
 		}
 		else
