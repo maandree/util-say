@@ -189,7 +189,7 @@ public class PonysayLinux extends PonysaySubmodule
 		if (this.fullcolour == false)
 		    colourindex1fore = matchColour(newForeground, palette, 16, 256, this.chroma);
 		int b = newFormat[0] ? 8 : 0;
-		    colourindex2fore = (this.colourful ? matchColour(this.fullcolour ? newForeground : palette[colourindex1fore], this.palette, b, b + 8, this.chroma) : 15);
+		colourindex2fore = (this.colourful ? matchColour(this.fullcolour ? newForeground : palette[colourindex1fore], this.palette, b, b + 8, this.chroma) : 15);
 	    }
 	
 	if (colourindex2back != -1)
