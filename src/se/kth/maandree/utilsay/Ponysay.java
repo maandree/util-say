@@ -82,7 +82,7 @@ public class Ponysay
 	
 	String platform = flags.get("platform");
 	if (platform != null)
-	{   platform = platform.replace("-", "").replace("_", "");
+        {   platform = platform.toLowerCase().replace("-", "").replace("_", "");
 	    platform = platform.replace("colour", "color");
 	    platform = platform.replace("colors", "color");
 	    platform = platform.intern();
@@ -91,6 +91,8 @@ public class Ponysay
 	    this.submodule = new PonysayXterm(flags);
 	else if ((platform == "linux") || (platform == "tty"))
 	    this.submodule = new PonysayLinux(flags);
+	else if (platform == "haiku")
+	    this.submodule = new PonysayHaiku(flags);
 	else
 	{   this.submodule = new PonysayXterm(flags);
 	    System.err.println("\033[01;31mutil-say: warning: ponysay submodule does not exist: " + platform + "\033[00m");
