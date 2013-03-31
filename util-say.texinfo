@@ -57,6 +57,7 @@ Texts. A copy of the license is included in the section entitled
 @menu
 * Overview::                            Brief overview of util-say.
 * Background::                          Brief background.
+* Using the converter::                 Using the converter, @command{ponytool}.
 * GNU Free Documentation License::      Copying and sharing this manual.
 * Concept index::                       Concept index.
 * Option index::                        Option index.
@@ -112,10 +113,42 @@ An essential part of letting one glyph represent two pixels is that terminals
 support both foreground and background colours, as well as 240 well definied
 colours as well as full transparency.
 
-@opindex cat
 This is the foundation that lets use print nice looking images in the terminal,
 and it can be done in @command{cat}:able text files, for details on the formats
 please refer to the documentation for that specific program.
+
+
+
+@node Using the converter
+@appendix Using the converter
+@cindex converter
+@cindex @command{ponytool}
+
+@cindex importing
+@cindex exporting
+The command @command{ponytool} is used to convert images between formats and
+configurations, it has the capability of importing one file and exporting
+multiple files. As you may notice, @command{ponytool} does not support short
+options, only long options, and all options takes exactly one argument.
+
+@cindex invoking
+@cindex selecting file
+@cindex file, select
+@opindex @option{import}
+@opindex @option{export}
+@opindex @option{in}
+@opindex @option{out}
+@opindex @option{file}
+To use the converter, run command
+@command{ponytool --import module [parameters...] @{--export module [parameters...]@}}.
+Note that parameters must be added after their @option{--import} or
+@option{--export}. Alternatively you can use @option{--in} instead of
+@option{--import} or @option{--out} instead of @option{--export}.
+Associated with @option{--import} and @option{--export} is a module take
+must follow directly. All modules, before for export and import, honors
+@option{--file} that takes the file to read to or write from and defaults
+to stdin or stdout, @code{-} begin the explicit value for those, and will
+note be listed in the module's documention's.
 
 
 
