@@ -6,17 +6,13 @@ JAR=jar
 JAVAC=javac
 
 SRC=$(shell find src/ | grep '\.java')
-OBJ=$(shell find src/ | grep '\.java' | sed -e 's_^src/__g' -e 's_\.java$$_\.class_g')
+OBJ=$(shell find src/ | grep '\.java' | sed -e 's_/[a-zA-Z]*\.java$$_/\*\.class_g' -e 's_^src/__g' | sort | uniq)
 
+all: util-say.jar
 
-all: util-say.jar util-say.info.gz
-
-
-$(OBJ): $(SRC)
-	@"$(JAVAC)" -O -cp src -s src -d . $^
-
-util-say.jar: META-INF/MANIFEST.MF $(OBJ)
-	@"$(JAR)" -cfm "$@" "META-INF/MANIFEST.MF" $(OBJ)
+util-say.jar:
+	"$(JAVAC)" -O -cp src -s src -d . $(SRC)
+	"$(JAR)" -cfm "$@" "META-INF/MANIFEST.MF" $(OBJ)
 
 
 info: util-say.info.gz
