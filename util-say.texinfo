@@ -182,8 +182,10 @@ The following version spans exists:
 
 @table @asis
 @item @bullet{} 0 @leq{} @option{version} @math{<} 2.1
+@cindex @command{cowsay}
 @command{cowsay} format.
 @item @bullet{} 2.1 @leq{} @option{version} @math{<} 2.9
+@cindex @command{unisay}
 @command{unisay} format.
 @item @bullet{} 2.9 @leq{} @option{version} @math{<} 3
 Metadata support is added.
@@ -196,24 +198,34 @@ The additional options are supported:
 @table @asis
 @item @option{--ignoreballoon} (export/import)
 @opindex @option{ignoreballoon}
+@cindex ignore balloons
+@cindex balloons, ignore
 Specifies whether to remove all balloons but not links and substitute with
 transparent pixels. To enable this, use a value starting with @code{y} or
 @code{Y}.
 
 @item @option{--ignorelink} (export/import)
 @opindex @option{ignorelink}
+@cindex ignore links
+@cindex links, ignore
 Specifies whether to remove all balloons links and substitute with
 transparent pixels. To enable this, use a value starting with @code{y} or
 @code{Y}, the value defaults to the value of @option{--ignoreballoon}.
 
 @item @option{--even} (export)
 @opindex @option{even}
+@cindex right padding
+@cindex padding, right
+@cindex padding, even
+@cindex even out
 Specifies whether to pad the the lines to make all lines of same visual
 lenght. To disable this, use a value starting with @code{n} or @code{N}.
 This option is only available in @option{--export}.
 
 @item @option{--fullblocks} (export)
 @opindex @option{fullblocks}
+@cindex block elements
+@cindex full blocks
 Specifies whether full block elements can be used when a pixel pair has the
 same colours; in modes where the paletter is modified, this allows better
 selection of colour index. To disable this, use a value starting with
@@ -221,18 +233,24 @@ selection of colour index. To disable this, use a value starting with
 
 @item @option{--spacesave} (export)
 @opindex @option{spacesave}
+@cindex compression
+@cindex file size
 Specifies whether to prefer small files over making the image look good
 while marked in a terminal. To enable this, use a value starting with
 @code{y} or @code{Y}. This option is only available in @option{--export}.
 
 @item @option{--zebra} (export)
 @opindex @option{zebra}
+@cindex zebra effect
 Specifies whether to use half block elements when the pixel's an pixel
 pair has the same colours. To enable this, use a value starting with
 @code{y} or @code{Y}. This option is only available in @option{--export}.
 
 @item @option{--utf8} (export)
 @opindex @option{utf8}
+@cindex cowsay encoding
+@cindex encoding, escaping
+@cindex UTF-8
 This option is only available when using the @command{cowsay} format in
 @option{--export}, it is manditorly enabled when not using the
 @command{cowsay} format. It specifies whether to encode the files in
@@ -241,6 +259,8 @@ starting with @code{y} or @code{Y}.
 
 @item @option{--escesc} (export)
 @opindex @option{escesc}
+@cindex cowsay encoding
+@cindex encoding, escaping
 This option is only available when using the @command{cowsay} format in
 @option{--export}, it is manditorly disabled when not using the
 @command{cowsay} format. It specifies whether to escape the escape
@@ -249,6 +269,7 @@ characters in the files. To enable this, use a value starting with
 
 @item @option{--left} (export)
 @opindex @option{left}
+@cindex margins
 Fix the number emptying columns at the left side of the pony, if the value
 cannot be parsed as a non-negative integer, for example @code{-}, the margin
 will not be modified from the original image. This options is import
@@ -256,6 +277,7 @@ supported in @option{--export}.
 
 @item @option{--right} (export)
 @opindex @option{right}
+@cindex margins
 Fix the number emptying columns at the right side of the pony, if the value
 cannot be parsed as a non-negative integer, for example @code{-}, the margin
 will not be modified from the original image. This options is import
@@ -263,6 +285,7 @@ supported in @option{--export}.
 
 @item @option{--top} (export)
 @opindex @option{top}
+@cindex margins
 Fix the number emptying lines at the top of the pony, if the value cannot
 be parsed as a non-negative integer, for example @code{-}, the margin will
 not be modified from the original image. This options is import supported
@@ -270,6 +293,7 @@ in @option{--export}.
 
 @item @option{--bottom} (export)
 @opindex @option{bottom}
+@cindex margins
 Fix the number emptying lines at the bottom of the pony, if the value cannot
 be parsed as a non-negative integer, for example @code{-}, the margin will
 not be modified from the original image. This options is import supported
@@ -277,11 +301,14 @@ in @option{--export}.
 
 @item @option{--balloon} (export/import)
 @opindex @option{balloon}
+@cindex balloon, insert
 This specifies whether to insert a balloon and its link at the top left of
 the image. Use a value starting with a @code{y} or @code{Y} to enable this.
 
 @item @option{--platform} (export/import)
 @opindex @option{platform}
+@cindex platform
+@cindex system
 Specifies a submodule for which platform the pony is or should be encoded.
 These submodules supports additional options. The platform string is case
 insensitive and ignores hyphens, underscores and blankspaces and trets
@@ -318,12 +345,13 @@ parse the cow file, which is a partial @command{perl} script.
 @cindex module, @code{image}
 
 The @code{image} module lets you import and export regular graphics images,
-such as portable network graphics (PNG) files. The module suports the
+such as Portable Network Graphics (PNG) files. The module suports the
 following options.
 
 @table @asis
 @item @option{--left} (export)
 @opindex @option{left}
+@cindex margins
 Fix the number emptying columns at the left side of the pony, if the value
 cannot be parsed as a non-negative integer, for example @code{-}, the margin
 will not be modified from the original image. This options is import supported
@@ -331,6 +359,7 @@ in @option{--export}.
 
 @item @option{--right} (export)
 @opindex @option{right}
+@cindex margins
 Fix the number emptying columns at the right side of the pony, if the value
 cannot be parsed as a non-negative integer, for example @code{-}, the margin
 will not be modified from the original image. This options is import supported
@@ -338,6 +367,7 @@ in @option{--export}.
 
 @item @option{--top} (export/import)
 @opindex @option{top}
+@cindex margins
 Fix the number emptying lines at the top of the pony, if the value cannot
 be parsed as a non-negative integer, for example @code{-}, the margin will
 not be modified from the original image. However, in @option{--import}
@@ -346,6 +376,7 @@ lines between the pony and the balloon. Defaults to 3 in @option{--import}.
 
 @item @option{--bottom} (export)
 @opindex @option{bottom}
+@cindex margins
 Fix the number emptying lines at the bottom of the pony, if the value cannot
 be parsed as a non-negative integer, for example @code{-}, the margin will
 not be modified from the original image. This options is import supported
@@ -353,6 +384,9 @@ in @option{--export}.
 
 @item @option{--magnified} (export/import)
 @opindex @option{magnified}
+@cindex scale up
+@cindex magnification
+@cindex pixel dimension
 Pixel magnification, this specifies the nearest neighbour scale up used on
 the image, and default to 2. In @option{--export} this means that every
 pixel in the pony be @math{M} by @math{M} pixels if the value is @math{M}.
@@ -362,23 +396,35 @@ must be a positive integer.
 
 @item @option{--encoded} (export/import)
 @opindex @option{encoded}
+@cindex balloon, encode
+@cindex balloon link, encode
+@cindex link, encode
+@cindex encoded images
+@cindex image, encoded
 This specifies whether the balloon and balloon link is or should be encoded
 into to image. Use a value starting with a @code{y} or @code{Y} to enable this.
 
 @item @option{--balloon} (export/import)
 @opindex @option{balloon}
+@cindex balloon, insert
 This specifies whether to insert a balloon and its link at the top left of
 the image. Use a value starting with a @code{y} or @code{Y} to enable this.
 
 @item @option{--format} (export)
 @opindex @option{format}
+@cindex image format
+@cindex format, image
+@cindex PNG
+@cindex Portable Network Graphics
+@cindex GIF
+@cindex Graphics Interchange Format
 This specified what format to export the image with, the image is automatically
 select on import. If a value is not specified it will be determined from the
-file name and if fall back to portable network graphics (PNG) if it is not
+file name and if fall back to Portable Network Graphics (PNG) if it is not
 possible to determine. Note that the program will fail if the format is not
 recognised, which is a possibility even for determination by file name.
 All formats support by your Java installation will be supported; you count on
-PNG and graphics interchange format (GIF) being supported.
+PNG and Graphics Interchange Format (GIF) being supported.
 @end table
 
 
