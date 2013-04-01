@@ -206,42 +206,32 @@ public class PonysayLinux extends PonysaySubmodule
 	    }
 	
 	if (colourindex2back != -1)
-	    if (this.fullcolour == false)
-	    {   Color colour = palette[colourindex1back];
-		rc.append("m\033]P");
-		rc.append("0123456789ABCDEF".charAt(colourindex2back));
-		rc.append("0123456789ABCDEF".charAt(colour.getRed() >>> 4));
-		rc.append("0123456789ABCDEF".charAt(colour.getRed() & 15));
-		rc.append("0123456789ABCDEF".charAt(colour.getGreen() >>> 4));
-		rc.append("0123456789ABCDEF".charAt(colour.getGreen() & 15));
-		rc.append("0123456789ABCDEF".charAt(colour.getBlue() >>> 4));
-		rc.append("0123456789ABCDEF".charAt(colour.getBlue() & 15));
-		rc.append("\033[4");
-		rc.append(colourindex2back);
-	    }
-	    else
-	    {   rc.append(";4");
-		rc.append(colourindex2back);
-	    }
+	{   Color colour = this.fullcolour ? newBackground : palette[colourindex1back];
+	    rc.append("m\033]P");
+	    rc.append("0123456789ABCDEF".charAt(colourindex2back));
+	    rc.append("0123456789ABCDEF".charAt(colour.getRed() >>> 4));
+	    rc.append("0123456789ABCDEF".charAt(colour.getRed() & 15));
+	    rc.append("0123456789ABCDEF".charAt(colour.getGreen() >>> 4));
+	    rc.append("0123456789ABCDEF".charAt(colour.getGreen() & 15));
+	    rc.append("0123456789ABCDEF".charAt(colour.getBlue() >>> 4));
+	    rc.append("0123456789ABCDEF".charAt(colour.getBlue() & 15));
+	    rc.append("\033[4");
+	    rc.append(colourindex2back);
+	}
 	
 	if (colourindex2fore != -1)
-	    if (this.fullcolour == false)
-	    {   Color colour = palette[colourindex1fore];
-		rc.append("m\033]P");
-		rc.append("0123456789ABCDEF".charAt(colourindex2fore));
-		rc.append("0123456789ABCDEF".charAt(colour.getRed() >>> 4));
-		rc.append("0123456789ABCDEF".charAt(colour.getRed() & 15));
-		rc.append("0123456789ABCDEF".charAt(colour.getGreen() >>> 4));
-		rc.append("0123456789ABCDEF".charAt(colour.getGreen() & 15));
-		rc.append("0123456789ABCDEF".charAt(colour.getBlue() >>> 4));
-		rc.append("0123456789ABCDEF".charAt(colour.getBlue() & 15));
-		rc.append("\033[3");
-		rc.append(colourindex2fore & 7);
-	    }
-	    else
-	    {   rc.append(";3");
-		rc.append(colourindex2fore & 7);
-	    }
+	{   Color colour = this.fullcolour ? newForeground : palette[colourindex1fore];
+	    rc.append("m\033]P");
+	    rc.append("0123456789ABCDEF".charAt(colourindex2fore));
+	    rc.append("0123456789ABCDEF".charAt(colour.getRed() >>> 4));
+	    rc.append("0123456789ABCDEF".charAt(colour.getRed() & 15));
+	    rc.append("0123456789ABCDEF".charAt(colour.getGreen() >>> 4));
+	    rc.append("0123456789ABCDEF".charAt(colour.getGreen() & 15));
+	    rc.append("0123456789ABCDEF".charAt(colour.getBlue() >>> 4));
+	    rc.append("0123456789ABCDEF".charAt(colour.getBlue() & 15));
+	    rc.append("\033[3");
+	    rc.append(colourindex2fore & 7);
+	}
 	
 	boolean _ = newFormat[0];
 	newFormat[0] = (colourindex2fore == -1) ? oldFormat[0] : ((8 <= colourindex2fore) && (colourindex2fore < 16));
