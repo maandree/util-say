@@ -1,0 +1,28 @@
+#!/usr/bin/env bash
+
+magnified='1'
+file='-'
+dash=0
+chroma=1
+c=0
+
+for arg in "$@"; do
+    if [ $c = 1 ]; then
+	c=0
+	chroma="$arg"
+    elif [ $dash = 1 ]; then
+	file="$arg"
+    elif [ "$arg" = "--" ]; then
+	dash=1
+    elif [ "$arg" = "-2" ]; then
+	magnified=2
+    elif [ "$arg" = "-c" ]; then
+	c=1
+    else
+	file="$arg"
+    fi
+done
+
+java -jar "$(dirname "$0")/util-say.jar" \
+--import image --magnified $magnified --file "$file" --balloon n --export cowsay --balloon y --file - --chroma "$chroma"
+

@@ -1,0 +1,24 @@
+#!/usr/bin/env bash
+
+magnified='1'
+file='-'
+dash=0
+
+for arg in "$@"; do
+    if [ $c = 1 ]; then
+	c=0
+	chroma="$arg"
+    elif [ $dash = 1 ]; then
+	file="$arg"
+    elif [ "$arg" = "--" ]; then
+	dash=1
+    elif [ "$arg" = "-2" ]; then
+	magnified=2
+    else
+	file="$arg"
+    fi
+done
+
+java -jar "$(dirname "$0")/util-say.jar" \
+--import ponysay --file - --export image --magnified $magnified --file "$file" --left - --right - --bottom - --top -
+

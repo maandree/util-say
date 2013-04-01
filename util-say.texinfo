@@ -569,7 +569,7 @@ PNG and Graphics Interchange Format (GIF) being supported.
 @cindex image to pony
 @cindex pony from image
 To create a pony file from an image, use the command
-@command{ponytool --import image --file file.png --balloon y --export ponysay}.
+@command{ponytool --import image --file file.png --export ponysay --balloon y}.
 
 @cindex make TTY pony
 @cindex make Linux VT pony
