@@ -54,6 +54,9 @@ install: util-say.jar util-say.info.gz
 	install -m 755 util-say.jar "$(DESTDIR)$(PREFIX)$(BIN)"
 	install -m 755 img2{pony,uni,cow}say "$(DESTDIR)$(PREFIX)$(BIN)"
 	install -m 755 {pony,uni,cow}say2img "$(DESTDIR)$(PREFIX)$(BIN)"
+	install -m 755 ponysay2ttyponysay "$(DESTDIR)$(PREFIX)$(BIN)"
+	ln -sf ponysay2ttyponysay "$(DESTDIR)$(PREFIX)$(BIN)"/tty2colourfultty
+	ln -sf /usr/bin/cat "$(DESTDIR)$(PREFIX)$(BIN)"/unzebra
 	install -m 755 ponytool "$(DESTDIR)$(PREFIX)$(BIN)"
 	install -d -m 755 "$(DESTDIR)$(PREFIX)$(DATA)/licenses/util-say"
 	install -m 644 LICENSE COPYING "$(DESTDIR)$(PREFIX)$(DATA)/licenses/util-say"
@@ -67,6 +70,9 @@ uninstall:
 	unlink "$(DESTDIR)$(PREFIX)$(DATA)/info/util-say.info.gz"
 	rm -- "$(DESTDIR)$(PREFIX)$(BIN)/"img2{pony,uni,cow}say
 	rm -- "$(DESTDIR)$(PREFIX)$(BIN)/"{pony,uni,cow}say2img
+	rm -- "$(DESTDIR)$(PREFIX)$(BIN)/"ponysay2ttyponysay
+	rm -- "$(DESTDIR)$(PREFIX)$(BIN)/"tty2colourfultty
+	rm -- "$(DESTDIR)$(PREFIX)$(BIN)/"unzebra
 	yes | rm -r "$(DESTDIR)$(PREFIX)$(DATA)/licenses/util-say"
 
 

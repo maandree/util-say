@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+
+p=0
+palette=''
+
+for arg in "$@"; do
+    if [ $p = 1 ]; then
+	p=0
+	palette="$arg"
+    elif [ "$arg" = '-p' ]; then
+	p=1
+    fi
+done
+
+java -jar "$(dirname "$0")/util-say.jar" \
+--import ponysay --file - --export ponysay --file - --left - --right - --bottom - --top - --palette "$palette"
+

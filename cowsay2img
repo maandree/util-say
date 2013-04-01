@@ -5,10 +5,7 @@ file='-'
 dash=0
 
 for arg in "$@"; do
-    if [ $c = 1 ]; then
-	c=0
-	chroma="$arg"
-    elif [ $dash = 1 ]; then
+    if [ $dash = 1 ]; then
 	file="$arg"
     elif [ "$arg" = "--" ]; then
 	dash=1
