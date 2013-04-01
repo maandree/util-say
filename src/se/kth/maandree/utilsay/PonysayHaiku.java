@@ -252,7 +252,7 @@ public class PonysayHaiku extends PonysaySubmodule
 	    }
 	    else if (colourindex2fore < 16)
 	    {   rc.append(";3");
-		rc.append(colourindex2fore);
+		rc.append(colourindex2fore & 7);
 	    }
 	    else
 	    {   rc.append(";38;5;");
