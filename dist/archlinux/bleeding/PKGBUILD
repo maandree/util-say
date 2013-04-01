@@ -1,14 +1,6 @@
-# This is an example PKGBUILD file. Use this as a start to creating your own,
-# and remove these comments. For more information, see 'man PKGBUILD'.
-# NOTE: Please fill out the license field for your package! If it is unknown,
-# then please put 'unknown'.
-
-# See http://wiki.archlinux.org/index.php/VCS_PKGBUILD_Guidelines
-# for more information on packaging from GIT sources.
-
-# Maintainer: Mattias Andrée <maandree@operamail.com>
+# Maintainer: Mattias Andrée <`base64 -d`(bWFhbmRyZWUK)@member.fsf.org>
 pkgname=util-say-git
-pkgver=20120820
+pkgver=20130401
 pkgrel=1
 pkgdesc="Tools for creating ponies for cowsay and cowsay-like programs"
 arch=('any')
@@ -16,7 +8,7 @@ url="https://github.com/maandree/util-say"
 license=('GPL3')
 depends=('java-runtime>=6')
 makedepends=('git' 'java-environment>=6' 'bash')
-optdepends=('imagemagick: allows imgsrcrecovery to read frames in GIF files' 'perl: required for cowsay2unisay')
+optdepends=('imagemagick: allows imgsrcrecovery to read frames in GIF files' 'perl: required for cowsay import support')
 provides=('util-say')
 conflicts=('util-say')
 
@@ -41,7 +33,6 @@ build() {
   git clone "$srcdir/$_gitname" "$srcdir/$_gitname-build"
   cd "$srcdir/$_gitname-build"
 
-  ./build.sh --build-make
   make -B DESTDIR="$pkgdir/"
 }
 
@@ -49,3 +40,4 @@ package() {
   cd "$srcdir/$_gitname-build"
   make DESTDIR="$pkgdir/" install
 }
+
