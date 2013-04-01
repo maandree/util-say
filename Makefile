@@ -1,3 +1,7 @@
+PREFIX=/usr
+BIN=/bin
+DATA=/share
+
 JAR=jar
 JAVAC=javac
 
@@ -5,7 +9,8 @@ SRC=$(shell find src/ | grep '\.java')
 OBJ=$(shell find src/ | grep '\.java' | sed -e 's_^src/__g' -e 's_\.java$$_\.class_g')
 
 
-all: util-say.jar
+all: util-say.jar util-say.info.gz
+
 
 $(OBJ): $(SRC)
 	@"$(JAVAC)" -O -cp src -s src -d . $^
@@ -14,18 +19,54 @@ util-say.jar: META-INF/MANIFEST.MF $(OBJ)
 	@"$(JAR)" -cfm "$@" "META-INF/MANIFEST.MF" $(OBJ)
 
 
-install:
-	install -d -m 755 "$(DESTDIR)/usr/bin"
-	install -m 755 util-say.jar "$(DESTDIR)/usr/bin"
-	install -m 755 ponytool "$(DESTDIR)/usr/bin"
-	install -d -m 755 "$(DESTDIR)/usr/share/licenses/util-say"
-	install -m 644 LICENSE COPYING "$(DESTDIR)/usr/share/licenses/util-say"
+info: util-say.info.gz
+%.info: %.texinfo
+	$(MAKEINFO) "$<"
+%.info.gz: %.info
+	gzip -9c < "$<" > "$@"
+
+
+pdf: util-say.pdf
+%.pdf: %.texinfo
+	texi2pdf "$<"
+
+pdf.gz: util-say.pdf.gz
+%.pdf.gz: %.pdf
+	gzip -9c < "$<" > "$@"
+
+pdf.xz: util-say.pdf.xz
+%.pdf.xz: %.pdf
+	xz -e9 < "$<" > "$@"
+
+
+dvi: util-say.dvi
+%.dvi: %.texinfo
+	$(TEXI2DVI) "$<"
+
+dvi.gz: util-say.dvi.gz
+%.dvi.gz: %.dvi
+	gzip -9c < "$<" > "$@"
+
+dvi.xz: util-say.dvi.xz
+%.dvi.xz: %.dvi
+	xz -e9 < "$<" > "$@"
+
+
+install: util-say.jar util-say.info.gz
+	install -d -m 755 "$(DESTDIR)$(PREFIX)$(BIN)"
+	install -m 755 util-say.jar "$(DESTDIR)$(PREFIX)$(BIN)"
+	install -m 755 ponytool "$(DESTDIR)$(PREFIX)$(BIN)"
+	install -d -m 755 "$(DESTDIR)$(PREFIX)$(DATA)/licenses/util-say"
+	install -m 644 LICENSE COPYING "$(DESTDIR)$(PREFIX)$(DATA)/licenses/util-say"
+	install -d -m 755 "$(DESTDIR)$(PREFIX)$(DATA)/info"
+	install -m 644 util-say.info.gz "$(DESTDIR)$(PREFIX)$(DATA)/info"
 
 
 uninstall:
-	unlink "$(DESTDIR)/usr/bin/util-say.jar"
-	unlink "$(DESTDIR)/usr/bin/ponytool"
-	yes | rm -r "$(DESTDIR)/usr/share/licenses/util-say"
+	unlink "$(DESTDIR)$(PREFIX)$(BIN)/util-say.jar"
+	unlink "$(DESTDIR)$(PREFIX)$(BIN)/ponytool"
+	unlink "$(DESTDIR)$(PREFIX)$(DATA)/info/util-say.info.gz"
+	yes | rm -r "$(DESTDIR)$(PREFIX)$(DATA)/licenses/util-say"
 
 
 .PHONY: clean

@@ -38,7 +38,6 @@ Texts. A copy of the license is included in the section entitled
 @titlepage
 @title util-say
 @subtitle Tools for creating ponies for ponysay and ponysay-like programs
-@subtitle Covers util-say version @value{VERSION}.
 @c ** start of front page image **
 @c If print make a pdf or hard copy with the front cover
 @c you may or may not want to remove this.
@@ -121,7 +120,7 @@ please refer to the documentation for that specific program.
 
 
 @node Using the converter
-@appendix Using the converter
+@chapter Using the converter
 @cindex converter
 @cindex @command{ponytool}
 
@@ -163,18 +162,137 @@ Supported modules are @code{ponysay}, @code{unisay}, @code{cowsay} and
 * Ponysay module::                      Using the @code{ponysay} module.
 * Unisay module::                       Using the @code{unisay} module.
 * Cowsay module::                       Using the @code{cowsay} module.
-* Image modules::                       Using the @code{image} module.
+* Image module::                        Using the @code{image} module.
 @end menu
 
 
 @node Ponysay module
 @section @code{ponysay} module
-@cinded @code{ponysay} module
+@cindex @code{ponysay} module
 @cindex module, @code{ponysay}
+
+@opindex @option{version}
+The @code{ponysay} module lets you import and export @command{ponysay}
+ponies of any @command{ponysay} version. To select the which version of
+@command{ponysay} to use, use the option @option{--version}, the value
+is version string (numerals seperated by dots). The version will always
+default to the latest version of @command{ponysay}, if not yet stabil.
+
+The following version spans exists:
+
+@table @asis
+@item @bullet{} 0 @leq{} @option{version} @math{<} 2.1
+@command{cowsay} format.
+@item @bullet{} 2.1 @leq{} @option{version} @math{<} 2.9
+@command{unisay} format.
+@item @bullet{} 2.9 @leq{} @option{version} @math{<} 3
+Metadata support is added.
+@item @bullet{} 3 @leq{} @option{version}
+Horizontal balloon justification is added.
+@end table
+
+The additional options are supported:
+
+@table @asis
+@item @option{--ignoreballoon} (export/import)
+@opindex @option{ignoreballoon}
+Specifies whether to remove all balloons but not links and substitute with
+transparent pixels. To enable this, use a value starting with @code{y} or
+@code{Y}.
+
+@item @option{--ignorelink} (export/import)
+@opindex @option{ignorelink}
+Specifies whether to remove all balloons links and substitute with
+transparent pixels. To enable this, use a value starting with @code{y} or
+@code{Y}, the value defaults to the value of @option{--ignoreballoon}.
+
+@item @option{--even} (export)
+@opindex @option{even}
+Specifies whether to pad the the lines to make all lines of same visual
+lenght. To disable this, use a value starting with @code{n} or @code{N}.
+This option is only available in @option{--export}.
+
+@item @option{--fullblocks} (export)
+@opindex @option{fullblocks}
+Specifies whether full block elements can be used when a pixel pair has the
+same colours; in modes where the paletter is modified, this allows better
+selection of colour index. To disable this, use a value starting with
+@code{n} or @code{N}. This option is only available in @option{--export}.
+
+@item @option{--spacesave} (export)
+@opindex @option{spacesave}
+Specifies whether to prefer small files over making the image look good
+while marked in a terminal. To enable this, use a value starting with
+@code{y} or @code{Y}. This option is only available in @option{--export}.
+
+@item @option{--zebra} (export)
+@opindex @option{zebra}
+Specifies whether to use half block elements when the pixel's an pixel
+pair has the same colours. To enable this, use a value starting with
+@code{y} or @code{Y}. This option is only available in @option{--export}.
+
+@item @option{--utf8} (export)
+@opindex @option{utf8}
+This option is only available when using the @command{cowsay} format in
+@option{--export}, it is manditorly enabled when not using the
+@command{cowsay} format. It specifies whether to encode the files in
+UTF-8, rather then using escaped strings. To enable this, use a value
+starting with @code{y} or @code{Y}.
+
+@item @option{--escesc} (export)
+@opindex @option{escesc}
+This option is only available when using the @command{cowsay} format in
+@option{--export}, it is manditorly disabled when not using the
+@command{cowsay} format. It specifies whether to escape the escape
+characters in the files. To enable this, use a value starting with
+@code{y} or @code{Y}.
+
+@item @option{--left} (export)
+@opindex @option{left}
+Fix the number emptying columns at the left side of the pony, if the value
+cannot be parsed as a non-negative integer, for example @code{-}, the margin
+will not be modified from the original image. This options is import
+supported in @option{--export}.
+
+@item @option{--right} (export)
+@opindex @option{right}
+Fix the number emptying columns at the right side of the pony, if the value
+cannot be parsed as a non-negative integer, for example @code{-}, the margin
+will not be modified from the original image. This options is import
+supported in @option{--export}.
+
+@item @option{--top} (export)
+@opindex @option{top}
+Fix the number emptying lines at the top of the pony, if the value cannot
+be parsed as a non-negative integer, for example @code{-}, the margin will
+not be modified from the original image. This options is import supported
+in @option{--export}.
+
+@item @option{--bottom} (export)
+@opindex @option{bottom}
+Fix the number emptying lines at the bottom of the pony, if the value cannot
+be parsed as a non-negative integer, for example @code{-}, the margin will
+not be modified from the original image. This options is import supported
+in @option{--export}.
+
+@item @option{--balloon} (export/import)
+@opindex @option{balloon}
+This specifies whether to insert a balloon and its link at the top left of
+the image. Use a value starting with a @code{y} or @code{Y} to enable this.
+
+@item @option{--platform} (export/import)
+@opindex @option{platform}
+Specifies a submodule for which platform the pony is or should be encoded.
+These submodules supports additional options. The platform string is case
+insensitive and ignores hyphens, underscores and blankspaces and trets
+@code{colours}, @code{colour}, @code{colors} and @code{color} all as the
+same word.
+@end table
+
 
 @node Unisay module
 @section @code{unisay} module
-@cinded @code{unisay} module
+@cindex @code{unisay} module
 @cindex module, @code{unisay}
 
 The @code{unisay} module is identical to @code{ponysay} with
@@ -182,10 +300,9 @@ The @code{unisay} module is identical to @code{ponysay} with
 dropped the use of cowsay and switch to @command{unisay}'s format.)
 
 
-
 @node Cowsay module
 @section @code{cowsay} module
-@cinded @code{cowsay} module
+@cindex @code{cowsay} module
 @cindex module, @code{cowsay}
 
 The @code{cowsay} module is an extension of the @code{ponysay} with
@@ -195,10 +312,9 @@ For import you will need @command{perl} installed as it is used to
 parse the cow file, which is a partial @command{perl} script.
 
 
-
 @node Image module
 @section @code{image} module
-@cinded @code{image} module
+@cindex @code{image} module
 @cindex module, @code{image}
 
 The @code{image} module lets you import and export regular graphics images,

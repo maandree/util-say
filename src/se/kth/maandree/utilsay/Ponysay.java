@@ -82,7 +82,7 @@ public class Ponysay
 	
 	String platform = flags.get("platform");
 	if (platform != null)
-        {   platform = platform.toLowerCase().replace("-", "").replace("_", "");
+        {   platform = platform.toLowerCase().replace("-", "").replace("_", "").replace(" ", "");
 	    platform = platform.replace("colour", "color");
 	    platform = platform.replace("colors", "color");
 	    platform = platform.intern();
@@ -168,14 +168,14 @@ public class Ponysay
     protected int top;
     
     /**
-     * Input/output option: insert balloon into the image, negative for false, otherwise the additional space between the pony and balloon
-     */
-    protected int balloon;
-    
-    /**
      * Output option: bottom margin, negative for unmodified
      */
     protected int bottom;
+    
+    /**
+     * Input/output option: insert balloon into the image, negative for false, otherwise the additional space between the pony and balloon
+     */
+    protected int balloon;
     
     /**
      * Input/output option: colouring submodule
