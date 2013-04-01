@@ -563,9 +563,20 @@ PNG and Graphics Interchange Format (GIF) being supported.
 @cindex usage examples
 @cindex examples, usage
 
+@cindex create pony file
+@cindex make pony file
+@cindex pony file, create
+@cindex image to pony
+@cindex pony from image
 To create a pony file from an image, use the command
 @command{ponytool --import image --file file.png --balloon y --export ponysay}.
 
+@cindex make TTY pony
+@cindex make Linux VT pony
+@cindex create TTY pony
+@cindex create Linux VT pony
+@cindex TTY pony, create
+@cindex Linux VT pony, create
 To create a Linux VT pony file from and XTerm pony file, use the command
 @command{ponytool --import ponysay --file file.pony --export ponysay --platform tty --left - --right - --top - --bottom - --file tty.pony}.
 
