@@ -182,6 +182,14 @@ Supported modules are @code{ponysay}, @code{unisay}, @code{cowsay} and
 @cinded @code{cowsay} module
 @cindex module, @code{cowsay}
 
+The @code{cowsay} module is an extension of the @code{ponysay} with
+@option{--version=0.1}, so the same options are supported, except
+@option{--version}. It can construct images usable with @code{cowsay}.
+For import you will need @command{perl} installed as it is used to
+parse the cow file, which is a partial @command{perl} script.
+
+
+
 @node Image module
 @section @code{image} module
 @cinded @code{image} module
