@@ -8,8 +8,9 @@ JAVAC=javac
 SRC=$(shell find src/ | grep '\.java')
 OBJ=$(shell find src/ | grep '\.java' | sed -e 's_/[a-zA-Z]*\.java$$_/\*\.class_g' -e 's_^src/__g' | sort | uniq)
 
-all: util-say.jar
+all: util-say.jar info
 
+.PHONY: util-say.jar
 util-say.jar:
 	"$(JAVAC)" -O -cp src -s src -d . $(SRC)
 	"$(JAR)" -cfm "$@" "META-INF/MANIFEST.MF" $(OBJ)
