@@ -177,6 +177,12 @@ Supported modules are @code{ponysay}, @code{unisay}, @code{cowsay} and
 @cinded @code{unisay} module
 @cindex module, @code{unisay}
 
+The @code{unisay} module is identical to @code{ponysay} with
+@option{--version=2.1}. (Which as the version of @command{ponysay}, that
+dropped the use of cowsay and switch to @command{unisay}'s format.)
+
+
+
 @node Cowsay module
 @section @code{cowsay} module
 @cinded @code{cowsay} module
