@@ -69,7 +69,7 @@ public class Image
     
     /**
      * <p>Output option: top margin, negative for unmodified</p>
-     * <p>Input option: Extra number of lines between the pony and balloon (must not be negative)</p>
+     * <p>Input option: extra number of lines between the pony and balloon (must not be negative)</p>
      */
     protected int top;
     
