@@ -918,6 +918,7 @@ public class Ponysay
 			    }
 		}
 	    }
+	    databuf.append(this.submodule.applyColour(colours, background, foreground, format, background = null, foreground = null, format));
 	    background = foreground = null;
 	    format = new boolean[9];
 	    databuf.append("\033[00m\n");

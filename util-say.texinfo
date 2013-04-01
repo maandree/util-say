@@ -57,6 +57,7 @@ Texts. A copy of the license is included in the section entitled
 * Overview::                            Brief overview of util-say.
 * Background::                          Brief background.
 * Using the converter::                 Using the converter, @command{ponytool}.
+* Usage examples::                      Examples of basic commands.
 * GNU Free Documentation License::      Copying and sharing this manual.
 * Concept index::                       Concept index.
 * Option index::                        Option index.
@@ -385,7 +386,8 @@ sRGB distances, you can use an invalid value for @option{--chroma}, for example,
 @cindex system, @code{tty}
 
 @code{linux}, or @code{tty}, is the submodule for parse or, primarly, create images
-printable in the Linux virtual terminal.
+printable in the Linux virtual terminal. You may use @code{xterm} for parsing Linux VT
+image, if but if you use @code{linux}, errors the pony will be visible.
 
 @opindex @option{fullcolour}
 @opindex @option{colourful}
@@ -553,6 +555,19 @@ recognised, which is a possibility even for determination by file name.
 All formats support by your Java installation will be supported; you count on
 PNG and Graphics Interchange Format (GIF) being supported.
 @end table
+
+
+
+@node Usage examples
+@chapter Usage examples
+@cindex usage examples
+@cindex examples, usage
+
+To create a pony file from an image, use the command
+@command{ponytool --import image --file file.png --balloon y --export ponysay}.
+
+To create a Linux VT pony file from and XTerm pony file, use the command
+@command{ponytool --import ponysay --file file.pony --export ponysay --platform tty --left - --right - --top - --bottom - --file tty.pony}.
 
 
 

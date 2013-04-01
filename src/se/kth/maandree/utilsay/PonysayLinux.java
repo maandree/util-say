@@ -337,8 +337,8 @@ public class PonysayLinux extends PonysaySubmodule
 			else if (value == 0)
 			{   for (int i = 0; i < 9; i++)
 				format[i] = false;
-			    background = null;
-			    forei = -1;
+			    background = colours[0].equals(this.palette[0]) ? null : colours[0];
+			    forei = colours[7].equals(this.palette[7]) ? -1 : 7;
 			}
 			else if (xterm256 == 1)
 			    xterm256 = value == 5 ? 2 : 0;
@@ -346,8 +346,8 @@ public class PonysayLinux extends PonysaySubmodule
 			    format[value - 1] = true;
 			else if ((20 < value) && (value < 30))
 			    format[value - 21] = false;
-			else if (value == 39)   forei = -1;
-			else if (value == 49)   background = null;
+			else if (value == 39)   forei = colours[7].equals(this.palette[7]) ? -1 : 7;
+			else if (value == 49)   background = colours[0].equals(this.palette[0]) ? null : colours[0];
 			else if (value == 38)   xterm256 = 1;
 			else if (value == 48)   xterm256 = 1;
 			else if (value < 38)    forei = value - 30;
