@@ -317,6 +317,133 @@ same word.
 @end table
 
 
+@menu
+* XTerm submodule::                     Using the @code{xterm-256color} submodule.
+* Linux VT submodule::                  Using the @code{linux} submodule.
+* Haiku submodule::                     Using the @code{haiku} submodule.
+@end menu
+
+
+@node XTerm submodule
+@subsection XTerm submodule
+@cindex @code{xterm}, platform
+@cindex platform, @code{xterm}
+@cindex system, @code{xterm}
+
+@code{xterm}, or @code{xterm-256color}, is the default module, in @option{--import}
+is reading files created with the @code{linux} submodule. @code{xterm} is used for
+normal @code{xterm-256color} capable terminals.
+
+@opindex @option{fullcolour}
+@opindex @option{colourful}
+@cindex 24-bit colour support
+@cindex colour support, 24 bits
+@code{xterm} will use the well defined colours with the indices 16 through 255
+(inclusive.) If you want to enable use any colour @code{xterm} can modify the palette,
+however terminals will normally not support this as the palette will be reset and
+normally everything is redrawn when the palette is modified. To do this, use the
+option @option{--fullcolour} with a value starting with @code{y} or @code{Y}. In this
+mode only the colour indices 7 (white) and 15 (bright white) will be modified and
+used, if you want 16 colour indices to be used, use the @option{--colourful} with a
+value starting with @code{y} or @code{Y}.
+
+@opindex @option{palette}
+@cindex palette, custom
+@cindex custom palette
+@cindex @option{fullcolour}
+You can specify which palette you want to use by adding it as the value of the option
+@option{--palette}, the value does not need to contain the characters ESC, @code{[}
+and @code{P}, and both XTerm and Linux VT palette strings are supported. When using
+@option{--fullcolour} it is a good idea to use this so the palette you are using does
+not get changed when displaying the image.
+
+@opindex @option{chroma}
+@cindex colour matching
+@cindex colour distance
+@cindex matching, colour
+@cindex distance, colour
+@cindex CIELAB
+@cindex sRGB
+@cindex standard RGB
+@cindex RGB, standard RGB
+The select which colour index to use, as it is limited, the best colour is choosen
+by selecting the first enumerated colour with minimal distance. By default the
+distances aer calculated as CIELAB distances. If you want to make the chroma more
+important than distance, you can specify a non-negative floating value in the
+option @option{--chroma}, which as the 1 as its default value. If you prefer
+sRGB distances, you can use an invalid value for @option{--chroma}, for example,
+@code{-}.
+
+
+@node Linux VT submodule
+@subsection Linux VT submodule
+@cindex @code{linux}, platform
+@cindex platform, @code{linux}
+@cindex system, @code{linux}
+@cindex @code{tty}, platform
+@cindex platform, @code{tty}
+@cindex system, @code{tty}
+
+@code{linux}, or @code{tty}, is the submodule for parse or, primarly, create images
+printable in the Linux virtual terminal.
+
+@opindex @option{fullcolour}
+@opindex @option{colourful}
+@cindex 24-bit colour support
+@cindex colour support, 24 bits
+@cindex VT switching
+@cindex switching VT
+@code{linux} will use XTerm's the well defined colours with the indices 16 through 255
+(inclusive.), use the option @option{--fullcolour} with a value starting with @code{y}
+or @code{Y}, to support any colour. By default ony the colour indices 7 (white) and 15
+(bright white) will be used and modified, if you want 16 colour indices to be used,
+use the @option{--colourful} with a value starting with @code{y} or @code{Y}.
+
+@opindex @option{palette}
+@cindex palette, custom
+@cindex custom palette
+@cindex @option{colourful}
+You can specify which palette you want to use by adding it as the value of the option
+@option{--palette}, the value does not need to contain the characters ESC, @code{[} and
+@code{P}. It is recommand no to use @option{--colourful} unless this option is used.
+
+
+@opindex @option{chroma}
+@cindex colour matching
+@cindex colour distance
+@cindex matching, colour
+@cindex distance, colour
+@cindex CIELAB
+@cindex sRGB
+@cindex standard RGB
+@cindex RGB, standard RGB
+The select which colour index to use, as it is limited, the best colour is choosen
+by selecting the first enumerated colour with minimal distance. By default the
+distances aer calculated as CIELAB distances. If you want to make the chroma more
+important than distance, you can specify a non-negative floating value in the
+option @option{--chroma}, which as the 1 as its default value. If you prefer
+sRGB distances, you can use an invalid value for @option{--chroma}, for example,
+@code{-}.
+
+
+@node Haiku submodule
+@subsection Haiku submodule
+@cindex @code{haiku}, platform
+@cindex platform, @code{haiku}
+@cindex system, @code{haiku}
+
+The @code{haiku} submodule works as the @code{xterm} submodule, but does not
+support @code{linux} import. The difference between @code{haiku} and @code{xterm}
+files is that transparency/default is encoded in conflicting escape sequences.
+
+@code{haiku} uses @code{CSI 40m} instead of @code{CSI 49m} for transparent
+backgrounds, and @code{CSI 37m} instead of @code{CSI 39m} for default
+foreground colour. More precisly, colour index 0 is used for the background
+colour instead of black, and colour index 7 is used for the foreground colour,
+while @code{CSI 49m} and @code{CSI 39m} is not recognised.
+
+
+
 @node Unisay module
 @section @code{unisay} module
 @cindex @code{unisay} module
