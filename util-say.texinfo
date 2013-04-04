@@ -163,6 +163,7 @@ Supported modules are @code{ponysay}, @code{unisay}, @code{cowsay} and
 * Ponysay module::                      Using the @code{ponysay} module.
 * Unisay module::                       Using the @code{unisay} module.
 * Cowsay module::                       Using the @code{cowsay} module.
+* Cat module::                          Using the @code{cat} module.
 * Image module::                        Using the @code{image} module.
 @end menu
 
@@ -466,6 +467,20 @@ The @code{cowsay} module is an extension of the @code{ponysay} with
 @option{--version}. It can construct images usable with @code{cowsay}.
 For import you will need @command{perl} installed as it is used to
 parse the cow file, which is a partial @command{perl} script.
+
+
+@node Cat module
+@section @code{cat} module
+@cindex @code{cat} module
+@cindex module, @code{cat}
+
+The @code{cat} module is identical to @code{ponysay} with
+@option{--version=2.8 --balloon=- --ignoreballoon=y --ignorelink=y}.
+It is designed to create pure images that are displayable by just
+printing them to the terminal as is, for example with @command{cat}.
+However the purity will be disrupted if the image contains stores
+and recalls, which they does not do as it is not intended for
+cross-format use.
 
 
 @node Image module
