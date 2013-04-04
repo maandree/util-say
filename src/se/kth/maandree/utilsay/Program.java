@@ -114,6 +114,7 @@ public class Program
 	if      (intype == "ponysay")  pony = (new Ponysay(inparams)).importPony();
 	else if (intype == "unisay")   pony = (new Unisay (inparams)).importPony();
 	else if (intype == "cowsay")   pony = (new Cowsay (inparams)).importPony();
+	else if (intype == "cat")      pony = (new Cat    (inparams)).importPony();
 	else if (intype == "image")    pony = (new Image  (inparams)).importPony();
 	else if (intype == "test")     pony = (new Test   (inparams)).importPony();
 	//TODO add warning
@@ -125,6 +126,7 @@ public class Program
 	    if      (outtype == "ponysay")  (new Ponysay(params)).exportPony(pony);
 	    else if (outtype == "unisay")   (new Unisay (params)).exportPony(pony);
 	    else if (outtype == "cowsay")   (new Cowsay (params)).exportPony(pony);
+	    else if (outtype == "cat")      (new Cat    (params)).exportPony(pony);
 	    else if (outtype == "image")    (new Image  (params)).exportPony(pony);
 	    else if (outtype == "test")     (new Test   (params)).exportPony(pony);
 	    //TODO add warning
