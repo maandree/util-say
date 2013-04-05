@@ -1,6 +1,6 @@
 # Maintainer: Mattias Andrée <`base64 -d`(bWFhbmRyZWUK)@member.fsf.org>
 pkgname=util-say
-pkgver=3.1
+pkgver=3.2
 pkgrel=1
 pkgdesc="Tools for creating ponies for cowsay and cowsay-like programs"
 arch=('any')
@@ -12,7 +12,7 @@ optdepends=('imagemagick: allows imgsrcrecovery to read frames in GIF files' 'pe
 provides=('util-say')
 conflicts=('util-say')
 source=(https://github.com/maandree/util-say/tarball/$pkgver)
-md5sums=(38845d19ea3d5741ddcc40dbf7f23611)
+md5sums=(188b5d178bc2c3dc01ad870f433ce110)
 
 build() {
   cd maandree-util-say-*
