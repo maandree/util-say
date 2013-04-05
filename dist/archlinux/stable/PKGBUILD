@@ -1,6 +1,6 @@
 # Maintainer: Mattias Andrée <`base64 -d`(bWFhbmRyZWUK)@member.fsf.org>
 pkgname=util-say
-pkgver=3.0
+pkgver=3.1
 pkgrel=1
 pkgdesc="Tools for creating ponies for cowsay and cowsay-like programs"
 arch=('any')
