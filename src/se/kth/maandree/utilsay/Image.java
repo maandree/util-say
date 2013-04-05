@@ -116,7 +116,7 @@ public class Image
 	
 	Pony.Cell cell;
 	Pony pony = new Pony((height >> 1) + (height & 1), width, null, null);
-	for (int y = 0; y < height - 1; y += 2)
+	for (int y = 0; y < height; y += 2)
 	    for (int x = 0; x < width; x++)
 	    {
 		int a = 0, r = 0, g = 0, b = 0;
@@ -192,6 +192,8 @@ public class Image
 	if (this.balloon)
 	    Common.insertBalloon(pony, this.top);
 	
+	pony.height = pony.matrix.length;
+	pony.width = pony.height == 0 ? 0 : pony.matrix[0].length;
 	return pony;
     }
     
@@ -205,12 +207,13 @@ public class Image
      */
     public void exportPony(Pony pony) throws IOException
     {
-	BufferedImage img = new BufferedImage(pony.width * this.magnified, (pony.height << 1) * this.magnified, BufferedImage.TYPE_INT_ARGB);
+	Common.changeMargins(pony, this.left, this.right, this.top, this.bottom);
+	int h = Math.max(1, pony.matrix.length);
+	int w = h == 0 ? 1 : Math.max(1, pony.matrix[0].length);
+	
+	BufferedImage img = new BufferedImage(w * this.magnified, (h << 1) * this.magnified, BufferedImage.TYPE_INT_ARGB);
 	Color TRANSPARENT = new Color(0, 0, 0, 0);
 	
-	Common.changeMargins(pony, this.left, this.right, this.top, this.bottom);
-	
-	int h = pony.height, w = pony.width;
 	for (int y = 0; y < h; y++)
 	{   Pony.Cell[] row = pony.matrix[y];
 	    Pony.Meta[][] metarow = pony.metamatrix[y];

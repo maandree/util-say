@@ -113,6 +113,9 @@ public class Common
      */
     public static int[] changeMargins(Pony pony, int left, int right, int top, int bottom)
     {
+	/*if ((bottom >= 0) && (top >= 0))
+	    bottom += top;*/
+	
 	Pony.Cell[][] matrix = pony.matrix;
 	Pony.Meta[][][] metamatrix = pony.metamatrix;
 	
@@ -233,7 +236,7 @@ public class Common
 	{
 	    int cur = 0, m = Math.min(matrix[0].length + right, matrix[0].length);
 	    outer:
-	    for (int n = matrix.length - 1 + top; cur <= n; cur++)
+	    for (int n = matrix.length - 1/* + top*/; cur <= n; cur++)
 		if (n - cur < matrix.length)
 		{   Pony.Cell[] row = matrix[n - cur];
 		    Pony.Meta[][] metarow = metamatrix[n - cur];

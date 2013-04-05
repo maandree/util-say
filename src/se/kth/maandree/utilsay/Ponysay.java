@@ -476,6 +476,8 @@ public class Ponysay
 	if (this.balloon >= 0)
 	    Common.insertBalloon(pony, this.balloon);
 	
+	pony.height = pony.matrix.length;
+	pony.width = pony.height == 0 ? 0 : pony.matrix[0].length;
 	return pony;
     }
     
@@ -652,8 +654,6 @@ public class Ponysay
 			}
 	        }
 	
-	if (this.bottom >= 0)
-	    this.bottom += top;
 	int[] margins = Common.changeMargins(pony, this.left, this.right, this.top, this.bottom);
 	matrix = pony.matrix;
 	metamatrix = pony.metamatrix;
