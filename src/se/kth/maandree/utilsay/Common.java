@@ -74,9 +74,9 @@ public class Common
 	    pony.height += 1 + space;
 	    y += 1 + space;
 	    if (y > x)
-		for (int i = 0, my = y + 1, mw = w + 1, h = pony.height; i < h; i++)
-		{   System.arraycopy(pony.matrix[i], 0, pony.matrix[i] = new Pony.Cell[y], 0, w);
-		    System.arraycopy(pony.metamatrix[i], 0, pony.metamatrix[i] = new Pony.Meta[my][], 0, mw);
+		for (int i = 0, mw = w + 1, h = pony.height; i < h; i++)
+		{   System.arraycopy(pony.matrix[i], 0, pony.matrix[i] = new Pony.Cell[w], 0, w);
+		    System.arraycopy(pony.metamatrix[i], 0, pony.metamatrix[i] = new Pony.Meta[mw][], 0, mw);
 		}
 	    x -= y;
 	    

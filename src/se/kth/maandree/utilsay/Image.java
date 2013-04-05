@@ -41,11 +41,11 @@ public class Image
     {
 	this.file = (flags.containsKey("file") ? (this.file = flags.get("file")).equals("-") : true) ? null : this.file;
 	this.balloon = this.encoded ? false : ((flags.containsKey("balloon") == false) || flags.get("balloon").toLowerCase().startsWith("y"));
-	this.left = (flags.containsKey("left") == false) ? -1 : Common.parseInteger(flags.get("left"));
-	this.right = (flags.containsKey("right") == false) ? -1 : Common.parseInteger(flags.get("right"));
-	this.top = (flags.containsKey("top") == false) ? (this.balloon ? 3 : -1) : Common.parseInteger(flags.get("top"));
-	this.bottom = (flags.containsKey("bottom") == false) ? -1 : Common.parseInteger(flags.get("bottom"));
-	this.magnified = (flags.containsKey("magnified") == false) ? 2 : Common.parseInteger(flags.get("magnified"));
+	this.left = (flags.containsKey("left") == false) ? -1 : Common.parseInteger(flags.get("left"), 3);
+	this.right = (flags.containsKey("right") == false) ? -1 : Common.parseInteger(flags.get("right"), 0);
+	this.top = (flags.containsKey("top") == false) ? (this.balloon ? 3 : -1) : Common.parseInteger(flags.get("top"), this.balloon ? 3 : 0);
+	this.bottom = (flags.containsKey("bottom") == false) ? -1 : Common.parseInteger(flags.get("bottom"), 1);
+	this.magnified = (flags.containsKey("magnified") == false) ? 2 : Common.parseInteger(flags.get("magnified"), 2);
 	this.encoded = flags.containsKey("encoded") && flags.get("encoded").toLowerCase().startsWith("y");
 	this.format = flags.containsKey("format") ? flags.get("format") : null;
     }

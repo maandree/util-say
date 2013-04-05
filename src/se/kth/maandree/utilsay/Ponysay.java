@@ -71,11 +71,11 @@ public class Ponysay
 	this.zebra = flags.containsKey("zebra") && flags.get("zebra").toLowerCase().startsWith("y");
 	this.version = flags.containsKey("version") ? parseVersion(flags.get("version")) : VERSION_HORIZONTAL_JUSTIFICATION;
 	this.utf8 = this.version > VERSION_COWSAY ? true : (flags.containsKey("utf8") && flags.get("utf8").toLowerCase().startsWith("y"));
-	this.balloon = (flags.containsKey("balloon") == false) ? -1 : Common.parseInteger(flags.get("balloon"));
-	this.left = (flags.containsKey("left") == false) ? 2 : Common.parseInteger(flags.get("left"));
-	this.right = (flags.containsKey("right") == false) ? 0 : Common.parseInteger(flags.get("right"));
-	this.top = (flags.containsKey("top") == false) ? 0 : Common.parseInteger(flags.get("top"));
-	this.bottom = (flags.containsKey("bottom") == false) ? 1 : Common.parseInteger(flags.get("bottom"));
+	this.balloon = (flags.containsKey("balloon") == false) ? -1 : Common.parseInteger(flags.get("balloon"), 3);
+	this.left = (flags.containsKey("left") == false) ? 2 : Common.parseInteger(flags.get("left"), 2);
+	this.right = (flags.containsKey("right") == false) ? 0 : Common.parseInteger(flags.get("right"), 0);
+	this.top = (flags.containsKey("top") == false) ? 0 : Common.parseInteger(flags.get("top"), 0);
+	this.bottom = (flags.containsKey("bottom") == false) ? 1 : Common.parseInteger(flags.get("bottom"), 0);
 	this.ignoreballoon = flags.containsKey("ignoreballoon") && flags.get("ignoreballoon").toLowerCase().startsWith("y");
 	this.ignorelink = flags.containsKey("ignorelink") ? flags.get("ignorelink").toLowerCase().startsWith("y") : this.ignoreballoon;
 	this.escesc = this.version > VERSION_COWSAY ? false : (flags.containsKey("escesc") && flags.get("escesc").toLowerCase().startsWith("y"));
@@ -584,11 +584,6 @@ public class Ponysay
      */
     public void exportPony(Pony pony) throws IOException
     {
-	if (this.balloon >= 0)
-	{   pony = (Pony)(pony.clone());
-	    Common.insertBalloon(pony, this.balloon);
-	}
-	
 	Color[] colours = new Color[256];
 	boolean[] format = new boolean[9];
 	Color background = null, foreground = null;
@@ -705,6 +700,25 @@ public class Ponysay
 	}
 	
 	
+	if (this.balloon >= 0)
+	{   int _h = pony.height;
+	    int _w = pony.width;
+	    Pony.Cell[][] _m = pony.matrix;
+	    Pony.Meta[][][] _mm = pony.metamatrix;
+	    pony.height = matrix.length;
+	    pony.width = matrix[0].length;
+	    pony.matrix = matrix;
+	    pony.metamatrix = metamatrix;
+	    Common.insertBalloon(pony, this.balloon);
+	    matrix = pony.matrix;
+	    metamatrix = pony.metamatrix;
+	    pony.height = _h;
+	    pony.width = _w;
+	    pony.matrix = _m;
+	    pony.metamatrix = _mm;
+	}
+	
+	
 	int[] endings = null;
 	if (this.even == false)
 	{
@@ -738,6 +752,7 @@ public class Ponysay
 		endings[y] = w - cur;
 	    }
 	}
+	
 	
 	Pony.Cell defaultcell = new Pony.Cell(Pony.Cell.PIXELS, null, null, PLAIN);
 	for (int y = this.top, h = matrix.length - this.bottom; y < h; y++)
@@ -937,7 +952,6 @@ public class Ponysay
 	
 	
 	String data = databuf.toString();
-	
 	
 	if (this.version == VERSION_COWSAY)
 	{
