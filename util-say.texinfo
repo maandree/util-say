@@ -276,6 +276,8 @@ Fix the number emptying columns at the left side of the pony, if the value
 cannot be parsed as a non-negative integer, for example @code{-}, the margin
 will not be modified from the original image. This options is import
 supported in @option{--export}.
+Use a value starting with a @code{y} or @code{Y} make the program use a
+default value.
 
 @item @option{--right} (export)
 @opindex @option{right}
@@ -285,6 +287,9 @@ cannot be parsed as a non-negative integer, for example @code{-}, the margin
 will not be modified from the original image. This options is import
 supported in @option{--export}.
 
+Use a value starting with a @code{y} or @code{Y} make the program use a
+default value.
+
 @item @option{--top} (export)
 @opindex @option{top}
 @cindex margins
@@ -292,6 +297,9 @@ Fix the number emptying lines at the top of the pony, if the value cannot
 be parsed as a non-negative integer, for example @code{-}, the margin will
 not be modified from the original image. This options is import supported
 in @option{--export}.
+
+Use a value starting with a @code{y} or @code{Y} make the program use a
+default value.
 
 @item @option{--bottom} (export)
 @opindex @option{bottom}
@@ -301,11 +309,15 @@ be parsed as a non-negative integer, for example @code{-}, the margin will
 not be modified from the original image. This options is import supported
 in @option{--export}.
 
+Use a value starting with a @code{y} or @code{Y} make the program use a
+default value.
+
 @item @option{--balloon} (export/import)
 @opindex @option{balloon}
 @cindex balloon, insert
 This specifies whether to insert a balloon and its link at the top left of
-the image. Use a value starting with a @code{y} or @code{Y} to enable this.
+the image. Specift the number of lines between the balloon and the pony or
+a value starting with a @code{y} or @code{Y} for a default value.
 
 @item @option{--platform} (export/import)
 @opindex @option{platform}
@@ -501,6 +513,9 @@ cannot be parsed as a non-negative integer, for example @code{-}, the margin
 will not be modified from the original image. This options is import supported
 in @option{--export}.
 
+Use a value starting with a @code{y} or @code{Y} make the program use a
+default value.
+
 @item @option{--right} (export)
 @opindex @option{right}
 @cindex margins
@@ -508,6 +523,9 @@ Fix the number emptying columns at the right side of the pony, if the value
 cannot be parsed as a non-negative integer, for example @code{-}, the margin
 will not be modified from the original image. This options is import supported
 in @option{--export}.
+
+Use a value starting with a @code{y} or @code{Y} make the program use a
+default value.
 
 @item @option{--top} (export/import)
 @opindex @option{top}
@@ -518,6 +536,9 @@ not be modified from the original image. However, in @option{--import}
 this value must be a non-negative integer, and is the number of additional
 lines between the pony and the balloon. Defaults to 3 in @option{--import}.
 
+Use a value starting with a @code{y} or @code{Y} make the program use a
+default value.
+
 @item @option{--bottom} (export)
 @opindex @option{bottom}
 @cindex margins
@@ -525,6 +546,9 @@ Fix the number emptying lines at the bottom of the pony, if the value cannot
 be parsed as a non-negative integer, for example @code{-}, the margin will
 not be modified from the original image. This options is import supported
 in @option{--export}.
+
+Use a value starting with a @code{y} or @code{Y} make the program use a
+default value.
 
 @item @option{--magnified} (export/import)
 @opindex @option{magnified}
@@ -537,6 +561,9 @@ pixel in the pony be @math{M} by @math{M} pixels if the value is @math{M}.
 In @option{--import} it means that the imported image has that magnification
 and the avarage pixel value will be used for the created pony. The value
 must be a positive integer.
+
+Use a value starting with a @code{y} or @code{Y} make the program use a
+default value.
 
 @item @option{--encoded} (export/import)
 @opindex @option{encoded}

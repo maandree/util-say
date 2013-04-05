@@ -74,7 +74,7 @@ public class Common
 	    pony.height += 1 + space;
 	    y += 1 + space;
 	    if (y > x)
-		for (int i = 0, my = y + 1, mw = w + 1, h = pony.height; i <= h; i++)
+		for (int i = 0, my = y + 1, mw = w + 1, h = pony.height; i < h; i++)
 		{   System.arraycopy(pony.matrix[i], 0, pony.matrix[i] = new Pony.Cell[y], 0, w);
 		    System.arraycopy(pony.metamatrix[i], 0, pony.metamatrix[i] = new Pony.Meta[my][], 0, mw);
 		}
@@ -380,6 +380,25 @@ public class Common
     }
     
     /**
+     * Parse double value
+     * 
+     * @param   value         String representation
+     * @param   defaultValue  Default value that will be used if that string starts with a ‘y’ or ‘Y’
+     * @return                Raw representation, -1 if not a number
+     */
+    public static double parseDouble(String value, double defaultValue)
+    {
+	if (value.startsWith("y") || value.startsWith("Y"))
+	    return defaultValue;
+	try
+	{   return Double.parseDouble(value);
+	}
+	catch (Throwable err)
+	{   return -1.0;
+	}
+    }
+    
+    /**
      * Parse integer value
      * 
      * @param   value  String representation
@@ -387,6 +406,25 @@ public class Common
      */
     public static int parseInteger(String value)
     {
+	try
+	{   return Integer.parseInt(value);
+	}
+	catch (Throwable err)
+	{   return -1;
+	}
+    }
+    
+    /**
+     * Parse integer value
+     * 
+     * @param   value         String representation
+     * @param   defaultValue  Default value that will be used if that string starts with a ‘y’ or ‘Y’
+     * @return                Raw representation, -1 if not an integer
+     */
+    public static int parseInteger(String value, int defaultValue)
+    {
+	if (value.startsWith("y") || value.startsWith("Y"))
+	    return defaultValue;
 	try
 	{   return Integer.parseInt(value);
 	}
