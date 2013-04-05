@@ -19,7 +19,7 @@ for arg in "$@"; do
 	magnified=2
     elif [ "$arg" = "-c" ]; then
 	c=1
-    elif [ "$arg" = "-p"]; then
+    elif [ "$arg" = "-p" ]; then
 	platform=linux
     else
 	file="$arg"
