@@ -12,7 +12,7 @@ optdepends=('imagemagick: allows imgsrcrecovery to read frames in GIF files' 'pe
 provides=('util-say')
 conflicts=('util-say')
 source=(https://github.com/maandree/util-say/tarball/$pkgver)
-md5sums=(c2e08988c195755e7c8c6385111373d7)
+md5sums=(38845d19ea3d5741ddcc40dbf7f23611)
 
 build() {
   cd maandree-util-say-*
