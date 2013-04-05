@@ -505,24 +505,22 @@ such as Portable Network Graphics (PNG) files. The module suports the
 following options.
 
 @table @asis
-@item @option{--left} (export)
+@item @option{--left} (export/import)
 @opindex @option{left}
 @cindex margins
 Fix the number emptying columns at the left side of the pony, if the value
 cannot be parsed as a non-negative integer, for example @code{-}, the margin
-will not be modified from the original image. This options is import supported
-in @option{--export}.
+will not be modified from the original image.
 
 Use a value starting with a @code{y} or @code{Y} make the program use a
 default value.
 
-@item @option{--right} (export)
+@item @option{--right} (export/import)
 @opindex @option{right}
 @cindex margins
 Fix the number emptying columns at the right side of the pony, if the value
 cannot be parsed as a non-negative integer, for example @code{-}, the margin
-will not be modified from the original image. This options is import supported
-in @option{--export}.
+will not be modified from the original image.
 
 Use a value starting with a @code{y} or @code{Y} make the program use a
 default value.
@@ -539,13 +537,12 @@ lines between the pony and the balloon. Defaults to 3 in @option{--import}.
 Use a value starting with a @code{y} or @code{Y} make the program use a
 default value.
 
-@item @option{--bottom} (export)
+@item @option{--bottom} (export/import)
 @opindex @option{bottom}
 @cindex margins
 Fix the number emptying lines at the bottom of the pony, if the value cannot
 be parsed as a non-negative integer, for example @code{-}, the margin will
-not be modified from the original image. This options is import supported
-in @option{--export}.
+not be modified from the original image.
 
 Use a value starting with a @code{y} or @code{Y} make the program use a
 default value.

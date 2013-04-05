@@ -71,11 +71,11 @@ public class Ponysay
 	this.zebra = flags.containsKey("zebra") && flags.get("zebra").toLowerCase().startsWith("y");
 	this.version = flags.containsKey("version") ? parseVersion(flags.get("version")) : VERSION_HORIZONTAL_JUSTIFICATION;
 	this.utf8 = this.version > VERSION_COWSAY ? true : (flags.containsKey("utf8") && flags.get("utf8").toLowerCase().startsWith("y"));
-	this.balloon = (flags.containsKey("balloon") == false) ? -1 : Common.parseInteger(flags.get("balloon"), 3);
-	this.left = (flags.containsKey("left") == false) ? 2 : Common.parseInteger(flags.get("left"), 2);
+	this.balloon = (flags.containsKey("balloon") == false) ? -1 : Common.parseInteger(flags.get("balloon"), 2);
+	this.left = (flags.containsKey("left") == false) ? 3 : Common.parseInteger(flags.get("left"), 3);
 	this.right = (flags.containsKey("right") == false) ? 0 : Common.parseInteger(flags.get("right"), 0);
-	this.top = (flags.containsKey("top") == false) ? 0 : Common.parseInteger(flags.get("top"), 0);
-	this.bottom = (flags.containsKey("bottom") == false) ? 1 : Common.parseInteger(flags.get("bottom"), 0);
+	this.top = (flags.containsKey("top") == false) ? 1 : Common.parseInteger(flags.get("top"), 1);
+	this.bottom = (flags.containsKey("bottom") == false) ? 1 : Common.parseInteger(flags.get("bottom"), 1);
 	this.ignoreballoon = flags.containsKey("ignoreballoon") && flags.get("ignoreballoon").toLowerCase().startsWith("y");
 	this.ignorelink = flags.containsKey("ignorelink") ? flags.get("ignorelink").toLowerCase().startsWith("y") : this.ignoreballoon;
 	this.escesc = this.version > VERSION_COWSAY ? false : (flags.containsKey("escesc") && flags.get("escesc").toLowerCase().startsWith("y"));
@@ -652,6 +652,8 @@ public class Ponysay
 			}
 	        }
 	
+	if (this.bottom >= 0)
+	    this.bottom += top;
 	int[] margins = Common.changeMargins(pony, this.left, this.right, this.top, this.bottom);
 	matrix = pony.matrix;
 	metamatrix = pony.metamatrix;

@@ -79,6 +79,8 @@ public class Common
 		    System.arraycopy(pony.metamatrix[i], 0, pony.metamatrix[i] = new Pony.Meta[mw][], 0, mw);
 		}
 	    x -= y;
+	    if (x < -1)
+		x = -1;
 	    
 	    for (int i = 1; i < y; i++)
 		pony.matrix[i][x + i] = new Pony.Cell(Pony.Cell.NNW_SSE, null, null, null);
