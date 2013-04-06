@@ -5,8 +5,8 @@ DATA=/share
 JAR=jar
 JAVAC=javac
 
-SRC=$(shell find src/ | grep '\.java')
-OBJ=$(shell find src/ | grep '\.java' | sed -e 's_/[a-zA-Z]*\.java$$_/\*\.class_g' -e 's_^src/__g' | sort | uniq)
+SRC=$(shell find src/ | grep '\.java$$')
+OBJ=$(shell find src/ | grep '\.java$$' | sed -e 's_/[a-zA-Z]*\.java$$_/\*\.class_g' -e 's_^src/__g' | sort | uniq)
 
 all: util-say.jar info
 
