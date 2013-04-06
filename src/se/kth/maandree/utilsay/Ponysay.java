@@ -265,8 +265,8 @@ public class Ponysay
 		block: {
 		    if (istag)
 		    {	istag = false;
-			name = line.substring(0, colon);
-			value = line.substring(colon + 1);
+			name = line.substring(0, colon).replace('\t', ' ');
+			value = line.substring(colon + 1).replace('\t', ' ');
 			char c;
 			for (int i = 0, n = name.length(); i < n; i++)
 			    if ((c = name.charAt(i)) != ' ')
