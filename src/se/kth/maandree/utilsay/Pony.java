@@ -135,6 +135,11 @@ public class Pony
 	 */
 	public static final int NNW_SSE = -3;
 	
+	/**
+	 * Cross link
+	 */
+	public static final int CROSS = -4;
+	
 	
 	
 	/**

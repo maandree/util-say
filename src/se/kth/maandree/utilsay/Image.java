@@ -160,6 +160,8 @@ public class Image
 				pony.matrix[y][x] = new Pony.Cell(Pony.Cell.NNW_SSE, null, null, null);
 			    else if ((r == 0) && (g == 0) && (b == 255))
 				pony.matrix[y][x] = new Pony.Cell(Pony.Cell.NNE_SSW, null, null, null);
+			    else if ((r == 255) && (g == 0) && (b == 255))
+				pony.matrix[y][x] = new Pony.Cell(Pony.Cell.CROSS, null, null, null);
 			    else if ((r == 0) && (g == 255) && (b == 0))
 			    {
 				int bw = x, _x = x;
@@ -293,6 +295,8 @@ public class Image
 			    upper = lower = this.encoded ? new Color(255, 0, 0, 100) : TRANSPARENT;
 			else if (cell.character == Pony.Cell.NNE_SSW)
 			    upper = lower = this.encoded ? new Color(0, 0, 255, 100) : TRANSPARENT;
+			else if (cell.character == Pony.Cell.CROSS)
+			    upper = lower = this.encoded ? new Color(255, 0, 255, 100) : TRANSPARENT;
 			else
 			{   if (!whitespace)
 				System.err.println("\033[01;31mutil-say: warning: cannot include text in images\033[00m");
