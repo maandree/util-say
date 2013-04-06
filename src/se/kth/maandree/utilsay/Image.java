@@ -160,6 +160,28 @@ public class Image
 				pony.matrix[y][x] = new Pony.Cell(Pony.Cell.NNW_SSE, null, null, null);
 			    else if ((r == 0) && (g == 0) && (b == 255))
 				pony.matrix[y][x] = new Pony.Cell(Pony.Cell.NNE_SSW, null, null, null);
+			    else if ((r == 0) && (g == 255) && (b == 0))
+			    {
+				int bw = x, _x = x;
+				for (x++; x < width; x++)
+				{   a = r = g = b = 0;
+				    for (int yy = 0; yy < this.magnified; yy++)
+					for (int xx = 0; xx < this.magnified; xx++)
+					{   int argb = image.getRGB(x * this.magnified + xx, y * this.magnified + yy);
+					    a += (argb >> 24) & 255;
+					    r += (argb >> 16) & 255;
+					    g += (argb >>  8) & 255;
+					    b +=  argb        & 255;
+					}
+				    if ((a != 100) || (r != 0) || (g != 255) || (b != 0))
+					break;
+				}
+				bw = x-- - bw;
+				pony.matrix[y][_x] = null;
+				pony.metamatrix[y][_x] = new Pony.Meta[] { new Pony.Balloon(
+						         null, null, new Integer(bw), null,
+							 null, null, Pony.Balloon.NONE) };
+			    }
 			    break;
 			    
 		        case 99:
