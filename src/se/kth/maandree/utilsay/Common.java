@@ -45,13 +45,14 @@ public class Common
      */
     public static void insertBalloon(Pony pony, int space)
     {
-	int y = 0, x = 0, w = pony.width;
+	int y = 0, x = 0, h = pony.matrix.length;
 	outer:
-	    for (int h = pony.height; y <= h; y++)
+	    for (; y <= h; y++)
 	    {   if (y == h)
 		{   y = x = -1;
 		    break;
 		}
+		int w = pony.matrix[y].length;
 		for (x = 0; x < w; x++)
 		{   Pony.Cell cell = pony.matrix[y][x];
 		    int character = cell == null ? ' ' : cell.character;
@@ -65,18 +66,20 @@ public class Common
 	    }   }
 	
 	if (y >= 0)
-	{   System.arraycopy(pony.matrix, 0, pony.matrix = new Pony.Cell[pony.height + 1 + space][], 1 + space, pony.height);
-	    System.arraycopy(pony.metamatrix, 0, pony.metamatrix = new Pony.Meta[pony.height + 1 + space][][], 1 + space, pony.height);
+	{   System.arraycopy(pony.matrix, 0, pony.matrix = new Pony.Cell[h + 1 + space][], 1 + space, h);
+	    System.arraycopy(pony.metamatrix, 0, pony.metamatrix = new Pony.Meta[h + 1 + space][][], 1 + space, h);
+	    int w = pony.matrix[1 + space].length;
 	    for (int i = 0, mw = w + 1; i <= space; i++)
 	    {   pony.matrix[i] = new Pony.Cell[w];
 		pony.metamatrix[i] = new Pony.Meta[mw][];
 	    }
-	    pony.height += 1 + space;
+	    pony.height = h += 1 + space;
 	    y += 1 + space;
 	    if (y > x)
-		for (int i = 0, mw = w + 1, h = pony.height; i < h; i++)
-		{   System.arraycopy(pony.matrix[i], 0, pony.matrix[i] = new Pony.Cell[w], 0, w);
-		    System.arraycopy(pony.metamatrix[i], 0, pony.metamatrix[i] = new Pony.Meta[mw][], 0, mw);
+		for (int i = 0; i < h; i++)
+		{   w = pony.matrix[i].length;
+		    System.arraycopy(pony.matrix[i], 0, pony.matrix[i] = new Pony.Cell[w], 0, w);
+		    System.arraycopy(pony.metamatrix[i], 0, pony.metamatrix[i] = new Pony.Meta[w + 1][], 0, w + 1);
 		}
 	    x -= y;
 	    if (x < -1)
@@ -85,7 +88,7 @@ public class Common
 	    for (int i = 1; i < y; i++)
 		pony.matrix[i][x + i] = new Pony.Cell(Pony.Cell.NNW_SSE, null, null, null);
 	}
-	else if ((pony.height == 0) || (w == 0))
+	else if ((h == 0) || (pony.matrix[0].length == 0))
 	{   pony.height = pony.width = 1;
 	    pony.matrix = new Pony.Cell[1][1];
 	    pony.metamatrix = new Pony.Meta[1][1][];
