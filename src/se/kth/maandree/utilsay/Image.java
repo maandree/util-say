@@ -53,6 +53,23 @@ public class Image
     
     
     /**
+     * Scan for image format plugins the first time the class is accessed
+     */
+    static
+    {
+	try
+	{
+	    ImageIO.scanForPlugins();
+	}
+	catch (final Throwable ignore)
+	{
+	    // just ignore
+	}
+    }
+    
+    
+    
+    /**
      * Input/output option: pony file
      */
     protected String file;
@@ -109,7 +126,19 @@ public class Image
      */
     public Pony importPony() throws IOException
     {
-	BufferedImage image = ImageIO.read(new BufferedInputStream(this.file == null ? System.in : new FileInputStream(this.file)));
+	BufferedInputStream instream = new BufferedInputStream(this.file == null ? System.in : new FileInputStream(this.file));
+	instream.mark(4);
+	int pnm = 0;
+	if (instream.read() == 'P')
+	{
+	    int d = instream.read();
+	    if (('1' <= d) && (d <= '6'))
+		if (instream.read() == '\n')
+		    pnm = d - '0';
+	}
+	instream.reset();
+	
+	BufferedImage image = pnm == 0 ? ImageIO.read(instream) : PNM.read(instream);
 	int width  = image.getWidth()  / this.magnified;
 	int height = image.getHeight() / this.magnified;
 	int div = this.magnified * this.magnified;
@@ -327,7 +356,27 @@ public class Image
 	    {   fmt = this.file.contains("/") ? this.file.substring(this.file.lastIndexOf("/") + 1) : this.file;
 		fmt = this.file.contains(".") ? this.file.substring(this.file.lastIndexOf(".") + 1) : "png";
 	    }
-	ImageIO.write(img, fmt, new BufferedOutputStream(this.file == null ? System.out : new FileOutputStream(this.file)));
+	
+	
+	fmt = fmt.toLowerCase();
+	int pnm = 0
+	if (fmt.equals("ppm") || fmt.equals("pnm") || fmt.equals("netpbm"))
+	    pnm = PNM.PPM_ASCII;
+	else if (fmt.equals("ppm-bin") || fmt.equals("pnm-bin") || fmt.equals("netpbm-bin"))
+	    pnm = PNM.PPM_BINARY;
+	else if (fmt.equals("pgm"))
+	    pnm = PNM.PGM_ASCII;
+	else if (fmt.equals("pgm-bin"))
+	    pnm = PNM.PGM_BINARY;
+	else if (fmt.equals("pbm"))
+	    pnm = PNM.PBM_ASCII;
+	else if (fmt.equals("pbm-bin"))
+	    pnm = PNM.PBM_BINARY;
+	
+	if (pnm == 0)
+	    ImageIO.write(img, fmt, new BufferedOutputStream(this.file == null ? System.out : new FileOutputStream(this.file)));
+	else
+	    PNM.write(img, pnm, new BufferedOutputStream(this.file == null ? System.out : new FileOutputStream(this.file)));
     }
     
 }
