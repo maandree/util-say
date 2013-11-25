@@ -183,15 +183,15 @@ default to the latest version of @command{ponysay}, if not yet stabil.
 The following version spans exists:
 
 @table @asis
-@item @bullet{} 0 <= @option{version} @math{<} 2.1
+@item @bullet{} 0 @math{<=} @option{version} @math{<} 2.1
 @cindex @command{cowsay}
 @command{cowsay} format.
-@item @bullet{} 2.1 <= @option{version} @math{<} 2.9
+@item @bullet{} 2.1 @math{<=} @option{version} @math{<} 2.9
 @cindex @command{unisay}
 @command{unisay} format.
-@item @bullet{} 2.9 <= @option{version} @math{<} 3
+@item @bullet{} 2.9 @math{<=} @option{version} @math{<} 3
 Metadata support is added.
-@item @bullet{} 3 <= @option{version}
+@item @bullet{} 3 @math{<=} @option{version}
 Horizontal balloon justification is added.
 @end table
 
