@@ -359,7 +359,7 @@ public class Image
 	
 	
 	fmt = fmt.toLowerCase();
-	int pnm = 0
+	int pnm = 0;
 	if (fmt.equals("ppm") || fmt.equals("pnm") || fmt.equals("netpbm"))
 	    pnm = PNM.PPM_ASCII;
 	else if (fmt.equals("ppm-bin") || fmt.equals("pnm-bin") || fmt.equals("netpbm-bin"))
