@@ -4,6 +4,8 @@ java-runtime>=6
 
 coreutils
 
+texinfo
+#for using the Makefile to generate "util-say.info.gz" || or if people type "make all"
 
 # OPTIONAL
 

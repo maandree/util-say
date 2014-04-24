@@ -233,7 +233,7 @@ public class PonysayLinux extends PonysaySubmodule
 	    rc.append(colourindex2fore & 7);
 	}
 	
-	boolean _ = newFormat[0];
+	boolean temp = newFormat[0];
 	newFormat[0] = (colourindex2fore == -1) ? oldFormat[0] : ((8 <= colourindex2fore) && (colourindex2fore < 16));
 	for (int i = 0; i < 9; i++)
 	    if (newFormat[i] ^ oldFormat[i])
@@ -245,7 +245,7 @@ public class PonysayLinux extends PonysaySubmodule
 		{   rc.append(";2");
 		    rc.append(i + 1);
 		}
-	newFormat[0] = _;
+	newFormat[0] = temp;
 	
 	String _rc = rc.toString();
 	if (_rc.isEmpty())
