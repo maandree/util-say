@@ -52,8 +52,8 @@ dvi.xz: util-say.dvi.xz
 install: util-say.jar util-say.info.gz
 	install -d -m 755 "$(DESTDIR)$(PREFIX)$(BIN)"
 	install -m 755 util-say.jar "$(DESTDIR)$(PREFIX)$(BIN)"
-	install -m 755 img2{pony,uni,cow}say "$(DESTDIR)$(PREFIX)$(BIN)"
-	install -m 755 {pony,uni,cow}say2img "$(DESTDIR)$(PREFIX)$(BIN)"
+	install -m 755 img2ponysay img2unisay img2cowsay "$(DESTDIR)$(PREFIX)$(BIN)"
+	install -m 755 ponysay2img unisay2img cowsay2img "$(DESTDIR)$(PREFIX)$(BIN)"
 	install -m 755 ponysay2ttyponysay "$(DESTDIR)$(PREFIX)$(BIN)"
 	ln -sf ponysay2ttyponysay "$(DESTDIR)$(PREFIX)$(BIN)"/tty2colourfultty
 	ln -sf /usr/bin/cat "$(DESTDIR)$(PREFIX)$(BIN)"/unzebra
@@ -68,8 +68,12 @@ uninstall:
 	unlink "$(DESTDIR)$(PREFIX)$(BIN)/util-say.jar"
 	unlink "$(DESTDIR)$(PREFIX)$(BIN)/ponytool"
 	unlink "$(DESTDIR)$(PREFIX)$(DATA)/info/util-say.info.gz"
-	rm -- "$(DESTDIR)$(PREFIX)$(BIN)/"img2{pony,uni,cow}say
-	rm -- "$(DESTDIR)$(PREFIX)$(BIN)/"{pony,uni,cow}say2img
+	rm -- "$(DESTDIR)$(PREFIX)$(BIN)/"img2ponysay
+	rm -- "$(DESTDIR)$(PREFIX)$(BIN)/"img2unisay
+	rm -- "$(DESTDIR)$(PREFIX)$(BIN)/"img2cowsay
+	rm -- "$(DESTDIR)$(PREFIX)$(BIN)/"ponysay2img
+	rm -- "$(DESTDIR)$(PREFIX)$(BIN)/"unisay2img
+	rm -- "$(DESTDIR)$(PREFIX)$(BIN)/"cowsay2img
 	rm -- "$(DESTDIR)$(PREFIX)$(BIN)/"ponysay2ttyponysay
 	rm -- "$(DESTDIR)$(PREFIX)$(BIN)/"tty2colourfultty
 	rm -- "$(DESTDIR)$(PREFIX)$(BIN)/"unzebra
