@@ -1,7 +1,7 @@
 /**
  * util-say — Utilities for cowsay and cowsay-like programs
  *
- * Copyright © 2012, 2013  Mattias Andrée (maandree@member.fsf.org)
+ * Copyright © 2012, 2013  Mattias Andrée (m@maandree.se)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -24,7 +24,7 @@ import java.awt.Color;
 /**
  * I'm a pony!
  * 
- * @author  Mattias Andrée, <a href="mailto:maandree@member.fsf.org">maandree@member.fsf.org</a>
+ * @author  Mattias Andrée, <a href="mailto:m@maandree.se">m@maandree.se</a>
  */
 public class Pony
 {

@@ -7,7 +7,7 @@
 
 /**
  * TWT — Terminal Window Toolkit, a free pure Java terminal toolkit.
- * Copyright (C) 2011 Mattias Andrée <maandree@member.fsf.org>
+ * Copyright (C) 2011 Mattias Andrée <m@maandree.se>
  *
  * This library is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -28,7 +28,7 @@ package se.kth.maandree.utilsay;
 /**
  * Terminal colour class
  * 
- * @author  Mattias Andrée, <a href="mailto:maandree@member.fsf.org">maandree@member.fsf.org</a>
+ * @author  Mattias Andrée, <a href="mailto:m@maandree.se">m@maandree.se</a>
  */
 public class Colour
 {

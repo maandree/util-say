@@ -1,7 +1,7 @@
 /**
  * util-say — Utilities for cowsay and cowsay-like programs
  *
- * Copyright © 2012, 2013  Mattias Andrée (maandree@member.fsf.org)
+ * Copyright © 2012, 2013  Mattias Andrée (m@maandree.se)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,7 +25,7 @@ import java.util.*;
 /**
  * Program selector for util-say
  *
- * @author  Mattias Andrée, <a href="mailto:maandree@member.fsf.org">maandree@member.fsf.org</a>
+ * @author  Mattias Andrée, <a href="mailto:m@maandree.se">m@maandree.se</a>
  */
 public class Program
 {
@@ -50,7 +50,7 @@ public class Program
     {
 	if ((args.length == 0) || ((args.length == 1) && args[0].equals("--help")))
 	{
-            System.out.println("Copyright (C) 2012, 2013  Mattias Andrée <maandree@member.fsf.org>");
+            System.out.println("Copyright (C) 2012, 2013  Mattias Andrée <m@maandree.se>");
             System.out.println();
             System.out.println("USAGE:  ponytool --import module [param*] {--export module [param*]}");
 	    System.out.println();
